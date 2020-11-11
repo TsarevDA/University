@@ -1,9 +1,5 @@
 package ru.tsar.university;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +9,19 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import ru.tsar.model.Auditorium;
-import ru.tsar.model.Course;
-import ru.tsar.model.Group;
-import ru.tsar.model.Lesson;
-import ru.tsar.model.LessonTime;
-import ru.tsar.model.Student;
-import ru.tsar.model.Teacher;
+import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Group;
+import ru.tsar.university.model.Lesson;
+import ru.tsar.university.model.LessonTime;
+import ru.tsar.university.model.Student;
+import ru.tsar.university.model.Teacher;
+import ru.tsar.university.model.Gender;
 
 public class ConsoleInterface {
-	University university;
+
+	private University university;
+	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	public ConsoleInterface(University university) {
 		this.university = university;
@@ -33,11 +32,12 @@ public class ConsoleInterface {
 		Scanner scanner = new Scanner(System.in);
 		String line = "";
 
-		while (true) {
+		while (line.equals("q")) {
 			System.out.println("for exit press 'q', for help press 'h'");
 			line = scanner.next();
 
 			if (line.equals("h")) {
+				// System.out.println(helpMenu());
 			}
 			if (line.equals("as")) {
 				addStudent();
@@ -65,22 +65,18 @@ public class ConsoleInterface {
 		}
 	}
 
-	public String testingMethod() {
-		return "test is ok";
-	}
-
 	private void addStudent() {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter student first name:");
 		String firstName = scanner.next();
 		System.out.println("Enter student last name:");
 		String lastName = scanner.next();
-		System.out.println("Enter student sex:");
-		String sex = scanner.next();
+		System.out.println("Enter student gender (male,female):");
+		String stringGender = scanner.next();
+		Gender gender = Gender.valueOf(stringGender);
 		System.out.println("Enter student birthday in format \"yyyy-MM-dd\":");
 		String birthday = scanner.next();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate date = LocalDate.parse(birthday, formatter);
+		LocalDate date = LocalDate.parse(birthday, dateFormatter);
 		System.out.println("Enter student email:");
 		String email = scanner.next();
 		System.out.println("Enter student phone:");
@@ -88,7 +84,7 @@ public class ConsoleInterface {
 		System.out.println("Enter student address:");
 		String address = scanner.next();
 
-		Student student = new Student(firstName, lastName, sex, date, email, phone, address);
+		Student student = new Student(firstName, lastName, gender, date, email, phone, address);
 		System.out.println(student);
 		university.addStudent(student);
 	}
@@ -131,12 +127,12 @@ public class ConsoleInterface {
 		String firstName = scanner.next();
 		System.out.println("Enter teacher last name:");
 		String lastName = scanner.next();
-		System.out.println("Enter student sex:");
-		String sex = scanner.next();
+		System.out.println("Enter student gender (male,female):");
+		String stringGender = scanner.next();
+		Gender gender = Gender.valueOf(stringGender);
 		System.out.println("Enter teacher birthday in format \"yyyy-MM-dd\":");
 		String birthday = scanner.next();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		LocalDate date = LocalDate.parse(birthday, formatter);
+		LocalDate date = LocalDate.parse(birthday, dateFormatter);
 		System.out.println("Enter teacher email:");
 		String email = scanner.next();
 		System.out.println("Enter teacher phone:");
@@ -149,7 +145,7 @@ public class ConsoleInterface {
 
 		List<Course> courses = university.getCourses().stream().filter(c -> coursesNames.contains(c.getName()))
 				.collect(Collectors.toList());
-		Teacher teacher = new Teacher(firstName, lastName, sex, date, email, phone, address, courses);
+		Teacher teacher = new Teacher(firstName, lastName, gender, date, email, phone, address, courses);
 		university.addTeacher(teacher);
 	}
 
@@ -213,7 +209,6 @@ public class ConsoleInterface {
 			lessonsTime.add(new LessonTime(i + 1, startTime.plusHours(i), endTime.plusHours(i)));
 		}
 		university.setLessonsTime(lessonsTime);
-
 	}
 
 	private void addLesson() {

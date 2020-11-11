@@ -1,4 +1,4 @@
-package ru.tsar.model;
+package ru.tsar.university.model;
 
 import java.time.LocalTime;
 
@@ -36,6 +36,11 @@ public class LessonTime {
 
 	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
+	}
+
+	@Override
+	public String toString() {
+		return "LessonTime [orderNumber=" + orderNumber + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
 	
 }

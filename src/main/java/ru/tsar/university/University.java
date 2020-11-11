@@ -2,24 +2,26 @@ package ru.tsar.university;
 
 import java.util.ArrayList;
 import java.util.List;
-import ru.tsar.model.Auditorium;
-import ru.tsar.model.Course;
-import ru.tsar.model.Group;
-import ru.tsar.model.Lesson;
-import ru.tsar.model.LessonTime;
-import ru.tsar.model.Student;
-import ru.tsar.model.Teacher;
+import java.util.Scanner;
+
+import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Group;
+import ru.tsar.university.model.Lesson;
+import ru.tsar.university.model.LessonTime;
+import ru.tsar.university.model.Student;
+import ru.tsar.university.model.Teacher;
 
 public class University {
-
+	
 	private List<Teacher> teachers;
 	private List<Course> courses;
 	private List<Group> groups;
 	private List<Student> students;
 	private List<Auditorium> auditoriums;
-	private List<LessonTime> lessonsTime;
 	private List<Lesson> lessons;
-
+	private List<LessonTime> lessonsTime;
+	
 	public University() {
 		this.teachers = new ArrayList<Teacher>();
 		this.courses = new ArrayList<Course>();
@@ -27,7 +29,6 @@ public class University {
 		this.students = new ArrayList<Student>();
 		this.auditoriums = new ArrayList<Auditorium>();
 	}
-
 	public University(List<Teacher> teachers, List<Course> courses, List<Group> groups, List<Student> students,
 			List<Auditorium> auditoriums) {
 		this.teachers = teachers;
@@ -44,7 +45,7 @@ public class University {
 	public void addTeacher(Teacher teacher) {
 		teachers.add(teacher);
 	}
-
+	
 	public void removeTeacher(Teacher teacher) {
 		teachers.remove(teacher);
 	}
@@ -56,7 +57,7 @@ public class University {
 	public void addCourse(Course course) {
 		courses.add(course);
 	}
-
+	
 	public void removeCourse(Course course) {
 		courses.remove(course);
 	}
@@ -68,7 +69,7 @@ public class University {
 	public void addGroup(Group group) {
 		groups.add(group);
 	}
-
+	
 	public void removeGroup(Group group) {
 		groups.remove(group);
 	}
@@ -80,7 +81,7 @@ public class University {
 	public void addStudent(Student student) {
 		students.add(student);
 	}
-
+	
 	public void removeStudent(Student student) {
 		students.remove(student);
 	}
@@ -92,29 +93,36 @@ public class University {
 	public void addAuditorium(Auditorium auditorium) {
 		auditoriums.add(auditorium);
 	}
-
+	
 	public void removeAuditorium(Auditorium auditorium) {
 		auditoriums.remove(auditorium);
 	}
-
-	public List<LessonTime> getLessonsTime() {
-		return lessonsTime;
-	}
-
-	public void addLessonsTime(LessonTime lessonTime) {
-		this.lessonsTime.add(lessonTime);
-	}
-
-	public void setLessonsTime(List<LessonTime> lessonsTime) {
-		this.lessonsTime = lessonsTime;
-	}
-
 	public List<Lesson> getLessons() {
 		return lessons;
 	}
-
 	public void addLessons(Lesson lesson) {
-		this.lessons.add(lesson);
+		lessons.add(lesson);
 	}
+	public void removeLessons(Lesson lesson) {
+		lessons.remove(lesson);
+	}
+	
+	public List<LessonTime> getLessonsTime() {
+		return lessonsTime;
+	}
+	public void addLessonsTime(LessonTime lessonTime) {
+		this.lessonsTime.add(lessonTime);
+	}
+	public void removeLessonsTime(LessonTime lessonTime) {
+		this.lessonsTime.remove(lessonTime);
+	}
+	public void setLessons(List<Lesson> lessons) {
+		this.lessons = lessons;
+	}
+	public void setLessonsTime(List<LessonTime> lessonsTime) {
+		this.lessonsTime = lessonsTime;
+	}
+	
 
+	
 }

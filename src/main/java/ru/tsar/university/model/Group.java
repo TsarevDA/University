@@ -1,4 +1,4 @@
-package ru.tsar.model;
+package ru.tsar.university.model;
 
 import java.util.List;
 

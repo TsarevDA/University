@@ -1,44 +1,41 @@
-package ru.tsar.model;
+package ru.tsar.university.model;
 
 import java.time.LocalDate;
-import java.util.List;
 
-public class Teacher {
-	
+public class Student {
+
 	private int id;
 	private String firstName;
 	private String lastName;
-	private String sex;
-	private LocalDate birthday;
+	private Gender gender;
+	private LocalDate birthDate;
 	private String email;
 	private String phone;
 	private String address;
-	private List<Course> courses;
-		
-	public Teacher( String firstName, String lastName, String sex, LocalDate birthday, String email,
-			String phone, String address, List<Course> courses) {
+
+	public Student(String firstName, String lastName, Gender gender, LocalDate birthday, String email, String phone,
+			String address) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.sex = sex;
-		this.birthday = birthday;
+		this.gender = gender;
+		this.birthDate = birthday;
 		this.email = email;
 		this.phone = phone;
 		this.address = address;
-		this.courses = courses;
 	}
-	
-	public Teacher(int id, String firstName, String lastName, String sex, LocalDate birthday, String email,
-			String phone, String address, List<Course> courses) {
+
+	public Student(int id, String firstName, String lastName, Gender gender, LocalDate birthday, String email,
+			String phone, String address) {
 		this.id = id;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.sex = sex;
-		this.birthday = birthday;
+		this.gender = gender;
+		this.birthDate = birthday;
 		this.email = email;
 		this.phone = phone;
 		this.address = address;
-		this.courses = courses;
 	}
+
 
 	public int getId() {
 		return id;
@@ -64,20 +61,20 @@ public class Teacher {
 		this.lastName = lastName;
 	}
 
-	public String getSex() {
-		return sex;
+	public Gender getGender() {
+		return gender;
 	}
 
-	public void setSex(String sex) {
-		this.sex = sex;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
-	public LocalDate getBirthday() {
-		return birthday;
+	public LocalDate getBirthDate() {
+		return birthDate;
 	}
 
-	public void setBirthday(LocalDate birthday) {
-		this.birthday = birthday;
+	public void setBirthDate(LocalDate birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public String getEmail() {
@@ -104,12 +101,10 @@ public class Teacher {
 		this.address = address;
 	}
 
-	public List<Course> getCourses() {
-		return courses;
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", sex=" + gender
+				+ ", birthday=" + birthDate + ", email=" + email + ", phone=" + phone + ", address=" + address + "]";
 	}
 
-	public void setCourses(List<Course> courses) {
-		this.courses = courses;
-	}
-	
 }

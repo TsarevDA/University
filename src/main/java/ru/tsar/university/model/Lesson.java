@@ -1,16 +1,28 @@
-package ru.tsar.model;
+package ru.tsar.university.model;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class Lesson {
 
+	private int id;
 	private Course course;
 	private Teacher teacher;
 	private List<Group> group;
 	private LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
+	
+	public Lesson(int id,Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
+			Auditorium auditorium) {
+		this.id = id;
+		this.course = course;
+		this.teacher = teacher;
+		this.group = group;
+		this.day = day;
+		this.time = time;
+		this.auditorium = auditorium;
+	}
 	
 	public Lesson(Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
 			Auditorium auditorium) {
@@ -20,6 +32,14 @@ public class Lesson {
 		this.day = day;
 		this.time = time;
 		this.auditorium = auditorium;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public Course getCourse() {

@@ -1,4 +1,4 @@
-package ru.tsar.model;
+package ru.tsar.university.model;
 
 public class Auditorium {
 
