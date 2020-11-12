@@ -21,7 +21,7 @@ import ru.tsar.university.model.Gender;
 public class ConsoleInterface {
 
 	private University university;
-	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	final private DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	public ConsoleInterface(University university) {
 		this.university = university;
@@ -32,13 +32,11 @@ public class ConsoleInterface {
 		Scanner scanner = new Scanner(System.in);
 		String line = "";
 
-		while (line.equals("q")) {
+		while (!line.equals("q")) {
+		//while (true) {
 			System.out.println("for exit press 'q', for help press 'h'");
 			line = scanner.next();
 
-			if (line.equals("h")) {
-				// System.out.println(helpMenu());
-			}
 			if (line.equals("as")) {
 				addStudent();
 			}
@@ -76,7 +74,7 @@ public class ConsoleInterface {
 		Gender gender = Gender.valueOf(stringGender);
 		System.out.println("Enter student birthday in format \"yyyy-MM-dd\":");
 		String birthday = scanner.next();
-		LocalDate date = LocalDate.parse(birthday, dateFormatter);
+		LocalDate date = LocalDate.parse(birthday, DATE_FORMATTER);
 		System.out.println("Enter student email:");
 		String email = scanner.next();
 		System.out.println("Enter student phone:");
@@ -132,7 +130,7 @@ public class ConsoleInterface {
 		Gender gender = Gender.valueOf(stringGender);
 		System.out.println("Enter teacher birthday in format \"yyyy-MM-dd\":");
 		String birthday = scanner.next();
-		LocalDate date = LocalDate.parse(birthday, dateFormatter);
+		LocalDate date = LocalDate.parse(birthday, DATE_FORMATTER);
 		System.out.println("Enter teacher email:");
 		String email = scanner.next();
 		System.out.println("Enter teacher phone:");
