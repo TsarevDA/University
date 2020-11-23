@@ -12,8 +12,8 @@ public class Lesson {
 	private LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
-	
-	public Lesson(int id,Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
+
+	public Lesson(int id, Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
 			Auditorium auditorium) {
 		this.id = id;
 		this.course = course;
@@ -23,7 +23,7 @@ public class Lesson {
 		this.time = time;
 		this.auditorium = auditorium;
 	}
-	
+
 	public Lesson(Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
 			Auditorium auditorium) {
 		this.course = course;

@@ -5,13 +5,12 @@ public class Auditorium {
 	private int id;
 	private String name;
 	private int capacity;
-	
+
 	public Auditorium(String name, int capacity) {
 		this.name = name;
 		this.capacity = capacity;
 	}
 
-	
 	public Auditorium(int id, String name, int capacity) {
 		this.id = id;
 		this.name = name;
@@ -41,5 +40,5 @@ public class Auditorium {
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
-		
+
 }

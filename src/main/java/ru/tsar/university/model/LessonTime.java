@@ -3,12 +3,12 @@ package ru.tsar.university.model;
 import java.time.LocalTime;
 
 public class LessonTime {
-	
+
 	private int id;
 	private int orderNumber;
 	private LocalTime startTime;
 	private LocalTime endTime;
-	
+
 	public LessonTime(int id, int orderNumber, LocalTime startTime, LocalTime endTime) {
 		this.id = id;
 		this.orderNumber = orderNumber;
@@ -58,5 +58,5 @@ public class LessonTime {
 	public String toString() {
 		return "LessonTime [orderNumber=" + orderNumber + ", startTime=" + startTime + ", endTime=" + endTime + "]";
 	}
-	
+
 }
