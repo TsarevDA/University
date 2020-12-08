@@ -9,15 +9,17 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
-import ru.tsar.dao.AuditoriumDao;
-import ru.tsar.dao.CourseDao;
-import ru.tsar.dao.GroupDao;
-import ru.tsar.dao.LessonDao;
-import ru.tsar.dao.LessonTimeDao;
-import ru.tsar.dao.StudentDao;
-import ru.tsar.dao.TeacherDao;
+import ru.tsar.university.dao.AuditoriumDao;
+import ru.tsar.university.dao.CourseDao;
+import ru.tsar.university.dao.GroupDao;
+import ru.tsar.university.dao.LessonDao;
+import ru.tsar.university.dao.LessonTimeDao;
+import ru.tsar.university.dao.StudentDao;
+import ru.tsar.university.dao.TeacherDao;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
@@ -27,12 +29,14 @@ import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 import ru.tsar.university.model.Gender;
 
+@Component
 public class ConsoleInterface {
 
 	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private University university;
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
 	public ConsoleInterface(University university, JdbcTemplate jdbcTemplate) {
 		this.university = university;
 		this.jdbcTemplate = jdbcTemplate;
@@ -112,7 +116,7 @@ public class ConsoleInterface {
 
 		Student student = new Student(firstName, lastName, gender, date, email, phone, address);
 		StudentDao studentDao = new StudentDao(jdbcTemplate);
-		studentDao.addStudent(student);
+		studentDao.create(student);
 
 		university.addStudent(student);
 	}
@@ -126,7 +130,7 @@ public class ConsoleInterface {
 		StudentDao studentDao = new StudentDao(jdbcTemplate);
 
 		for (Student student : studentsForRemoving) {
-			studentDao.deleteStudent(student.getId());
+			studentDao.deleteById(student.getId());
 			university.deleteStudent(student);
 		}
 	}
@@ -139,7 +143,7 @@ public class ConsoleInterface {
 		String description = scanner.next();
 		Course course = new Course(name, description);
 		CourseDao courseDao = new CourseDao(jdbcTemplate);
-		courseDao.addCourse(course);
+		courseDao.create(course);
 		university.addCourse(course);
 	}
 
@@ -152,7 +156,7 @@ public class ConsoleInterface {
 		CourseDao courseDao = new CourseDao(jdbcTemplate);
 		for (Course course : coursesForRemoving) {
 			university.deleteCourse(course);
-			courseDao.deleteCourse(course.getId());
+			courseDao.deleteById(course.getId());
 		}
 	}
 
@@ -182,7 +186,7 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		Teacher teacher = new Teacher(firstName, lastName, gender, date, email, phone, address, courses);
 		TeacherDao teacherDao = new TeacherDao(jdbcTemplate);
-		teacherDao.addTeacher(teacher);
+		teacherDao.create(teacher);
 		university.addTeacher(teacher);
 	}
 
@@ -195,7 +199,7 @@ public class ConsoleInterface {
 		TeacherDao teacherDao = new TeacherDao(jdbcTemplate);
 		for (Teacher teacher : teachersForRemoving) {
 			university.deleteTeacher(teacher);
-			teacherDao.deleteTeacher(teacher.getId());
+			teacherDao.deleteById(teacher.getId());
 		}
 	}
 
@@ -205,7 +209,7 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		Group group = new Group(name);
 		GroupDao groupDao = new GroupDao(jdbcTemplate);
-		groupDao.addGroup(group);
+		groupDao.create(group);
 		university.addGroup(group);
 	}
 
@@ -218,7 +222,7 @@ public class ConsoleInterface {
 		GroupDao groupDao = new GroupDao(jdbcTemplate);
 		for (Group group : groupsForRemoving) {
 			university.deleteGroup(group);
-			groupDao.deleteGroup(group.getId());
+			groupDao.deleteById(group.getId());
 		}
 	}
 
@@ -230,7 +234,7 @@ public class ConsoleInterface {
 		int capacity = scanner.nextInt();
 		Auditorium auditorium = new Auditorium(name, capacity);
 		AuditoriumDao auditoriumDao = new AuditoriumDao(jdbcTemplate);
-		auditoriumDao.addAuditorium(auditorium);
+		auditoriumDao.create(auditorium);
 		university.addAuditorium(auditorium);
 	}
 
@@ -244,7 +248,7 @@ public class ConsoleInterface {
 		AuditoriumDao auditoriumDao = new AuditoriumDao(jdbcTemplate);
 		for (Auditorium auditorium : auditoriumsForRemoving) {
 			university.deleteAuditorium(auditorium);
-			auditoriumDao.deleteAuditorium(auditorium.getId());
+			auditoriumDao.deleteById(auditorium.getId());
 		}
 	}
 
@@ -256,7 +260,7 @@ public class ConsoleInterface {
 			lessonsTime.add(new LessonTime(i + 1, startTime.plusHours(i), endTime.plusHours(i)));
 		}
 		LessonTimeDao lessonTimeDao = new LessonTimeDao(jdbcTemplate);
-		lessonsTime.stream().forEach(lt -> lessonTimeDao.addLessonTime(lt));
+		lessonsTime.stream().forEach(lt -> lessonTimeDao.create(lt));
 		university.setLessonsTime(lessonsTime);
 
 	}
@@ -304,7 +308,7 @@ public class ConsoleInterface {
 		Lesson lesson = new Lesson(course, teacher, groups, day, lessonTime, auditorium);
 
 		LessonDao lessonDao = new LessonDao(jdbcTemplate);
-		lessonDao.addLesson(lesson);
+		lessonDao.create(lesson);
 
 	}
 
@@ -318,7 +322,7 @@ public class ConsoleInterface {
 
 		for (Lesson lesson : lessonForRemoving) {
 			university.deleteLesson(lesson);
-			lessonDao.deleteLesson(lesson.getId());
+			lessonDao.deleteById(lesson.getId());
 		}
 
 	}

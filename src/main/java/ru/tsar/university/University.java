@@ -2,7 +2,8 @@ package ru.tsar.university;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+
+import org.springframework.stereotype.Component;
 
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
@@ -12,6 +13,7 @@ import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 
+@Component
 public class University {
 
 	private List<Teacher> teachers;

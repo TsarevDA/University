@@ -11,6 +11,10 @@
 		<maven.compiler.target>8</maven.compiler.target>
 		<junit.jupiter.version>5.4.0</junit.jupiter.version>
 		<postgresql.version>42.2.16</postgresql.version>
+		<springframework.version>2.3.5.RELEASE</springframework.version>
+		<org.springframework-jdbc.version>5.2.11.RELEASE</org.springframework-jdbc.version>
+		
+		
 	</properties>
 
 	<dependencies>
@@ -36,26 +40,26 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<version>2.3.5.RELEASE</version>
+			<version>${springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
-			<version>2.3.5.RELEASE</version>
+			<version>${springframework.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>5.2.11.RELEASE</version>
+			<version>${org.springframework-jdbc.version}</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>2.3.5.RELEASE</version>
+			<version>${springframework.version}</version>
 		</dependency>
 
 

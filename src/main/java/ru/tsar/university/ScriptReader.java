@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ScriptReader {
-	
 	public Stream<String> read(String scriptName) throws IOException {
 		if (getClass().getClassLoader().getResource(scriptName) == null) {
 			throw new IllegalArgumentException("File " + scriptName + " does not exist.");
