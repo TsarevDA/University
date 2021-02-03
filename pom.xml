@@ -7,17 +7,52 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
-		<maven.compiler.source>8</maven.compiler.source>
-		<maven.compiler.target>8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<junit.jupiter.version>5.4.0</junit.jupiter.version>
 		<postgresql.version>42.2.16</postgresql.version>
-		<springframework.version>2.3.5.RELEASE</springframework.version>
-		<org.springframework-jdbc.version>5.2.11.RELEASE</org.springframework-jdbc.version>
-		
-		
+
+		<spring-core.version>5.2.11.RELEASE</spring-core.version>
+		<spring-context.version>5.2.11.RELEASE</spring-context.version>
+		<spring-jdbc.version>5.2.11.RELEASE</spring-jdbc.version>
+		<spring-boot-starter-test.version>2.3.7.RELEASE</spring-boot-starter-test.version>
+		<spring-boot-starter-data-jpa.version>2.3.7.RELEASE</spring-boot-starter-data-jpa.version>
+
+
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgresql.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring-core.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring-context.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring-jdbc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>${spring-boot-starter-test.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
@@ -31,38 +66,13 @@
 			<version>${junit.jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>${postgresql.version}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${springframework.version}</version>
+			<version>${spring-boot-starter-test.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-			<version>${springframework.version}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-jdbc -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>${org.springframework-jdbc.version}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>${springframework.version}</version>
-		</dependency>
-
-
 
 	</dependencies>
 
@@ -103,9 +113,9 @@
 							<goal>report</goal>
 						</goals>
 						<configuration>
-							<!--Sets the path to file which contains the execution data. -->
+
 							<dataFile>target/jacoco.exec</dataFile>
-							<!-- Sets the output directory for the code coverage report. -->
+
 							<outputDirectory>target/my-reports</outputDirectory>
 						</configuration>
 					</execution>

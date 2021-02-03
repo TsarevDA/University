@@ -2,23 +2,23 @@ package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ru.tsar.university.TablesCreation;
+import ru.tsar.university.SpringConfig;
 import ru.tsar.university.model.LessonTime;
 
+@SpringJUnitConfig(classes= SpringConfig.class)
+@Sql("/schema.sql")
 class LessonTimeDaoTest {
 
 	final static private String GET_COURSES_REQUEST = "SELECT lt.* FROM lessons_time lt";
@@ -29,15 +29,7 @@ class LessonTimeDaoTest {
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private LessonTimeDao lessonTimeDao;
-
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		lessonTimeDao = context.getBean("lessonTimeDao", LessonTimeDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
+	
 
 	@Test
 	void setLessonTime_whenCreate_thenCreateLessonTime() {

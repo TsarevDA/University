@@ -2,18 +2,23 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import ru.tsar.university.mapper.CourseRowMapper;
 import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Teacher;
 
 @Component
 public class CourseDao {
-	final static private String CREATE_COURSE_QUERY = "INSERT INTO courses(course_name,description) VALUES(?,?)";
+
+	final static private String CREATE_COURSE_QUERY = "INSERT INTO courses(name,description) VALUES(?,?)";
 	final static private String DELETE_COURSE_QUERY = "DELETE FROM courses WHERE id =?";
-	final static private String GET_BY_ID_REQUEST = "SELECT c.* FROM courses c WHERE id=?";
+	final static private String GET_BY_ID_QUERY = "SELECT * FROM courses WHERE id=?";
+	final private static String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -37,10 +42,13 @@ public class CourseDao {
 	}
 
 	public Course getById(int id) {
-		Course course = jdbcTemplate.queryForObject(GET_BY_ID_REQUEST, (resultSet, rowNum) -> {
-			Course newCourse = new Course(id, resultSet.getString("course_name"), resultSet.getString("description"));
-			return newCourse;
-		}, id);
-		return course;
+		CourseRowMapper rowMapper = new CourseRowMapper();
+		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+	}
+
+	public List<Course> getCoursesByTeacher(Teacher teacher) {
+		CourseRowMapper rowMapper = new CourseRowMapper();
+		List<Course> courses = jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, teacher.getId());
+		return courses;
 	}
 }

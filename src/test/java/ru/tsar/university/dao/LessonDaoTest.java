@@ -9,14 +9,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
-import ru.tsar.university.TablesCreation;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import ru.tsar.university.SpringConfig;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
@@ -25,17 +26,16 @@ import ru.tsar.university.model.Lesson;
 import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.model.Teacher;
 
-@Component
+@SpringJUnitConfig(classes = SpringConfig.class)
+@Sql("/schema.sql")
 class LessonDaoTest {
 
-	final static private String GET_LESSON_REQUEST = "SELECT l.* FROM lessons l";
 	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM lessons WHERE id=?";
-	final static private String CREATE_LESSON_QUERY = "INSERT INTO lessons(course_id, teacher_id, day, lesson_time,auditorium) VALUES(?,?,?,?,?)";
-	final static private String GET_BY_ID_REQUEST = "SELECT l.id as lesson_id,l.day,"
-			+ "c.id as course_id,c.course_name, c.description, "
+	final static private String GET_BY_ID_QUERY = "SELECT l.id as lesson_id,l.day,"
+			+ "c.id as course_id,c.name as course_name, c.description, "
 			+ "t.id as teacher_id, t.first_name, t.last_name, t.gender, t.birth_date, t.email, t.phone, t.address, "
 			+ "lt.id as lesson_time_id, lt.order_number, lt.start_time, lt.end_time, "
-			+ "a.id as auditorium_id, a.auditorium_name,a.capacity "
+			+ "a.id as auditorium_id, a.name as auditorium_name,a.capacity "
 			+ "FROM lessons l left join courses c on l.course_id=c.id " + "left join teachers t on l.teacher_id=t.id "
 			+ "left join lessons_time lt on lt.order_number = l.lesson_time "
 			+ "left join auditoriums a on l.auditorium= a.id WHERE l.id =?";
@@ -56,20 +56,6 @@ class LessonDaoTest {
 	private LessonTimeDao lessonTimeDao;
 	@Autowired
 	private GroupDao groupDao;
-
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		lessonDao = context.getBean("lessonDao", LessonDao.class);
-		groupDao = context.getBean("groupDao", GroupDao.class);
-		auditoriumDao = context.getBean("auditoriumDao", AuditoriumDao.class);
-		courseDao = context.getBean("courseDao", CourseDao.class);
-		teacherDao = context.getBean("teacherDao", TeacherDao.class);
-		lessonTimeDao = context.getBean("lessonTimeDao", LessonTimeDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
 
 	@Test
 	void setLesson_whenCreate_thenCreateLesson() {
@@ -99,17 +85,17 @@ class LessonDaoTest {
 		lessonDao.create(expected);
 
 		List<Course> coursesForTeacher = jdbcTemplate.query(GET_TEACHER_COURSES_REQUEST, (resultSet, rowNum) -> {
-			Course newCourse = new Course(resultSet.getInt("id"), resultSet.getString("course_name"),
+			Course newCourse = new Course(resultSet.getInt("id"), resultSet.getString("name"),
 					resultSet.getString("description"));
 			return newCourse;
 		}, expected.getId());
 
 		List<Group> actualGroups = jdbcTemplate.query(GET_GROUPS_LESSONS_REQUEST, (resultSet, rowNum) -> {
-			Group newGroup = new Group(resultSet.getInt("id"), resultSet.getString("group_name"));
+			Group newGroup = new Group(resultSet.getInt("id"), resultSet.getString("name"));
 			return newGroup;
 		}, expected.getId());
 
-		Lesson actual = jdbcTemplate.queryForObject(GET_BY_ID_REQUEST, (resultSet, rowNum) -> {
+		Lesson actual = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, (resultSet, rowNum) -> {
 			Course actualCourse = new Course(resultSet.getInt("course_id"), resultSet.getString("course_name"),
 					resultSet.getString("description"));
 
@@ -198,7 +184,3 @@ class LessonDaoTest {
 	}
 
 }
-
-
-
-

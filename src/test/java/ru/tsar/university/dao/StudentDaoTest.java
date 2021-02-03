@@ -9,20 +9,28 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ru.tsar.university.TablesCreation;
+import ru.tsar.university.SpringConfig;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Student;
 
+@SpringJUnitConfig(classes = SpringConfig.class)
+@Sql("/schema.sql")
 class StudentDaoTest {
 
-	final static private String GET_STUDENT_REQUEST = "SELECT s.* FROM students s";
+	final static private String GET_STUDENT_REQUEST = "SELECT * FROM students";
 	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM students WHERE id=?";
 	final static private String CREATE_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 
@@ -30,15 +38,6 @@ class StudentDaoTest {
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private StudentDao studentDao;
-
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		studentDao = context.getBean("studentDao", StudentDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
 
 	@Test
 	void setStudent_whenCreate_thenCreateStudent() {

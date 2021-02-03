@@ -2,52 +2,56 @@ package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Component;
 
-import ru.tsar.university.TablesCreation;
-import ru.tsar.university.model.Course;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import ru.tsar.university.SpringConfig;
+import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
-@Component
+@SpringJUnitConfig(classes= SpringConfig.class)
+@Sql("/schema.sql")
 class GroupDaoTest {
 
-	final static private String GET_GROUP_REQUEST = "SELECT g.* FROM groups g";
-	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM groups WHERE id=?";
-	final static private String CREATE_GROUP_QUERY = "INSERT INTO groups(group_name) VALUES(?)";
+	final static private String GET_GROUP_QUERY = "SELECT * FROM groups";
+	final static private String GET_COUNT_BY_ID_QUERY = "select count(*) FROM groups WHERE id=?";
+	final static private String CREATE_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
+	
+	final static private String CREATE_STUDENTS_GROUPS_QUERY = "INSERT INTO groups_students(group_id,student_id) VALUES(?,?)";
+	
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private GroupDao groupDao;
+	@Autowired
+	private StudentDao studentDao;
 
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		groupDao = context.getBean("groupDao", GroupDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
+	
+	
 
 	@Test
 	void setGroup_whenCreate_thenCreateGroup() {
 		Group expected = new Group("T7-09");
 		groupDao.create(expected);
-		List<Group> groups = jdbcTemplate.query(GET_GROUP_REQUEST, (resultSet, rowNum) -> {
-			Group newGroup = new Group(resultSet.getInt("id"), resultSet.getString("group_name"));
+		List<Group> groups = jdbcTemplate.query(GET_GROUP_QUERY, (resultSet, rowNum) -> {
+			Group newGroup = new Group(resultSet.getInt("id"), resultSet.getString("name"));
 			return newGroup;
 		});
 		Group actual = groups.get(groups.size() - 1);
@@ -60,8 +64,24 @@ class GroupDaoTest {
 		groupDao.create(group);
 		groupDao.deleteById(group.getId());
 
-		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_REQUEST, Integer.class, group.getId());
+		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_QUERY, Integer.class, group.getId());
 		assertEquals(0, actual);
+	}
+	
+	@Test
+	void setGroupWithStudents_whenDeleteById_thenGroupWithStudents() {
+		Group group = new Group("T7-09");
+		groupDao.create(group);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Student student = new Student("Ivan", "Ivanov", Gender.valueOf("MALE"),
+				LocalDate.parse("1990-01-01", formatter), "mail@mail.ru", "88008080", "Ivanov street, 25-5");
+		
+		studentDao.create(student);
+		jdbcTemplate.update(CREATE_STUDENTS_GROUPS_QUERY,1,1);
+		groupDao.deleteById(group.getId());
+
+		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_QUERY, Integer.class, group.getId());
+		assertEquals(1, actual);
 	}
 
 	@Test

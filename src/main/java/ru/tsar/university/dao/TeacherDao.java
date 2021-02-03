@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import ru.tsar.university.mapper.TeacherRowMapper;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
@@ -22,8 +24,8 @@ public class TeacherDao {
 	final static private String CREATE_TEACHERS_COURSES_QUERY = "INSERT INTO teachers_courses(teacher_id,course_id) VALUES(?,?)";
 	final static private String DELETE_TEACHERS_COURSES_QUERY = "DELETE FROM teachers_courses where teacher_id = ?";
 	final static private String DELETE_TEACHER_QUERY = "DELETE FROM teachers where id =?";
-	final static private String GET_BY_ID_REQUEST = "SELECT t.* FROM teachers t WHERE id=?";
-	final static private String GET_COURSES_BY_TEACHER_ID_REQUEST = "SELECT tc.* FROM teachers_courses tc WHERE teacher_id = ?";
+	final static private String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
+	final static private String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses WHERE teacher_id = ?";
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -48,8 +50,8 @@ public class TeacherDao {
 		teacher.setId((int) holder.getKeys().get("id"));
 
 		teacher.getCourses().stream()
-		.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
-		
+				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
+
 	}
 
 	public void deleteById(int id) {
@@ -58,23 +60,11 @@ public class TeacherDao {
 	}
 
 	public Teacher getById(int id) {
-		Teacher teacher = jdbcTemplate.queryForObject(GET_BY_ID_REQUEST, (resultSet, rowNum) -> {
-			Teacher newTeacher = new Teacher(id, resultSet.getString("first_name"), resultSet.getString("last_name"),
-					Gender.valueOf(resultSet.getString("gender")), resultSet.getDate("birth_date").toLocalDate(),
-					resultSet.getString("email"), resultSet.getString("phone"), resultSet.getString("address"));
-			return newTeacher;
-		}, id);
-		List<Integer> coursesId = jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_REQUEST, (resultSet, rowNum) -> {
-			return resultSet.getInt("course_id");
-		}, id);
+		TeacherRowMapper rowMapper = new TeacherRowMapper();
+		Teacher teacher = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		CourseDao courseDao = new CourseDao(jdbcTemplate);
-		List<Course> courses = new ArrayList<>();
-		coursesId.stream().forEach(cId -> {
-			courses.add(courseDao.getById(cId));
-		});
-		teacher.setCourses(courses);
-
+		teacher.setCourses(courseDao.getCoursesByTeacher(teacher));
 		return teacher;
-	}
 
+	}
 }

@@ -17,11 +17,11 @@ DROP TABLE IF EXISTS lessons;
 
 CREATE TABLE groups(
 id SERIAL PRIMARY KEY,
-group_name VARCHAR(255));
+name VARCHAR(255));
 
 CREATE TABLE courses(
 id SERIAL PRIMARY KEY,
-course_name VARCHAR(255),
+name VARCHAR(255),
 description TEXT);
 
 CREATE TABLE lessons_time(
@@ -33,7 +33,7 @@ UNIQUE(order_number));
 
 CREATE TABLE auditoriums(
 id SERIAL PRIMARY KEY,
-auditorium_name VARCHAR(255),
+name VARCHAR(255),
 capacity INTEGER);
 
 CREATE TABLE students(
@@ -78,3 +78,4 @@ CREATE TABLE lessons_groups(
 lesson_id integer REFERENCES lessons(id), 
 group_id integer REFERENCES groups(id),
 UNIQUE(lesson_id,group_id));
+

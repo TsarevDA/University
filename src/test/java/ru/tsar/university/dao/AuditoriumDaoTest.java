@@ -2,50 +2,46 @@ package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import ru.tsar.university.TablesCreation;
+import ru.tsar.university.SpringConfig;
+
 import ru.tsar.university.model.Auditorium;
 
-
+@SpringJUnitConfig(classes = SpringConfig.class)
+@Sql("/schema.sql")
 class AuditoriumDaoTest {
 
-	final static private String GET_AUDITORIUMS_REQUEST = "SELECT a.* FROM auditoriums a";
-	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM auditoriums WHERE id=?";
-	final static private String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(auditorium_name,capacity) VALUES(?,?)";
+	final static private String GET_AUDITORIUMS_QUERY = "SELECT * FROM auditoriums";
+	final static private String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
+	final static private String GET_COUNT_BY_ID_QUERY = "select count(*) FROM auditoriums WHERE id=?";
+	final static private String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name,capacity) VALUES(?,?)";
 
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
 	private AuditoriumDao auditoriumDao;
-	
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		auditoriumDao = context.getBean("auditoriumDao", AuditoriumDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
-
 
 	@Test
 	void setAuditorium_whenCreate_thenCreateAuditorium() {
 		Auditorium expected = new Auditorium("Name", 100);
 		auditoriumDao.create(expected);
 
-		List<Auditorium> auditoriums = jdbcTemplate.query(GET_AUDITORIUMS_REQUEST, (resultSet, rowNum) -> {
-			Auditorium newAuditorium = new Auditorium(resultSet.getInt("id"), resultSet.getString("auditorium_name"),
+		List<Auditorium> auditoriums = jdbcTemplate.query(GET_AUDITORIUMS_QUERY, (resultSet, rowNum) -> {
+			Auditorium newAuditorium = new Auditorium(resultSet.getInt("id"), resultSet.getString("name"),
 					resultSet.getInt("capacity"));
 			return newAuditorium;
 		});
@@ -59,7 +55,7 @@ class AuditoriumDaoTest {
 		Auditorium auditorium = new Auditorium("AName", 1000);
 		auditoriumDao.create(auditorium);
 		auditoriumDao.deleteById(auditorium.getId());
-		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_REQUEST, Integer.class, auditorium.getId());
+		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_QUERY, Integer.class, auditorium.getId());
 		assertEquals(0, actual);
 	}
 
@@ -76,6 +72,44 @@ class AuditoriumDaoTest {
 		}, holder);
 		expected.setId((int) holder.getKeys().get("id"));
 		Auditorium actual = auditoriumDao.getById(expected.getId());
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	void setAuditorium_whenUpdate_thenUpdatedAuditorium() {
+		Auditorium old = new Auditorium("Name", 100);
+		auditoriumDao.create(old);
+
+		Auditorium expected = new Auditorium(old.getId(), "newAuditorium", 1000);
+		auditoriumDao.update(expected);
+
+		Auditorium actual = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, (resultSet, rowNum) -> {
+			Auditorium newAuditorium = new Auditorium(resultSet.getInt("id"), resultSet.getString("name"),
+					resultSet.getInt("capacity"));
+			return newAuditorium;
+		}, old.getId());
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	void setAuditoriums_whengetAuditoriumsList_thenAuditoriumsList() {
+		Auditorium first = new Auditorium("First", 100);
+		auditoriumDao.create(first);
+
+		Auditorium second = new Auditorium("Second", 500);
+		auditoriumDao.create(second);
+
+		List<Auditorium> expected = new ArrayList<>();
+		expected.add(first);
+		expected.add(second);
+
+		List<Auditorium> actual = jdbcTemplate.query(GET_AUDITORIUMS_QUERY, (resultSet, rowNum) -> {
+			Auditorium newAuditorium = new Auditorium(resultSet.getInt("id"), resultSet.getString("name"),
+					resultSet.getInt("capacity"));
+			return newAuditorium;
+		});
+
 		assertEquals(expected, actual);
 	}
 

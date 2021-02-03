@@ -2,50 +2,46 @@ package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Component;
 
-import ru.tsar.university.TablesCreation;
-import ru.tsar.university.model.Auditorium;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import ru.tsar.university.SpringConfig;
+
 import ru.tsar.university.model.Course;
 
-@Component
+@SpringJUnitConfig(classes= SpringConfig.class)
+@Sql("/schema.sql")
 class CourseDaoTest {
 
-	final static private String GET_COURSES_REQUEST = "SELECT c.* FROM courses c";
-	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM courses WHERE id=?";
-	final static private String CREATE_COURSE_QUERY = "INSERT INTO courses(course_name,description) VALUES(?,?)";
+	final static private String GET_COURSES_QUERY = "SELECT * FROM courses";
+	final static private String GET_COUNT_BY_ID_QUERY = "select count(*) FROM courses WHERE id=?";
+	final static private String CREATE_COURSE_QUERY = "INSERT INTO courses(name,description) VALUES(?,?)";
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private CourseDao courseDao;
 
-	@BeforeEach
-	void setUp() throws IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		courseDao = context.getBean("courseDao", CourseDao.class);
-		jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		TablesCreation tablesCreation = context.getBean("tablesCreation", TablesCreation.class);
-		tablesCreation.createTables();
-	}
+
 
 	@Test
 	void setCourse_whenCreate_thenCreateCourse() {
 		Course expected = new Course("Astronomy", "Science about stars and deep space");
 		courseDao.create(expected);
-		List<Course> courses = jdbcTemplate.query(GET_COURSES_REQUEST, (resultSet, rowNum) -> {
-			Course newCourse = new Course(resultSet.getInt("id"), resultSet.getString("course_name"),
+		List<Course> courses = jdbcTemplate.query(GET_COURSES_QUERY, (resultSet, rowNum) -> {
+			Course newCourse = new Course(resultSet.getInt("id"), resultSet.getString("name"),
 					resultSet.getString("description"));
 			return newCourse;
 		});
@@ -59,7 +55,7 @@ class CourseDaoTest {
 		courseDao.create(course);
 		courseDao.deleteById(course.getId());
 
-		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_REQUEST, Integer.class, course.getId());
+		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_QUERY, Integer.class, course.getId());
 		assertEquals(0, actual);
 	}
 

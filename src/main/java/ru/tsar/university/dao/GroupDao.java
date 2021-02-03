@@ -2,30 +2,28 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
+import ru.tsar.university.mapper.GroupRowMapper;
 import ru.tsar.university.model.Group;
-import ru.tsar.university.model.Student;
+
 
 @Component
 public class GroupDao {
 
-	final static private String ADD_GROUP_QUERY = "INSERT INTO groups(group_name) VALUES(?)";
-	final static private String ADD_GROUPS_STUDENTS_QUERY = "INSERT INTO groups_students(group_id,student_id) VALUES(?,?)";
-	final static private String DELETE_GROUPS_STUDENTS_QUERY = "DELETE FROM groups_students where group_id =?";
+	final static private String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
 	final static private String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
-	final static private String GET_BY_ID_REQUEST = "SELECT g.* FROM groups g WHERE id=?";
-	final static private String GET_STUDENTS_BY_GROUP_ID_REQUEST = "SELECT gs.* FROM groups_students gs WHERE group_id=?";
-
+	final static private String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
+	final static private String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
+	final static private String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
+	
 	private JdbcTemplate jdbcTemplate;
+	
 
-	@Autowired
 	public GroupDao(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -41,25 +39,27 @@ public class GroupDao {
 	}
 
 	public void deleteById(int id) {
-		jdbcTemplate.update(DELETE_GROUPS_STUDENTS_QUERY, id);
-		jdbcTemplate.update(DELETE_GROUP_QUERY, id);
+		Integer studentCount = jdbcTemplate.queryForObject(GET_STUDENTS_GROUPS_COUNT_QUERY, Integer.class, id);
+		
+		if (studentCount==0) {
+			jdbcTemplate.update(DELETE_GROUP_QUERY, id);	
+		} 
+		
 	}
 
 	public Group getById(int id) {
-		Group group = jdbcTemplate.queryForObject(GET_BY_ID_REQUEST, (resultSet, rowNum) -> {
-			Group newGroup = new Group(id, resultSet.getString("group_name"));
-			return newGroup;
-		}, id);
-		List<Integer> studentsId = jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_REQUEST, (resultSet, rowNum) -> {
-			return resultSet.getInt("student_id");
-		}, id);
-		StudentDao studentDao = new StudentDao(jdbcTemplate);
-		List<Student> students = new ArrayList<>();
-		studentsId.stream().forEach(sId -> {
-			students.add(studentDao.getById(sId));
-		});
+		GroupRowMapper rowMapper = new GroupRowMapper();
+		Group group =  jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 
-		group.setStudents(students);
-		return group;
+	StudentDao studentDao = new StudentDao(jdbcTemplate);
+	group.setStudents(studentDao.getStudentsByGroup(group));
+	return group;
+
 	}
+	
+	public List<Group> getGroupsByLessonId(int id) {
+		GroupRowMapper rowMapper = new GroupRowMapper();
+		return jdbcTemplate.query(GET_GROUPS_BY_LESSOM_QUERY, rowMapper, id);
+	}
+	
 }

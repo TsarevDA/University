@@ -33,14 +33,16 @@ import ru.tsar.university.model.Gender;
 public class ConsoleInterface {
 
 	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	@Autowired
 	private University university;
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
-	public ConsoleInterface(University university, JdbcTemplate jdbcTemplate) {
-		this.university = university;
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	
+	//public ConsoleInterface(University university, JdbcTemplate jdbcTemplate) {
+		//this.university = university;
+	//	this.jdbcTemplate = jdbcTemplate;
+	//}
 
 	public void startMenu() {
 
