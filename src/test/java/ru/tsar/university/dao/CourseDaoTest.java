@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +20,7 @@ import ru.tsar.university.SpringConfig;
 
 import ru.tsar.university.model.Course;
 
-@SpringJUnitConfig(classes= SpringConfig.class)
+@SpringJUnitConfig(classes = SpringConfig.class)
 @Sql("/schema.sql")
 class CourseDaoTest {
 
@@ -33,8 +32,6 @@ class CourseDaoTest {
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private CourseDao courseDao;
-
-
 
 	@Test
 	void setCourse_whenCreate_thenCreateCourse() {

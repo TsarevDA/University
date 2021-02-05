@@ -35,14 +35,21 @@ public class ConsoleInterface {
 	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	@Autowired
 	private University university;
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
 
-	
-	//public ConsoleInterface(University university, JdbcTemplate jdbcTemplate) {
-		//this.university = university;
-	//	this.jdbcTemplate = jdbcTemplate;
-	//}
+	@Autowired
+	private StudentDao studentDao;
+	@Autowired
+	private CourseDao courseDao;
+	@Autowired
+	private TeacherDao teacherDao;
+	@Autowired
+	private GroupDao groupDao;
+	@Autowired
+	private AuditoriumDao auditoriumDao;
+	@Autowired
+	private LessonTimeDao lessonTimeDao;
+	@Autowired
+	private LessonDao lessonDao;
 
 	public void startMenu() {
 
@@ -117,7 +124,6 @@ public class ConsoleInterface {
 		String address = scanner.next();
 
 		Student student = new Student(firstName, lastName, gender, date, email, phone, address);
-		StudentDao studentDao = new StudentDao(jdbcTemplate);
 		studentDao.create(student);
 
 		university.addStudent(student);
@@ -129,7 +135,6 @@ public class ConsoleInterface {
 		int id = scanner.nextInt();
 		List<Student> students = university.getStudents();
 		List<Student> studentsForRemoving = students.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
-		StudentDao studentDao = new StudentDao(jdbcTemplate);
 
 		for (Student student : studentsForRemoving) {
 			studentDao.deleteById(student.getId());
@@ -144,7 +149,7 @@ public class ConsoleInterface {
 		System.out.println("Enter course description:");
 		String description = scanner.next();
 		Course course = new Course(name, description);
-		CourseDao courseDao = new CourseDao(jdbcTemplate);
+
 		courseDao.create(course);
 		university.addCourse(course);
 	}
@@ -155,7 +160,6 @@ public class ConsoleInterface {
 		int id = scanner.nextInt();
 		List<Course> courses = university.getCourses();
 		List<Course> coursesForRemoving = courses.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
-		CourseDao courseDao = new CourseDao(jdbcTemplate);
 		for (Course course : coursesForRemoving) {
 			university.deleteCourse(course);
 			courseDao.deleteById(course.getId());
@@ -187,7 +191,7 @@ public class ConsoleInterface {
 		List<Course> courses = university.getCourses().stream().filter(c -> coursesNames.contains(c.getName()))
 				.collect(Collectors.toList());
 		Teacher teacher = new Teacher(firstName, lastName, gender, date, email, phone, address, courses);
-		TeacherDao teacherDao = new TeacherDao(jdbcTemplate);
+
 		teacherDao.create(teacher);
 		university.addTeacher(teacher);
 	}
@@ -198,7 +202,6 @@ public class ConsoleInterface {
 		int id = scanner.nextInt();
 		List<Teacher> teachers = university.getTeachers();
 		List<Teacher> teachersForRemoving = teachers.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
-		TeacherDao teacherDao = new TeacherDao(jdbcTemplate);
 		for (Teacher teacher : teachersForRemoving) {
 			university.deleteTeacher(teacher);
 			teacherDao.deleteById(teacher.getId());
@@ -210,7 +213,6 @@ public class ConsoleInterface {
 		System.out.println("Enter group name:");
 		String name = scanner.next();
 		Group group = new Group(name);
-		GroupDao groupDao = new GroupDao(jdbcTemplate);
 		groupDao.create(group);
 		university.addGroup(group);
 	}
@@ -221,7 +223,6 @@ public class ConsoleInterface {
 		int id = scanner.nextInt();
 		List<Group> groups = university.getGroups();
 		List<Group> groupsForRemoving = groups.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
-		GroupDao groupDao = new GroupDao(jdbcTemplate);
 		for (Group group : groupsForRemoving) {
 			university.deleteGroup(group);
 			groupDao.deleteById(group.getId());
@@ -235,7 +236,6 @@ public class ConsoleInterface {
 		System.out.println("Enter auditorium capacity:");
 		int capacity = scanner.nextInt();
 		Auditorium auditorium = new Auditorium(name, capacity);
-		AuditoriumDao auditoriumDao = new AuditoriumDao(jdbcTemplate);
 		auditoriumDao.create(auditorium);
 		university.addAuditorium(auditorium);
 	}
@@ -247,7 +247,6 @@ public class ConsoleInterface {
 		List<Auditorium> auditoriums = university.getAuditoriums();
 		List<Auditorium> auditoriumsForRemoving = auditoriums.stream().filter(s -> s.getId() == id)
 				.collect(Collectors.toList());
-		AuditoriumDao auditoriumDao = new AuditoriumDao(jdbcTemplate);
 		for (Auditorium auditorium : auditoriumsForRemoving) {
 			university.deleteAuditorium(auditorium);
 			auditoriumDao.deleteById(auditorium.getId());
@@ -261,7 +260,6 @@ public class ConsoleInterface {
 		for (int i = 0; i < 5; i++) {
 			lessonsTime.add(new LessonTime(i + 1, startTime.plusHours(i), endTime.plusHours(i)));
 		}
-		LessonTimeDao lessonTimeDao = new LessonTimeDao(jdbcTemplate);
 		lessonsTime.stream().forEach(lt -> lessonTimeDao.create(lt));
 		university.setLessonsTime(lessonsTime);
 
@@ -309,7 +307,6 @@ public class ConsoleInterface {
 
 		Lesson lesson = new Lesson(course, teacher, groups, day, lessonTime, auditorium);
 
-		LessonDao lessonDao = new LessonDao(jdbcTemplate);
 		lessonDao.create(lesson);
 
 	}
@@ -320,7 +317,6 @@ public class ConsoleInterface {
 		int id = scanner.nextInt();
 		List<Lesson> lessons = university.getLessons();
 		List<Lesson> lessonForRemoving = lessons.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
-		LessonDao lessonDao = new LessonDao(jdbcTemplate);
 
 		for (Lesson lesson : lessonForRemoving) {
 			university.deleteLesson(lesson);

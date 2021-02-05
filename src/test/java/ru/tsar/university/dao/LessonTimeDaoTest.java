@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ru.tsar.university.SpringConfig;
 import ru.tsar.university.model.LessonTime;
 
-@SpringJUnitConfig(classes= SpringConfig.class)
+@SpringJUnitConfig(classes = SpringConfig.class)
 @Sql("/schema.sql")
 class LessonTimeDaoTest {
 
@@ -29,7 +29,6 @@ class LessonTimeDaoTest {
 	private JdbcTemplate jdbcTemplate;
 	@Autowired
 	private LessonTimeDao lessonTimeDao;
-	
 
 	@Test
 	void setLessonTime_whenCreate_thenCreateLessonTime() {

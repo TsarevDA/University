@@ -3,22 +3,22 @@ package ru.tsar.university.dao;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.mapper.LessonRowMapper;
-
 import ru.tsar.university.model.Lesson;
 
 @Component
 public class LessonDao {
 
-	final static private String CREATE_LESSON_QUERY = "INSERT INTO lessons(course_id,teacher_id,day,lesson_time,auditorium) VALUES(?,?,?,?,?)";
-	final static private String CREATE_LESSONS_GROUPS_QUERY = "INSERT INTO lessons_groups(lesson_id,group_id) VALUES(?,?)";
-	final static private String DELETE_LESSONS_GROUPS_QUERY = "DELETE FROM lessons_groups where lesson_id =?";
-	final static private String DELETE_LESSON_QUERY = "DELETE FROM lessons where id =?";
-	final static private String GET_BY_ID_QUERY = "SELECT l.id,l.day,"
+	private static final String CREATE_LESSON_QUERY = "INSERT INTO lessons(course_id,teacher_id,day,lesson_time,auditorium) VALUES(?,?,?,?,?)";
+	private static final String CREATE_LESSONS_GROUPS_QUERY = "INSERT INTO lessons_groups(lesson_id,group_id) VALUES(?,?)";
+	private static final String DELETE_LESSONS_GROUPS_QUERY = "DELETE FROM lessons_groups where lesson_id =?";
+	private static final String DELETE_LESSON_QUERY = "DELETE FROM lessons where id =?";
+	private static final String GET_BY_ID_QUERY = "SELECT l.id,l.day,"
 			+ "c.id as course_id,c.name as course_name, c.description, "
 			+ "t.id as teacher_id, t.first_name, t.last_name, t.gender, t.birth_date, t.email, t.phone, t.address, "
 			+ "lt.id as lesson_time_id, lt.order_number, lt.start_time, lt.end_time, "
@@ -26,13 +26,12 @@ public class LessonDao {
 			+ "FROM lessons l left join courses c on l.course_id=c.id " + "left join teachers t on l.teacher_id=t.id "
 			+ "left join lessons_time lt on lt.order_number = l.lesson_time "
 			+ "left join auditoriums a on l.auditorium= a.id WHERE l.id =?";
+	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time=?,auditorium=? WHERE id=?";
 
-
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	public LessonDao(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	@Autowired
+	private LessonRowMapper rowMapper;
 
 	public void create(Lesson lesson) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
@@ -57,11 +56,14 @@ public class LessonDao {
 	}
 
 	public Lesson getById(int id) {
-
-		LessonRowMapper rowMapper = new LessonRowMapper(jdbcTemplate);
 		Lesson lesson = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 
 		return lesson;
+	}
+
+	public void update(Lesson lesson) {
+		jdbcTemplate.update(UPDATE_LESSON_QUERY, lesson.getCourse().getId(), lesson.getTeacher().getId(),
+				lesson.getDay(), lesson.getTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
 	}
 
 }

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -11,22 +12,22 @@ import org.springframework.stereotype.Component;
 import ru.tsar.university.mapper.GroupRowMapper;
 import ru.tsar.university.model.Group;
 
-
 @Component
 public class GroupDao {
 
-	final static private String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
-	final static private String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
-	final static private String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
-	final static private String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
-	final static private String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
-	
-	private JdbcTemplate jdbcTemplate;
-	
+	private static final String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
+	private static final String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
+	private static final String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
+	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
+	private static final String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
+	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
 
-	public GroupDao(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private GroupRowMapper rowMapper;
+	@Autowired
+	private StudentDao studentDao;
 
 	public void create(Group group) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
@@ -40,26 +41,26 @@ public class GroupDao {
 
 	public void deleteById(int id) {
 		Integer studentCount = jdbcTemplate.queryForObject(GET_STUDENTS_GROUPS_COUNT_QUERY, Integer.class, id);
-		
-		if (studentCount==0) {
-			jdbcTemplate.update(DELETE_GROUP_QUERY, id);	
-		} 
-		
+
+		if (studentCount == 0) {
+			jdbcTemplate.update(DELETE_GROUP_QUERY, id);
+		}
+
 	}
 
 	public Group getById(int id) {
-		GroupRowMapper rowMapper = new GroupRowMapper();
-		Group group =  jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
-
-	StudentDao studentDao = new StudentDao(jdbcTemplate);
-	group.setStudents(studentDao.getStudentsByGroup(group));
-	return group;
+		Group group = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		group.setStudents(studentDao.getByGroup(group));
+		return group;
 
 	}
-	
-	public List<Group> getGroupsByLessonId(int id) {
-		GroupRowMapper rowMapper = new GroupRowMapper();
+
+	public List<Group> getByLessonId(int id) {
 		return jdbcTemplate.query(GET_GROUPS_BY_LESSOM_QUERY, rowMapper, id);
 	}
-	
+
+	public void update(Group group) {
+		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
+	}
+
 }

@@ -11,20 +11,22 @@ import org.springframework.stereotype.Component;
 
 import ru.tsar.university.mapper.AuditoriumRowMapper;
 import ru.tsar.university.model.Auditorium;
-import ru.tsar.university.model.Gender;
-import ru.tsar.university.model.Student;
 
 @Component
 public class AuditoriumDao {
 
-	final static private String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name,capacity) VALUES(?,?)";
-	final static private String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
-	final static private String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
-	final static private String GET_AUDITORIUMS_QUERY = "SELECT * FROM auditoriums ";
-	final static private String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?,capacity=? WHERE id=?";
+	private static final String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name,capacity) VALUES(?,?)";
+	private static final String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
+	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
+	private static final String GET_AUDITORIUMS_QUERY = "SELECT * FROM auditoriums ";
+	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?,capacity=? WHERE id=?";
 
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	
+	@Autowired
+	private AuditoriumRowMapper rowMapper;
+
+	@Autowired
 	public AuditoriumDao(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -47,22 +49,15 @@ public class AuditoriumDao {
 	}
 
 	public Auditorium getById(int id) {
-		AuditoriumRowMapper rowMapper = new AuditoriumRowMapper();
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
-	public List<Auditorium> getAuditoriumsList() {
-		AuditoriumRowMapper rowMapper = new AuditoriumRowMapper();
-		List<Auditorium> auditoriums = jdbcTemplate.query(GET_AUDITORIUMS_QUERY, rowMapper);
-		return auditoriums;
+	public List<Auditorium> getAll() {
+		return jdbcTemplate.query(GET_AUDITORIUMS_QUERY, rowMapper);
 	}
-	
+
 	public void update(Auditorium auditorium) {
-		
-			jdbcTemplate.update(UPDATE_AUDITORIUMS_QUERY,
-				auditorium.getName(),
-				auditorium.getCapacity(),
-				auditorium.getId()
-				);
+		jdbcTemplate.update(UPDATE_AUDITORIUMS_QUERY, auditorium.getName(), auditorium.getCapacity(),
+				auditorium.getId());
 	}
 }

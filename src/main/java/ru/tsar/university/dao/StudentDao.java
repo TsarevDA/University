@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -15,17 +16,16 @@ import ru.tsar.university.model.Student;
 @Component
 public class StudentDao {
 
-	final static private String ADD_STUDENT_QUERY = "INSERT INTO students(first_name,last_name,gender,birth_date,email,phone,address) VALUES(?,?,?,?,?,?,?)";
-	final static private String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
-	final static private String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
+	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name,last_name,gender,birth_date,email,phone,address) VALUES(?,?,?,?,?,?,?)";
+	private static final String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
+	private static final String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
+	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
+	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?,last_name=?,gender=?,birth_date=?,email=?,phone=?,address=? WHERE id=?";
 
-	final static private String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
-
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	public StudentDao(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	@Autowired
+	private StudentRowMapper rowMapper;
 
 	public void create(Student student) {
 
@@ -49,12 +49,17 @@ public class StudentDao {
 	}
 
 	public Student getById(int id) {
-		StudentRowMapper rowMapper = new StudentRowMapper();
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
-	public List<Student> getStudentsByGroup(Group group) {
-		StudentRowMapper rowMapper = new StudentRowMapper();
+	public List<Student> getByGroup(Group group) {
 		return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, group.getId());
 	}
+
+	public void update(Student student) {
+		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
+				student.getGender().name(), student.getBirthDate(), student.getPhone(), student.getAddress(),
+				student.getId());
+	}
+
 }

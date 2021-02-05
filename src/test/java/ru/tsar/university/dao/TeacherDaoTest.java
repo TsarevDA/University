@@ -21,7 +21,7 @@ import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
 
-@SpringJUnitConfig(classes= SpringConfig.class)
+@SpringJUnitConfig(classes = SpringConfig.class)
 @Sql("/schema.sql")
 class TeacherDaoTest {
 

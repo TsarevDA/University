@@ -13,12 +13,11 @@ import org.springframework.context.annotation.PropertySource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
 @Configuration
 @ComponentScan("ru.tsar.university")
 @PropertySource("classpath:config.properties")
 public class SpringConfig {
-	
+
 	@Value("${driver}")
 	public String driver;
 	@Value("${url}")
@@ -31,13 +30,12 @@ public class SpringConfig {
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource)
 			throws IllegalAccessException, InvocationTargetException, InstantiationException {
-		
+
 		JdbcTemplate jdbcTemplate = new JdbcTemplate();
 		jdbcTemplate.setDataSource(dataSource);
 		return jdbcTemplate;
 	}
-	
-	
+
 	@Bean
 	public DataSource dataSource() {
 		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
@@ -47,8 +45,5 @@ public class SpringConfig {
 		dataSourceBuilder.password(password);
 		return dataSourceBuilder.build();
 	}
-	
 
-
-	
 }
