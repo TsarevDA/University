@@ -2,6 +2,7 @@ package ru.tsar.university.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ public class LessonTimeRowMapper implements RowMapper<LessonTime> {
 	@Override
 	public LessonTime mapRow(ResultSet rs, int rowNum) throws SQLException {
 		LessonTime lessonTime = new LessonTime(rs.getInt("id"), rs.getInt("order_number"),
-				rs.getTime("start_time").toLocalTime(), rs.getTime("end_time").toLocalTime());
+				rs.getObject("start_time",LocalTime.class),rs.getObject("end_time",LocalTime.class));
 		return lessonTime;
 	}
 
