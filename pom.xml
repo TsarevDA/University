@@ -15,14 +15,13 @@
 		<spring-core.version>5.2.11.RELEASE</spring-core.version>
 		<spring-context.version>5.2.11.RELEASE</spring-context.version>
 		<spring-jdbc.version>5.2.11.RELEASE</spring-jdbc.version>
-		<spring-boot-starter-test.version>2.3.7.RELEASE</spring-boot-starter-test.version>
-		<spring-boot-starter-data-jpa.version>2.3.7.RELEASE</spring-boot-starter-data-jpa.version>
+		<spring-test.version>5.2.11.RELEASE</spring-test.version>
 
 
 	</properties>
 
 	<dependencies>
-
+		
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -48,6 +47,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring-test.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${junit.jupiter.version}</version>
@@ -63,9 +69,9 @@
 
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${spring-boot-starter-test.version}</version>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.200</version>
 			<scope>test</scope>
 		</dependency>
 

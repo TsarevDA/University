@@ -1,11 +1,9 @@
-package ru.tsar.university.mapper;
+package ru.tsar.university.dao.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -24,16 +22,20 @@ import ru.tsar.university.model.Teacher;
 @Component
 public class LessonRowMapper implements RowMapper<Lesson> {
 
-	@Autowired
 	private TeacherDao teacherDao;
-	@Autowired
 	private LessonTimeDao lessonTimeDao;
-	@Autowired
 	private CourseDao courseDao;
-	@Autowired
 	private AuditoriumDao auditoriumDao;
-	@Autowired
 	private GroupDao groupDao;
+	
+	
+	public LessonRowMapper(TeacherDao teacherDao,LessonTimeDao lessonTimeDao, CourseDao courseDao, AuditoriumDao auditoriumDao, GroupDao groupDao) {
+		this.teacherDao = teacherDao;
+		this.lessonTimeDao = lessonTimeDao;
+		this.courseDao = courseDao;
+		this.auditoriumDao = auditoriumDao;
+		this.groupDao = groupDao;
+	}
 
 	@Override
 	public Lesson mapRow(ResultSet rs, int rowNum) throws SQLException {

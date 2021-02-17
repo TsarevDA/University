@@ -9,7 +9,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.mapper.GroupRowMapper;
+import ru.tsar.university.dao.mapper.GroupRowMapper;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Group;
 
 @Component
@@ -21,13 +22,17 @@ public class GroupDao {
 	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
 	private static final String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
 	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM groups ";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private GroupRowMapper rowMapper;
-	@Autowired
 	private StudentDao studentDao;
+
+	public GroupDao(JdbcTemplate jdbcTemplate, GroupRowMapper rowMapper, StudentDao studentDao) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.rowMapper = rowMapper;
+		this.studentDao = studentDao;
+	}
 
 	public void create(Group group) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
@@ -63,4 +68,7 @@ public class GroupDao {
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
 	}
 
+	public List<Group> getAll() {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
 }

@@ -9,23 +9,27 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.mapper.StudentRowMapper;
+import ru.tsar.university.dao.mapper.StudentRowMapper;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
 @Component
 public class StudentDao {
 
-	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name,last_name,gender,birth_date,email,phone,address) VALUES(?,?,?,?,?,?,?)";
+	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 	private static final String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
 	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
-	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?,last_name=?,gender=?,birth_date=?,email=?,phone=?,address=? WHERE id=?";
+	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM students ";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private StudentRowMapper rowMapper;
+
+	public StudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper rowMapper) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.rowMapper = rowMapper;
+	}
 
 	public void create(Student student) {
 
@@ -60,6 +64,10 @@ public class StudentDao {
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
 				student.getGender().name(), student.getBirthDate(), student.getPhone(), student.getAddress(),
 				student.getId());
+	}
+
+	public List<Student> getAll() {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 
 }

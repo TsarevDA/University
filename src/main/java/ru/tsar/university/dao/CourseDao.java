@@ -9,23 +9,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.mapper.CourseRowMapper;
+import ru.tsar.university.dao.mapper.CourseRowMapper;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Teacher;
 
 @Component
 public class CourseDao {
 
-	private static final String CREATE_COURSE_QUERY = "INSERT INTO courses(name,description) VALUES(?,?)";
+	private static final String CREATE_COURSE_QUERY = "INSERT INTO courses(name, description) VALUES(?,?)";
 	private static final String DELETE_COURSE_QUERY = "DELETE FROM courses WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM courses WHERE id=?";
 	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
-	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?,description=? WHERE id=?";
+	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?, description=? WHERE id=?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM courses ";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private CourseRowMapper rowMapper;
+
+	public CourseDao(JdbcTemplate jdbcTemplate, CourseRowMapper rowMapper) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.rowMapper = rowMapper;
+	}
 
 	public void create(Course course) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
@@ -46,12 +51,15 @@ public class CourseDao {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
-	public List<Course> getCoursesByTeacher(Teacher teacher) {
-		List<Course> courses = jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, teacher.getId());
-		return courses;
+	public List<Course> getByTeacher(Teacher teacher) {
+		return jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, teacher.getId());
 	}
 
 	public void update(Course course) {
 		jdbcTemplate.update(UPDATE_COURSE_QUERY, course.getName(), course.getDescription(), course.getId());
+	}
+
+	public List<Course> getAll() {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 }

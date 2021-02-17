@@ -2,36 +2,40 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.mapper.TeacherRowMapper;
-
+import ru.tsar.university.dao.mapper.TeacherRowMapper;
+import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 
 @Component
 public class TeacherDao {
 
-	private static final String CREATE_TEACHER_QUERY = "INSERT INTO teachers(first_name,last_name,gender,birth_date,email,phone,address) VALUES(?,?,?,?,?,?,?)";
-	private static final String CREATE_TEACHERS_COURSES_QUERY = "INSERT INTO teachers_courses(teacher_id,course_id) VALUES(?,?)";
+	private static final String CREATE_TEACHER_QUERY = "INSERT INTO teachers(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
+	private static final String CREATE_TEACHERS_COURSES_QUERY = "INSERT INTO teachers_courses(teacher_id, course_id) VALUES(?,?)";
 	private static final String DELETE_TEACHERS_COURSES_QUERY = "DELETE FROM teachers_courses where teacher_id = ?";
 	private static final String DELETE_TEACHER_QUERY = "DELETE FROM teachers where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
-	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?,last_name=?,gender=?,birth_date=?,email=?,phone=?,address=? WHERE id=?";
+	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM teachers ";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private TeacherRowMapper rowMapper;
-	@Autowired
 	private CourseDao courseDao;
 
-	public void create(Teacher teacher) {
+	public TeacherDao(JdbcTemplate jdbcTemplate, TeacherRowMapper rowMapper, CourseDao courseDao) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.rowMapper = rowMapper;
+		this.courseDao = courseDao;
+	}
 
+	public void create(Teacher teacher) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(CREATE_TEACHER_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -57,14 +61,16 @@ public class TeacherDao {
 	}
 
 	public Teacher getById(int id) {
-		Teacher teacher = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
-		teacher.setCourses(courseDao.getCoursesByTeacher(teacher));
-		return teacher;
+		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
-	public void update(Student student) {
-		jdbcTemplate.update(UPDATE_TEACHER_QUERY, student.getFirstName(), student.getLastName(),
-				student.getGender().name(), student.getBirthDate(), student.getPhone(), student.getAddress(),
-				student.getId());
+	public void update(Teacher teacher) {
+		jdbcTemplate.update(UPDATE_TEACHER_QUERY, teacher.getFirstName(), teacher.getLastName(),
+				teacher.getGender().name(), teacher.getBirthDate(), teacher.getPhone(), teacher.getAddress(),
+				teacher.getId());
+	}
+
+	public List<Teacher> getAll() {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 }

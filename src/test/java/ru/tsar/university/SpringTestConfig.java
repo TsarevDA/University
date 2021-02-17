@@ -1,5 +1,6 @@
 package ru.tsar.university;
 
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -16,16 +17,17 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @Configuration
 @ComponentScan("ru.tsar.university")
-@PropertySource("classpath:config.properties")
-public class SpringConfig {
+@PropertySource("classpath:configTest.properties")
 
-	@Value("${driver}")
+public class SpringTestConfig {
+
+	@Value("${testDriver}")
 	public String driver;
-	@Value("${url}")
+	@Value("${testUrl}")
 	public String url;
-	@Value("${login}")
+	@Value("${testLogin}")
 	public String login;
-	@Value("${password}")
+	@Value("${testPassword}")
 	public String password;
 
 	@Bean

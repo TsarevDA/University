@@ -9,22 +9,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
-import ru.tsar.university.SpringConfig;
+import ru.tsar.university.SpringTestConfig;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
-@SpringJUnitConfig(classes = SpringConfig.class)
-@Sql("/schema.sql")
 class GroupDaoTest {
 
 	final static private String GET_GROUP_QUERY = "SELECT * FROM groups";
@@ -33,23 +32,31 @@ class GroupDaoTest {
 
 	final static private String CREATE_STUDENTS_GROUPS_QUERY = "INSERT INTO groups_students(group_id,student_id) VALUES(?,?)";
 
-	@Autowired
+	private AnnotationConfigApplicationContext context;
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private GroupDao groupDao;
-	@Autowired
 	private StudentDao studentDao;
+
+	@BeforeEach
+	void setUp() {
+		context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
+		context.getBean("databasePopulator", DatabasePopulator.class);
+		this.jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
+		this.groupDao = context.getBean("groupDao", GroupDao.class);
+		this.studentDao = context.getBean("studentDao", StudentDao.class);
+	}
+
+	@AfterEach
+	void setDown() {
+		context.close();
+	}
 
 	@Test
 	void setGroup_whenCreate_thenCreateGroup() {
 		Group expected = new Group("T7-09");
 		groupDao.create(expected);
-		List<Group> groups = jdbcTemplate.query(GET_GROUP_QUERY, (resultSet, rowNum) -> {
-			Group newGroup = new Group(resultSet.getInt("id"), resultSet.getString("name"));
-			return newGroup;
-		});
-		Group actual = groups.get(groups.size() - 1);
-		assertEquals(expected, actual);
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", "id = " + expected.getId());
+		assertEquals(1, actual);
 	}
 
 	@Test
@@ -57,8 +64,7 @@ class GroupDaoTest {
 		Group group = new Group("T7-09");
 		groupDao.create(group);
 		groupDao.deleteById(group.getId());
-
-		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_QUERY, Integer.class, group.getId());
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", "id = " + group.getId());
 		assertEquals(0, actual);
 	}
 
@@ -83,15 +89,25 @@ class GroupDaoTest {
 		Group expected = new Group("T7-09");
 		ArrayList<Student> students = new ArrayList<>();
 		expected.setStudents(students);
-		GeneratedKeyHolder holder = new GeneratedKeyHolder();
-		jdbcTemplate.update(connection -> {
-			PreparedStatement ps = connection.prepareStatement(CREATE_GROUP_QUERY, Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, expected.getName());
-			return ps;
-		}, holder);
-		expected.setId((int) holder.getKeys().get("id"));
+		groupDao.create(expected);
 		Group actual = groupDao.getById(expected.getId());
 
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	void setGroups_whenGetAll_thenGroupsList() {
+		Group first = new Group("T7-09");
+		groupDao.create(first);
+
+		Group second = new Group("A7-98");
+		groupDao.create(second);
+
+		List<Group> expected = new ArrayList<>();
+		expected.add(first);
+		expected.add(second);
+
+		List<Group> actual = groupDao.getAll();
 		assertEquals(expected, actual);
 	}
 }

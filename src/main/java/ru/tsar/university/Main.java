@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 
-//@SpringBootApplication
 public class Main {
 		
 	public static void main(String[] args) throws IOException {
@@ -15,6 +14,5 @@ public class Main {
 		
 		ConsoleInterface consoleInterface = context.getBean("consoleInterface", ConsoleInterface.class);
 		consoleInterface.startMenu();
-
 	}
 }

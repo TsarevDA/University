@@ -9,26 +9,24 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.mapper.AuditoriumRowMapper;
+import ru.tsar.university.dao.mapper.AuditoriumRowMapper;
 import ru.tsar.university.model.Auditorium;
 
 @Component
 public class AuditoriumDao {
 
-	private static final String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name,capacity) VALUES(?,?)";
+	private static final String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name, capacity) VALUES(?,?)";
 	private static final String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
-	private static final String GET_AUDITORIUMS_QUERY = "SELECT * FROM auditoriums ";
-	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?,capacity=? WHERE id=?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums ";
+	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?, capacity=? WHERE id=?";
 
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private AuditoriumRowMapper rowMapper;
 
-	@Autowired
-	public AuditoriumDao(JdbcTemplate jdbcTemplate) {
+	public AuditoriumDao(JdbcTemplate jdbcTemplate, AuditoriumRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.rowMapper = rowMapper;
 	}
 
 	public void create(Auditorium auditorium) {
@@ -53,7 +51,7 @@ public class AuditoriumDao {
 	}
 
 	public List<Auditorium> getAll() {
-		return jdbcTemplate.query(GET_AUDITORIUMS_QUERY, rowMapper);
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 
 	public void update(Auditorium auditorium) {

@@ -1,4 +1,4 @@
-package ru.tsar.university.mapper;
+package ru.tsar.university.dao.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

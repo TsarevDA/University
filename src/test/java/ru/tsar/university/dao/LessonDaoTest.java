@@ -9,15 +9,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.stereotype.Component;
+import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.SpringConfig;
+import ru.tsar.university.SpringTestConfig;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
@@ -26,8 +29,6 @@ import ru.tsar.university.model.Lesson;
 import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.model.Teacher;
 
-@SpringJUnitConfig(classes = SpringConfig.class)
-@Sql("/schema.sql")
 class LessonDaoTest {
 
 	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM lessons WHERE id=?";
@@ -42,20 +43,32 @@ class LessonDaoTest {
 	final static private String GET_TEACHER_COURSES_REQUEST = "SELECT c.* FROM teachers_courses tc left join courses c on tc.course_id = c.id WHERE teacher_id = ?";
 	final static private String GET_GROUPS_LESSONS_REQUEST = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
 
-	@Autowired
+	private AnnotationConfigApplicationContext context;
 	private JdbcTemplate jdbcTemplate;
-	@Autowired
 	private LessonDao lessonDao;
-	@Autowired
 	private AuditoriumDao auditoriumDao;
-	@Autowired
 	private CourseDao courseDao;
-	@Autowired
 	private TeacherDao teacherDao;
-	@Autowired
 	private LessonTimeDao lessonTimeDao;
-	@Autowired
 	private GroupDao groupDao;
+
+	@BeforeEach
+	void setUp() {
+		context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
+		context.getBean("databasePopulator", DatabasePopulator.class);
+		this.jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
+		this.lessonDao = context.getBean("lessonDao", LessonDao.class);
+		this.auditoriumDao = context.getBean("auditoriumDao", AuditoriumDao.class);
+		this.courseDao = context.getBean("courseDao", CourseDao.class);
+		this.teacherDao = context.getBean("teacherDao", TeacherDao.class);
+		this.lessonTimeDao = context.getBean("lessonTimeDao", LessonTimeDao.class);
+		this.groupDao = context.getBean("groupDao", GroupDao.class);
+	}
+
+	@AfterEach
+	void setDown() {
+		context.close();
+	}
 
 	@Test
 	void setLesson_whenCreate_thenCreateLesson() {
@@ -95,28 +108,8 @@ class LessonDaoTest {
 			return newGroup;
 		}, expected.getId());
 
-		Lesson actual = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, (resultSet, rowNum) -> {
-			Course actualCourse = new Course(resultSet.getInt("course_id"), resultSet.getString("course_name"),
-					resultSet.getString("description"));
-
-			Teacher actualTeacher = new Teacher(resultSet.getInt("teacher_id"), resultSet.getString("first_name"),
-					resultSet.getString("last_name"), Gender.valueOf(resultSet.getString("gender")),
-					resultSet.getDate("birth_date").toLocalDate(), resultSet.getString("email"),
-					resultSet.getString("phone"), resultSet.getString("address"), coursesForTeacher);
-
-			LessonTime actualLessonTime = new LessonTime(resultSet.getInt("lesson_time_id"),
-					resultSet.getInt("order_number"), resultSet.getTime("start_time").toLocalTime(),
-					resultSet.getTime("end_time").toLocalTime());
-
-			Auditorium actualAuditorium = new Auditorium(resultSet.getInt("auditorium_id"),
-					resultSet.getString("auditorium_name"), resultSet.getInt("capacity"));
-
-			Lesson newLesson = new Lesson(resultSet.getInt("lesson_id"), actualCourse, actualTeacher, groups,
-					resultSet.getDate("day").toLocalDate(), actualLessonTime, actualAuditorium);
-			return newLesson;
-		}, expected.getId());
-
-		assertEquals(expected, actual);
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons", "id = " + expected.getId());
+		assertEquals(1, actual);
 	}
 
 	@Test
@@ -147,7 +140,7 @@ class LessonDaoTest {
 		lessonDao.create(lesson);
 		lessonDao.deleteById(lesson.getId());
 
-		int actual = jdbcTemplate.queryForObject(GET_COUNT_BY_ID_REQUEST, Integer.class, lesson.getId());
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons", "id = " + lesson.getId());
 		assertEquals(0, actual);
 	}
 
@@ -183,4 +176,37 @@ class LessonDaoTest {
 		assertEquals(expected, actual);
 	}
 
+	@Test
+	void setAuditoriums_whenGetAll_thenAuditoriumsList() {
+		Group group = new Group("T7-09");
+		Auditorium auditorium = new Auditorium("Name", 100);
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Course course = new Course("Astronomy", "Science about stars and deep space");
+		Teacher teacher = new Teacher("Ivan", "Ivanov", Gender.valueOf("MALE"),
+				LocalDate.parse("1990-01-01", dateFormatter), "mail@mail.ru", "88008080", "Ivanov street, 25-5");
+		List<Course> teacherCourses = new ArrayList<>();
+		teacherCourses.add(course);
+		teacher.setCourses(teacherCourses);
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("08:00", timeFormatter);
+		LocalTime endTime = LocalTime.parse("09:00", timeFormatter);
+		LessonTime lessonTime = new LessonTime(1, startTime, endTime);
+		groupDao.create(group);
+		auditoriumDao.create(auditorium);
+		courseDao.create(course);
+		teacherDao.create(teacher);
+		lessonTimeDao.create(lessonTime);
+		ArrayList<Group> groups = new ArrayList<>();
+		groups.add(group);
+
+		LocalDate day = LocalDate.parse("2020-12-08", dateFormatter);
+		Lesson first = new Lesson(course, teacher, groups, day, lessonTime, auditorium);
+		lessonDao.create(first);
+
+		List<Lesson> expected = new ArrayList<>();
+		expected.add(first);
+
+		List<Lesson> actual = lessonDao.getAll();
+		assertEquals(expected, actual);
+	}
 }
