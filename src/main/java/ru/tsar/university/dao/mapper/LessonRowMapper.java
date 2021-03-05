@@ -27,9 +27,9 @@ public class LessonRowMapper implements RowMapper<Lesson> {
 	private CourseDao courseDao;
 	private AuditoriumDao auditoriumDao;
 	private GroupDao groupDao;
-	
-	
-	public LessonRowMapper(TeacherDao teacherDao,LessonTimeDao lessonTimeDao, CourseDao courseDao, AuditoriumDao auditoriumDao, GroupDao groupDao) {
+
+	public LessonRowMapper(TeacherDao teacherDao, LessonTimeDao lessonTimeDao, CourseDao courseDao,
+			AuditoriumDao auditoriumDao, GroupDao groupDao) {
 		this.teacherDao = teacherDao;
 		this.lessonTimeDao = lessonTimeDao;
 		this.courseDao = courseDao;
@@ -41,12 +41,12 @@ public class LessonRowMapper implements RowMapper<Lesson> {
 	public Lesson mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 		Teacher teacher = teacherDao.getById(rs.getInt("teacher_id"));
-		LessonTime lessonTime = lessonTimeDao.getByOrder(rs.getInt("order_number"));
+		LessonTime lessonTime = lessonTimeDao.getById(rs.getInt("lesson_time_id"));
 		Course course = courseDao.getById(rs.getInt("course_id"));
 		Auditorium auditorium = auditoriumDao.getById(rs.getInt("auditorium_id"));
 		List<Group> groups = groupDao.getByLessonId(rs.getInt("id"));
 
-		return new Lesson(rs.getInt("id"), course, teacher, groups, rs.getDate("day").toLocalDate(), lessonTime,
-				auditorium);
+		return new Lesson.LessonBuilder().setId(rs.getInt("id")).setCourse(course).setTeacher(teacher)
+				.setDay(rs.getDate("day").toLocalDate()).setTime(lessonTime).setAuditorium(auditorium).setGroup(groups).build();
 	}
 }

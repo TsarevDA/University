@@ -1,5 +1,4 @@
-package ru.tsar.university;
-
+package ru.tsar.university.config;
 
 import javax.sql.DataSource;
 
@@ -10,24 +9,25 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ComponentScan("ru.tsar.university")
-@PropertySource("classpath:configTest.properties")
+@PropertySource("classpath:config.properties")
+public class SpringConfig {
 
-public class SpringTestConfig {
-
-	@Value("${testDriver}")
+	@Value("${database.driver}")
 	public String driver;
-	@Value("${testUrl}")
+	@Value("${database.url}")
 	public String url;
-	@Value("${testLogin}")
+	@Value("${database.login}")
 	public String login;
-	@Value("${testPassword}")
+	@Value("${database.password}")
 	public String password;
 
 	@Bean
@@ -51,5 +51,10 @@ public class SpringTestConfig {
 		populator.addScripts(new ClassPathResource("/schema.sql"));
 		DatabasePopulatorUtils.execute(populator, dataSource);
 		return populator;
+	}
+
+	@Bean
+	public PlatformTransactionManager txManager(DataSource dataSource) {
+		return new DataSourceTransactionManager(dataSource);
 	}
 }

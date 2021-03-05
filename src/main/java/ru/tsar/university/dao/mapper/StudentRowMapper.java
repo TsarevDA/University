@@ -15,10 +15,10 @@ public class StudentRowMapper implements RowMapper<Student> {
 
 	@Override
 	public Student mapRow(ResultSet rs, int rowNum) throws SQLException {
-		Student student = new Student(rs.getInt("id"), rs.getString("first_name"), rs.getString("last_name"),
-				Gender.valueOf(rs.getString("gender")), rs.getObject("birth_date", LocalDate.class),
-				rs.getString("email"), rs.getString("phone"), rs.getString("address"));
-		return student;
+		return new Student.StudentBuilder().setId(rs.getInt("id")).setFirstName(rs.getString("first_name"))
+		.setLastName(rs.getString("last_name")).setGender(Gender.valueOf(rs.getString("gender")))
+		.setBirthDate(rs.getObject("birth_date", LocalDate.class)).setEmail(rs.getString("email"))
+		.setPhone(rs.getString("phone")).setAddress(rs.getString("address")).build();
 	}
 
 }

@@ -13,7 +13,6 @@ public class AuditoriumRowMapper implements RowMapper<Auditorium> {
 
 	@Override
 	public Auditorium mapRow(ResultSet rs, int rowNum) throws SQLException {
-		Auditorium auditorium = new Auditorium(rs.getInt("id"), rs.getString("name"), rs.getInt("capacity"));
-		return auditorium;
+		return new Auditorium.AuditoriumBuilder().setId(rs.getInt("id")).setName(rs.getString("name")).setCapacity(rs.getInt("capacity")).build();
 	}
 }

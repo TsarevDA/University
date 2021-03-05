@@ -13,29 +13,7 @@ public class Person {
 	private String phone;
 	private String address;
 
-	public Person(String firstName, String lastName, Gender gender, LocalDate birthday, String email, String phone,
-			String address) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.gender = gender;
-		this.birthDate = birthday;
-		this.email = email;
-		this.phone = phone;
-		this.address = address;
-	}
-
-	public Person(int id, String firstName, String lastName, Gender gender, LocalDate birthday, String email,
-			String phone, String address) {
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.gender = gender;
-		this.birthDate = birthday;
-		this.email = email;
-		this.phone = phone;
-		this.address = address;
-	}
-
+	
 	public int getId() {
 		return id;
 	}
@@ -99,7 +77,12 @@ public class Person {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
+	
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", gender=" + gender
+				+ ", birthDate=" + birthDate + ", email=" + email + ", phone=" + phone + ", address=" + address + "]";
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

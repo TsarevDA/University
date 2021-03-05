@@ -8,48 +8,36 @@ public class Group {
 	private String name;
 	private List<Student> students;
 
-	public Group(String name) {
-		this.name = name;
+	public Group(GroupBuilder builder) {
+		id = builder.id;
+		name = builder.name;
+		students = builder.students;	
 	}
-	public Group(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public Group(String name, List<Student> students) {
-		this.name = name;
-		this.students = students;
-	}
-
-	public Group(int id, String name, List<Student> students) {
-		this.id = id;
-		this.name = name;
-		this.students = students;
-	}
-
+	
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public List<Student> getStudents() {
 		return students;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setStudents(List<Student> students) {
 		this.students = students;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -85,6 +73,35 @@ public class Group {
 	@Override
 	public String toString() {
 		return "Group [id=" + id + ", name=" + name + ", students=" + students + "]";
+	}
+	
+	public static class GroupBuilder {
+		
+		private int id;
+		private String name;
+		private List<Student> students;
+		
+		public GroupBuilder() {
+			
+		}
+		
+		public GroupBuilder setId(int id) {
+			this.id = id;
+			return this;
+				
+		}
+		public GroupBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		public GroupBuilder setStudents(List<Student> students) {
+			this.students = students;
+			return this;
+		}
+			
+		public Group build() {
+			return new Group(this);
+		}
 	}
 
 }

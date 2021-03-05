@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.TeacherRowMapper;
 import ru.tsar.university.model.Group;
@@ -35,6 +37,7 @@ public class TeacherDao {
 		this.courseDao = courseDao;
 	}
 
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void create(Teacher teacher) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
@@ -55,6 +58,7 @@ public class TeacherDao {
 
 	}
 
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, id);
 		jdbcTemplate.update(DELETE_TEACHER_QUERY, id);
@@ -64,10 +68,15 @@ public class TeacherDao {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void update(Teacher teacher) {
 		jdbcTemplate.update(UPDATE_TEACHER_QUERY, teacher.getFirstName(), teacher.getLastName(),
 				teacher.getGender().name(), teacher.getBirthDate(), teacher.getPhone(), teacher.getAddress(),
 				teacher.getId());
+		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, teacher.getId());
+		teacher.getCourses().stream()
+				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
+
 	}
 
 	public List<Teacher> getAll() {

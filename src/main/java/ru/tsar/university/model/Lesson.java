@@ -12,78 +12,67 @@ public class Lesson {
 	private LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
-
-	public Lesson(int id, Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
-			Auditorium auditorium) {
-		this.id = id;
-		this.course = course;
-		this.teacher = teacher;
-		this.group = group;
-		this.day = day;
-		this.time = time;
-		this.auditorium = auditorium;
-	}
-
-	public Lesson(Course course, Teacher teacher, List<Group> group, LocalDate day, LessonTime time,
-			Auditorium auditorium) {
-		this.course = course;
-		this.teacher = teacher;
-		this.group = group;
-		this.day = day;
-		this.time = time;
-		this.auditorium = auditorium;
+	
+	public Lesson(LessonBuilder builder) {
+		id = builder.id;
+		course = builder.course;
+		teacher = builder.teacher;
+		group = builder.group;
+		day = builder.day;
+		time = builder.time;
+		auditorium = builder.auditorium;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
 	public Course getCourse() {
 		return course;
-	}
-
-	public void setCourse(Course course) {
-		this.course = course;
 	}
 
 	public Teacher getTeacher() {
 		return teacher;
 	}
 
-	public void setTeacher(Teacher teacher) {
-		this.teacher = teacher;
-	}
-
 	public List<Group> getGroup() {
 		return group;
-	}
-
-	public void setGroup(List<Group> group) {
-		this.group = group;
 	}
 
 	public LocalDate getDay() {
 		return day;
 	}
 
-	public void setDay(LocalDate day) {
-		this.day = day;
-	}
-
 	public LessonTime getTime() {
 		return time;
 	}
 
-	public void setTime(LessonTime time) {
-		this.time = time;
-	}
-
 	public Auditorium getAuditorium() {
 		return auditorium;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setCourse(Course course) {
+		this.course = course;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+
+	public void setGroup(List<Group> group) {
+		this.group = group;
+	}
+
+	public void setDay(LocalDate day) {
+		this.day = day;
+	}
+
+	public void setTime(LessonTime time) {
+		this.time = time;
 	}
 
 	public void setAuditorium(Auditorium auditorium) {
@@ -148,4 +137,57 @@ public class Lesson {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Lesson [id=" + id + ", course=" + course + ", teacher=" + teacher + ", group=" + group + ", day=" + day
+				+ ", time=" + time + ", auditorium=" + auditorium + "]";
+	}
+
+	public static class LessonBuilder {
+
+		private int id;
+		private Course course;
+		private Teacher teacher;
+		private List<Group> group;
+		private LocalDate day;
+		private LessonTime time;
+		private Auditorium auditorium;
+		
+		public LessonBuilder () {
+		}
+		
+		public LessonBuilder setId(int id) {
+			this.id = id;
+			return this;
+		}
+		public LessonBuilder setAuditorium(Auditorium auditorium) {
+			this.auditorium = auditorium;
+			return this;
+		}
+		public LessonBuilder setTime(LessonTime time) {
+			this.time = time;
+			return this;
+		}
+		public LessonBuilder setDay(LocalDate day) {
+			this.day = day;
+			return this;
+		}
+		public LessonBuilder setGroup(List<Group> group) {
+			this.group = group;
+			return this;
+		}
+		public LessonBuilder setTeacher(Teacher teacher) {
+			this.teacher = teacher;
+			return this;
+		}
+		public LessonBuilder setCourse(Course course) {
+			this.course = course;
+			return this;
+		}
+		public Lesson build() {
+			return new Lesson(this);
+		}
+		
+	}
+	
 }

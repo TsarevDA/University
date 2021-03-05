@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.CourseRowMapper;
 import ru.tsar.university.model.Auditorium;
@@ -51,8 +53,8 @@ public class CourseDao {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 	}
 
-	public List<Course> getByTeacher(Teacher teacher) {
-		return jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, teacher.getId());
+	public List<Course> getByTeacherId(int id) {
+		return jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, id);
 	}
 
 	public void update(Course course) {

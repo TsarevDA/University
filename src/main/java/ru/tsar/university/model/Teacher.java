@@ -4,31 +4,23 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.tsar.university.model.Student.StudentBuilder;
+
 public class Teacher extends Person {
 
 	private List<Course> courses;
-
-	public Teacher(String firstName, String lastName, Gender gender, LocalDate birthday, String email, String phone,
-			String address, List<Course> courses) {
-		super(firstName, lastName, gender, birthday, email, phone, address);
-		this.courses = courses;
-	}
-
-	public Teacher(String firstName, String lastName, Gender gender, LocalDate birthday, String email, String phone,
-			String address) {
-		super(firstName, lastName, gender, birthday, email, phone, address);
-		courses = new ArrayList<Course>();
-	}
-
-	public Teacher(int id, String firstName, String lastName, Gender gender, LocalDate birthday, String email,
-			String phone, String address) {
-		super(id, firstName, lastName, gender, birthday, email, phone, address);
-	}
-
-	public Teacher(int id, String firstName, String lastName, Gender gender, LocalDate birthday, String email,
-			String phone, String address, List<Course> courses) {
-		super(id, firstName, lastName, gender, birthday, email, phone, address);
-		this.courses = courses;
+	
+	
+	public Teacher(TeacherBuilder builder) {
+		setId(builder.id);
+		setFirstName(builder.firstName);
+		setLastName(builder.lastName);
+		setGender(builder.gender);
+		setBirthDate(builder.birthDate);
+		setEmail(builder.email);
+		setPhone(builder.phone);
+		setAddress(builder.address);
+		courses = builder.courses;
 	}
 
 	public List<Course> getCourses() {
@@ -37,6 +29,12 @@ public class Teacher extends Person {
 
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
+	}
+	
+	@Override
+	public String toString() {
+		
+		return super.toString() + "Teacher [courses=" + courses + "]";
 	}
 
 	@Override
@@ -62,5 +60,72 @@ public class Teacher extends Person {
 		} else if (!courses.equals(other.courses))
 			return false;
 		return true;
+	}
+	
+	
+	public static class TeacherBuilder {
+		
+		private int id;
+		private String firstName;
+		private String lastName;
+		private Gender gender;
+		private LocalDate birthDate;
+		private String email;
+		private String phone;
+		private String address;
+		private List<Course> courses;
+		
+		public TeacherBuilder() {
+		}
+		
+		public TeacherBuilder setId(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public TeacherBuilder setFirstName(String firstName) {
+			this.firstName = firstName;
+			return this;
+		}
+		
+		public TeacherBuilder setLastName(String lastName) {
+			this.lastName = lastName;
+			return this;
+		}
+		public TeacherBuilder setGender(Gender gender) {
+			this.gender = gender;
+			return this;
+		}
+
+		public TeacherBuilder setBirthDate(LocalDate birthDate) {
+			this.birthDate = birthDate;
+			return this;
+		}
+
+		public TeacherBuilder setEmail(String email) {
+			this.email = email;
+			return this;
+		}
+		
+		public TeacherBuilder setPhone(String phone) {
+			this.phone = phone;
+			return this;
+		}
+		public TeacherBuilder setAddress(String address) {
+			this.address = address;
+			return this;
+		}
+		
+		public TeacherBuilder setCourses(List<Course> courses) {
+			this.courses = courses;
+			return this;
+		}
+		
+		public Teacher build() {
+			return new Teacher(this);
+		}
+		
+		
+		
 	}
 }

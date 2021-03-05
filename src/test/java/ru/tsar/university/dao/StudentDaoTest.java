@@ -2,104 +2,87 @@ package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.DatabasePopulator;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import ru.tsar.university.SpringConfig;
-import ru.tsar.university.SpringTestConfig;
-import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.config.SpringTestConfig;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Student;
 
+@SpringJUnitConfig
+@ContextConfiguration(classes = SpringTestConfig.class)
+@Sql("/studentData.sql")
 class StudentDaoTest {
 
-	final static private String GET_STUDENT_REQUEST = "SELECT * FROM students";
-	final static private String GET_COUNT_BY_ID_REQUEST = "select count(*) FROM students WHERE id=?";
-	final static private String CREATE_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
-
-	private AnnotationConfigApplicationContext context;
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
 	private StudentDao studentDao;
 
-	@BeforeEach
-	void setUp() {
-		context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		context.getBean("databasePopulator", DatabasePopulator.class);
-		this.jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		this.studentDao = context.getBean("studentDao", StudentDao.class);
-	}
-
-	@AfterEach
-	void setDown() {
-		context.close();
-	}
-
 	@Test
-	void setStudent_whenCreate_thenCreateStudent() {
+	@DirtiesContext
+	void givenStudent_whenCreate_thenCreated() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student expected = new Student("Ivan", "Ivanov", Gender.valueOf("MALE"),
-				LocalDate.parse("1990-01-01", formatter), "mail@mail.ru", "88008080", "Ivanov street, 25-5");
+		Student expected = new Student.StudentBuilder().setFirstName("Ivan").setLastName("Ivanov")
+				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
+				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5").build();
+		
 		studentDao.create(expected);
+		
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "students", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
 
 	@Test
-	void setId_whenDeleteById_thenDeleteStudent() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student student = new Student("Ivan", "Ivanov", Gender.valueOf("MALE"),
-				LocalDate.parse("1990-01-01", formatter), "mail@mail.ru", "88008080", "Ivanov street, 25-5");
-		studentDao.create(student);
-		studentDao.deleteById(student.getId());
+	@DirtiesContext
+	void givenId_whenDeleteById_thenDeleted() {
 
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "students", "id = " + student.getId());
+		studentDao.deleteById(1);
+		
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "students", "id = 1 ");
 		assertEquals(0, actual);
 	}
 
 	@Test
-	void setId_whenGetById_thenGetStudent() {
+	@DirtiesContext
+	void givenId_whenGetById_thenStudentFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student expected = new Student("Ivan", "Ivanov", Gender.valueOf("MALE"),
-				LocalDate.parse("1990-01-01", formatter), "mail@mail.ru", "88008080", "Ivanov street, 25-5");
-		studentDao.create(expected);
-		Student actual = studentDao.getById(expected.getId());
+		Student expected = new Student.StudentBuilder().setId(1).setFirstName("Ivan").setLastName("Ivanov")
+				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
+				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5").build();
+		
+		Student actual = studentDao.getById(1);
+		
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	void setStudents_whenGetAll_thenStudentsList() {
+	@DirtiesContext
+	void givenStudents_whenGetAll_thenStudentsListFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student first = new Student("Ivan", "Ivanov", Gender.valueOf("MALE"), LocalDate.parse("1990-01-01", formatter),
-				"mail@mail.ru", "88008080", "Ivanov street, 25-5");
-		studentDao.create(first);
-
-		Student second = new Student("Petr", "Ivanov", Gender.valueOf("MALE"), LocalDate.parse("1992-05-03", formatter),
-				"mail11111@mail.ru", "880899908080", "Petrov street, 25-5");
-		studentDao.create(second);
-
+		Student student1 = new Student.StudentBuilder().setId(1).setFirstName("Ivan").setLastName("Ivanov")
+				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
+				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5").build();
+		Student student2 = new Student.StudentBuilder().setId(2).setFirstName("Petr").setLastName("Ivanov")
+				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1992-05-03", formatter))
+				.setEmail("mail11111@mail.ru").setPhone("880899908080").setAddress("Petrov street, 25-5").build();
 		List<Student> expected = new ArrayList<>();
-		expected.add(first);
-		expected.add(second);
+		expected.add(student1);
+		expected.add(student2);
 
 		List<Student> actual = studentDao.getAll();
+		
 		assertEquals(expected, actual);
 	}
 }

@@ -5,89 +5,84 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import ru.tsar.university.SpringTestConfig;
+import ru.tsar.university.config.SpringTestConfig;
 import ru.tsar.university.model.Auditorium;
 
+@SpringJUnitConfig
+@ContextConfiguration(classes = SpringTestConfig.class)
+@Sql("/auditoriumData.sql")
 class AuditoriumDaoTest {
 
-	private AnnotationConfigApplicationContext context;
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
 	private AuditoriumDao auditoriumDao;
 
-	@BeforeEach
-	void setUp() {
-		context = new AnnotationConfigApplicationContext(SpringTestConfig.class);
-		context.getBean("databasePopulator", DatabasePopulator.class);
-		this.jdbcTemplate = context.getBean("jdbcTemplate", JdbcTemplate.class);
-		this.auditoriumDao = context.getBean("auditoriumDao", AuditoriumDao.class);
-	}
-
-	@AfterEach
-	void setDown() {
-		context.close();
-	}
 
 	@Test
-	void setAuditorium_whenCreate_thenCreateAuditorium() {
-		Auditorium expected = new Auditorium("Name", 100);
+	void givenNewAuditorium_whenCreate_thenCreated() {
+		Auditorium expected = new Auditorium.AuditoriumBuilder().setName("Name").setCapacity(100).build();
+		
 		auditoriumDao.create(expected);
+		
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
 
 	@Test
-	void setId_whenDeleteById_thenDeleteAuditorium() {
-		Auditorium auditorium = new Auditorium("AName", 1000);
-		auditoriumDao.create(auditorium);
-		auditoriumDao.deleteById(auditorium.getId());
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums", "id = " + auditorium.getId());
+	@DirtiesContext
+	void givenId_whenDeleteById_thenDeleted() {
+		
+		auditoriumDao.deleteById(1);
+		
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums", "id = 1");
 		assertEquals(0, actual);
 	}
 
 	@Test
-	void setId_whenGetById_thenGetAuditorium() {
-
-		Auditorium expected = new Auditorium("Name", 100);
-		auditoriumDao.create(expected);
-		Auditorium actual = auditoriumDao.getById(expected.getId());
+	@DirtiesContext
+	void givenId_whenGetById_thenAuditoriumFound() {
+		Auditorium expected = new Auditorium.AuditoriumBuilder().setId(1).setName("First").setCapacity(100).build();
+		
+		Auditorium actual = auditoriumDao.getById(1);
+		
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	void setAuditorium_whenUpdate_thenUpdatedAuditorium() {
-
-		Auditorium old = new Auditorium("Name", 100);
-		auditoriumDao.create(old);
-		Auditorium expected = new Auditorium(old.getId(), "newAuditorium", 1000);
+	@DirtiesContext
+	void givenAuditorium_whenUpdate_thenUpdated() {
+		Auditorium expected = new Auditorium.AuditoriumBuilder().setId(1).setName("newAuditorium").setCapacity(1000).build();
+		
 		auditoriumDao.update(expected);
+		
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums",
-				"name = 'newAuditorium' and id = " + old.getId());
-
+				"name = 'newAuditorium' and id = 1");
 		assertEquals(1, actual);
 	}
 
 	@Test
-	void setAuditoriums_whenGetAll_thenAuditoriumsList() {
-		Auditorium first = new Auditorium("First", 100);
-		auditoriumDao.create(first);
-
-		Auditorium second = new Auditorium("Second", 500);
-		auditoriumDao.create(second);
-
+	@DirtiesContext
+	void givenAuditoriums_whenGetAll_thenAuditoriumsListFound() {
+		Auditorium auditorium1 = new Auditorium.AuditoriumBuilder().setId(1).setName("First").setCapacity(100).build();
+		Auditorium auditorium2 = new Auditorium.AuditoriumBuilder().setId(2).setName("Second").setCapacity(500).build();
 		List<Auditorium> expected = new ArrayList<>();
-		expected.add(first);
-		expected.add(second);
+		expected.add(auditorium1);
+		expected.add(auditorium2);
 
 		List<Auditorium> actual = auditoriumDao.getAll();
+		
 		assertEquals(expected, actual);
 	}
 

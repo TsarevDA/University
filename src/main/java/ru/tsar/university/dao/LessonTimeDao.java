@@ -20,7 +20,8 @@ public class LessonTimeDao {
 	private static final String ADD_LESSON_TIME_QUERY = "INSERT INTO lessons_time(order_number,start_time,end_time) VALUES(?,?,?)";
 	private static final String DELETE_LESSON_TIME_QUERY = "DELETE FROM lessons_time where id =?";
 	private static final String GET_BY_ORDER_NUMBER_QUERY = "SELECT * FROM lessons_time WHERE order_number=?";
-	private static final String UPDATE_LESSON_TIME_QUERY = "UPDATE lessons_time SET start_time=?,end_time=?, WHERE order_number=?";
+	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons_time WHERE id=?";
+	private static final String UPDATE_LESSON_TIME_QUERY = "UPDATE lessons_time SET start_time=?,end_time=?, WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons_time ";
 
 	private JdbcTemplate jdbcTemplate;
@@ -49,6 +50,10 @@ public class LessonTimeDao {
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_LESSON_TIME_QUERY, id);
 	}
+	
+	public LessonTime getById(int id) {
+		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+	}
 
 	public LessonTime getByOrder(int order) {
 		return jdbcTemplate.queryForObject(GET_BY_ORDER_NUMBER_QUERY, rowMapper, order);
@@ -56,7 +61,7 @@ public class LessonTimeDao {
 
 	public void update(LessonTime lessonTime) {
 		jdbcTemplate.update(UPDATE_LESSON_TIME_QUERY, lessonTime.getStartTime(), lessonTime.getEndTime(),
-				lessonTime.getOrderNumber());
+				lessonTime.getId());
 	}
 
 	public List<LessonTime> getAll() {

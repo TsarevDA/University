@@ -11,17 +11,12 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<junit.jupiter.version>5.4.0</junit.jupiter.version>
 		<postgresql.version>42.2.16</postgresql.version>
-
-		<spring-core.version>5.2.11.RELEASE</spring-core.version>
-		<spring-context.version>5.2.11.RELEASE</spring-context.version>
-		<spring-jdbc.version>5.2.11.RELEASE</spring-jdbc.version>
-		<spring-test.version>5.2.11.RELEASE</spring-test.version>
-
-
+		<spring.version>5.2.11.RELEASE</spring.version>
+		<h2.version>1.4.200</h2.version>
 	</properties>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -31,25 +26,25 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>${spring-core.version}</version>
+			<version>${spring.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${spring-context.version}</version>
+			<version>${spring.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>${spring-jdbc.version}</version>
+			<version>${spring.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<version>${spring-test.version}</version>
+			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -71,7 +66,7 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>1.4.200</version>
+			<version>${h2.version}</version>
 			<scope>test</scope>
 		</dependency>
 

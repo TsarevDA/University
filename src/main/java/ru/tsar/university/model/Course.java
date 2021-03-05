@@ -6,39 +6,39 @@ public class Course {
 	private String name;
 	private String description;
 
-	public Course(String name, String description) {
-		this.name = name;
-		this.description = description;
+	public Course(CourseBuilder builder) {
+		id = builder.id;
+		name = builder.name;
+		description = builder.description;
 	}
-
-	public Course(int id, String name, String description) {
-		this.id = id;
-		this.name = name;
-		this.description = description;
-	}
-
+	
 	public int getId() {
 		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public String getName() {
 		return name;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return "Course [id=" + id + ", name=" + name + ", description=" + description + "]";
 	}
 
 	@Override
@@ -73,6 +73,33 @@ public class Course {
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+	
+	public static class CourseBuilder{
+		
+		private int id;
+		private String name;
+		private String description;
+		
+		public CourseBuilder() {
+		}
+		
+		public CourseBuilder setId(int id) {
+			this.id = id;
+			return this;
+		}
+		public CourseBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		public CourseBuilder setDescription(String description) {
+			this.description = description;
+			return this;
+		}
+		public Course build() {
+			return new Course(this);
+		}
+		
 	}
 
 }
