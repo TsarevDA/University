@@ -32,7 +32,7 @@ class AuditoriumDaoTest {
 
 	@Test
 	void givenNewAuditorium_whenCreate_thenCreated() {
-		Auditorium expected = new Auditorium.AuditoriumBuilder().setName("Name").setCapacity(100).build();
+		Auditorium expected = Auditorium.builder().name("Name").capacity(100).build();
 		
 		auditoriumDao.create(expected);
 		
@@ -53,7 +53,7 @@ class AuditoriumDaoTest {
 	@Test
 	@DirtiesContext
 	void givenId_whenGetById_thenAuditoriumFound() {
-		Auditorium expected = new Auditorium.AuditoriumBuilder().setId(1).setName("First").setCapacity(100).build();
+		Auditorium expected = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
 		
 		Auditorium actual = auditoriumDao.getById(1);
 		
@@ -63,8 +63,9 @@ class AuditoriumDaoTest {
 	@Test
 	@DirtiesContext
 	void givenAuditorium_whenUpdate_thenUpdated() {
-		Auditorium expected = new Auditorium.AuditoriumBuilder().setId(1).setName("newAuditorium").setCapacity(1000).build();
-		
+	
+		Auditorium expected = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
+				
 		auditoriumDao.update(expected);
 		
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums",
@@ -75,8 +76,8 @@ class AuditoriumDaoTest {
 	@Test
 	@DirtiesContext
 	void givenAuditoriums_whenGetAll_thenAuditoriumsListFound() {
-		Auditorium auditorium1 = new Auditorium.AuditoriumBuilder().setId(1).setName("First").setCapacity(100).build();
-		Auditorium auditorium2 = new Auditorium.AuditoriumBuilder().setId(2).setName("Second").setCapacity(500).build();
+		Auditorium auditorium1 = Auditorium.builder().id(1).name("First").capacity(100).build();
+		Auditorium auditorium2 = Auditorium.builder().id(2).name("Second").capacity(500).build();
 		List<Auditorium> expected = new ArrayList<>();
 		expected.add(auditorium1);
 		expected.add(auditorium2);

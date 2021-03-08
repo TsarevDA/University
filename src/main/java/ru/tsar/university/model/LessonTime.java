@@ -2,6 +2,8 @@ package ru.tsar.university.model;
 
 import java.time.LocalTime;
 
+import ru.tsar.university.model.Lesson.LessonBuilder;
+
 public class LessonTime {
 
 	private int id;
@@ -9,11 +11,8 @@ public class LessonTime {
 	private LocalTime startTime;
 	private LocalTime endTime;
 	
-	public LessonTime (LessonTimeBuilder builder) {
-		id = builder.id;
-		orderNumber = builder.orderNumber;
-		startTime = builder.startTime;
-		endTime = builder.endTime;
+	private LessonTime () {
+
 	}
 
 	public int getOrderNumber() {
@@ -92,6 +91,10 @@ public class LessonTime {
 			return false;
 		return true;
 	}
+	
+	public static LessonTimeBuilder builder() {
+		return new LessonTimeBuilder();
+	}
 
 	public static class LessonTimeBuilder {
 
@@ -103,26 +106,32 @@ public class LessonTime {
 		public LessonTimeBuilder() {
 		}
 		
-		public LessonTimeBuilder setId(int id) {
+		public LessonTimeBuilder id(int id) {
 			this.id = id;
 			return this;
 		}
 		
-		public LessonTimeBuilder setOrderNumber(int orderNumber) {
+		public LessonTimeBuilder orderNumber(int orderNumber) {
 			this.orderNumber = orderNumber;
 			return this;
 		}
-		public LessonTimeBuilder setStartTime(LocalTime startTime) {
+		public LessonTimeBuilder startTime(LocalTime startTime) {
 			this.startTime = startTime;
 			return this;
 		}
-		public LessonTimeBuilder setEndTime(LocalTime endTime) {
+
+		public LessonTimeBuilder endTime(LocalTime endTime) {
 			this.endTime = endTime;
 			return this;
 		}
 		
 		public LessonTime build() {
-			return new LessonTime(this);
+			LessonTime lessonTime = new LessonTime();
+			lessonTime.setId(id);
+			lessonTime.setOrderNumber(orderNumber);
+			lessonTime.setStartTime(startTime);
+			lessonTime.setEndTime(endTime);
+			return lessonTime;
 		}
 	}
 }

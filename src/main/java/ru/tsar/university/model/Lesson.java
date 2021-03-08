@@ -3,6 +3,8 @@ package ru.tsar.university.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import ru.tsar.university.model.Auditorium.AuditoriumBuilder;
+
 public class Lesson {
 
 	private int id;
@@ -12,15 +14,8 @@ public class Lesson {
 	private LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
-	
-	public Lesson(LessonBuilder builder) {
-		id = builder.id;
-		course = builder.course;
-		teacher = builder.teacher;
-		group = builder.group;
-		day = builder.day;
-		time = builder.time;
-		auditorium = builder.auditorium;
+
+	private Lesson() {
 	}
 
 	public int getId() {
@@ -143,6 +138,10 @@ public class Lesson {
 				+ ", time=" + time + ", auditorium=" + auditorium + "]";
 	}
 
+	public static LessonBuilder builder() {
+		return new LessonBuilder();
+	}
+
 	public static class LessonBuilder {
 
 		private int id;
@@ -152,42 +151,57 @@ public class Lesson {
 		private LocalDate day;
 		private LessonTime time;
 		private Auditorium auditorium;
-		
-		public LessonBuilder () {
+
+		public LessonBuilder() {
 		}
-		
-		public LessonBuilder setId(int id) {
+
+		public LessonBuilder id(int id) {
 			this.id = id;
 			return this;
 		}
-		public LessonBuilder setAuditorium(Auditorium auditorium) {
+
+		public LessonBuilder auditorium(Auditorium auditorium) {
 			this.auditorium = auditorium;
 			return this;
 		}
-		public LessonBuilder setTime(LessonTime time) {
+
+		public LessonBuilder time(LessonTime time) {
 			this.time = time;
 			return this;
 		}
-		public LessonBuilder setDay(LocalDate day) {
+
+		public LessonBuilder day(LocalDate day) {
 			this.day = day;
 			return this;
 		}
-		public LessonBuilder setGroup(List<Group> group) {
+
+		public LessonBuilder group(List<Group> group) {
 			this.group = group;
 			return this;
 		}
-		public LessonBuilder setTeacher(Teacher teacher) {
+
+		public LessonBuilder teacher(Teacher teacher) {
 			this.teacher = teacher;
 			return this;
 		}
-		public LessonBuilder setCourse(Course course) {
+
+		public LessonBuilder course(Course course) {
 			this.course = course;
 			return this;
 		}
+
 		public Lesson build() {
-			return new Lesson(this);
+			Lesson lesson = new Lesson();
+			lesson.setId(id);
+			lesson.setCourse(course);
+			lesson.setTeacher(teacher);
+			lesson.setGroup(group);
+			lesson.setDay(day);
+			lesson.setTime(time);
+			lesson.setAuditorium(auditorium);
+			return lesson;
 		}
-		
+
 	}
-	
+
 }

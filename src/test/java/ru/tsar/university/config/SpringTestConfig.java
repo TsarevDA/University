@@ -11,7 +11,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Configuration
-@PropertySource("classpath:configTest.properties")
 @Import(SpringConfig.class)
 public class SpringTestConfig {
 

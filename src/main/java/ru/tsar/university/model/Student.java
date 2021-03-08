@@ -2,17 +2,15 @@ package ru.tsar.university.model;
 
 import java.time.LocalDate;
 
+import ru.tsar.university.model.LessonTime.LessonTimeBuilder;
+
 public class Student extends Person {
-	
-	public Student(StudentBuilder builder) {
-		setId(builder.id);
-		setFirstName(builder.firstName);
-		setLastName(builder.lastName);
-		setGender(builder.gender);
-		setBirthDate(builder.birthDate);
-		setEmail(builder.email);
-		setPhone(builder.phone);
-		setAddress(builder.address);
+
+	private Student() {
+	}
+
+	public static StudentBuilder builder() {
+		return new StudentBuilder();
 	}
 
 	public static class StudentBuilder {
@@ -25,53 +23,64 @@ public class Student extends Person {
 		private String email;
 		private String phone;
 		private String address;
-		
+
 		public StudentBuilder() {
-		
+
 		}
-		
-		public StudentBuilder setId(int id) {
+
+		public StudentBuilder id(int id) {
 			this.id = id;
 			return this;
 		}
-		
-		public StudentBuilder setFirstName(String firstName) {
-			 
+
+		public StudentBuilder firstName(String firstName) {
+
 			this.firstName = firstName;
 			return this;
 		}
-		
-		public StudentBuilder setLastName(String lastName) {
+
+		public StudentBuilder lastName(String lastName) {
 			this.lastName = lastName;
 			return this;
 		}
-		public StudentBuilder setGender(Gender gender) {
+
+		public StudentBuilder gender(Gender gender) {
 			this.gender = gender;
 			return this;
 		}
 
-		public StudentBuilder setBirthDate(LocalDate birthDate) {
+		public StudentBuilder birthDate(LocalDate birthDate) {
 			this.birthDate = birthDate;
 			return this;
 		}
 
-		public StudentBuilder setEmail(String email) {
+		public StudentBuilder email(String email) {
 			this.email = email;
 			return this;
 		}
-		
-		public StudentBuilder setPhone(String phone) {
+
+		public StudentBuilder phone(String phone) {
 			this.phone = phone;
 			return this;
 		}
-		public StudentBuilder setAddress(String address) {
+
+		public StudentBuilder address(String address) {
 			this.address = address;
 			return this;
 		}
-		
+
 		public Student build() {
-			return new Student(this);
-		}	
-		
+			Student student = new Student();
+			student.setId(id);
+			student.setFirstName(firstName);
+			student.setLastName(lastName);
+			student.setGender(gender);
+			student.setBirthDate(birthDate);
+			student.setEmail(email);
+			student.setPhone(phone);
+			student.setAddress(address);
+			return student;
+		}
+
 	}
 }

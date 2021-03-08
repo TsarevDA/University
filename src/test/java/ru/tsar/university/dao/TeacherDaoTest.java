@@ -36,13 +36,12 @@ class TeacherDaoTest {
 	@DirtiesContext
 	void givenTeacher_whenCreate_thenCreated() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Teacher expected = new Teacher.TeacherBuilder().setFirstName("Ivan").setLastName("Ivanov")
-				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
-				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5")
-				.setCourses(new ArrayList<Course>()).build();
-		
+		Teacher expected = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
+
 		teacherDao.create(expected);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "teachers", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
@@ -50,9 +49,9 @@ class TeacherDaoTest {
 	@Test
 	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
-		
+
 		teacherDao.deleteById(1);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "teachers", "id = 1");
 		assertEquals(0, actual);
 	}
@@ -61,13 +60,12 @@ class TeacherDaoTest {
 	@DirtiesContext
 	void givenId_whenGetById_thenTeacherFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Teacher expected = new Teacher.TeacherBuilder().setId(1).setFirstName("Ivan").setLastName("Ivanov")
-				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
-				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5")
-				.setCourses(new ArrayList<Course>()).build();
-		
+		Teacher expected = Teacher.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
+
 		Teacher actual = teacherDao.getById(1);
-		
+
 		assertEquals(expected, actual);
 	}
 
@@ -76,20 +74,20 @@ class TeacherDaoTest {
 	void givenTeachers_whenGetAll_thenTeachersListFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		List<Course> courses = new ArrayList<>();
-		Teacher teacher1 = new Teacher.TeacherBuilder().setFirstName("Ivan").setLastName("Ivanov")
-				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1990-01-01", formatter))
-				.setEmail("mail@mail.ru").setPhone("88008080").setAddress("Ivanov street, 25-5").build();
+		Teacher teacher1 = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").build();
 		teacher1.setCourses(courses);
-		Teacher teacher2 = new Teacher.TeacherBuilder().setFirstName("Petr").setLastName("Ivanov")
-				.setGender(Gender.valueOf("MALE")).setBirthDate(LocalDate.parse("1992-05-03", formatter))
-				.setEmail("mail11111@mail.ru").setPhone("880899908080").setAddress("Petrov street, 25-5").build();
+		Teacher teacher2 = Teacher.builder().firstName("Petr").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.parse("1992-05-03", formatter)).email("mail11111@mail.ru").phone("880899908080")
+				.address("Petrov street, 25-5").build();
 		teacher2.setCourses(courses);
 		List<Teacher> expected = new ArrayList<>();
 		expected.add(teacher1);
 		expected.add(teacher2);
 
 		List<Teacher> actual = teacherDao.getAll();
-		
+
 		assertEquals(expected, actual);
 	}
 

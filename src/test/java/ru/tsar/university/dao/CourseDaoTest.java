@@ -15,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 
 @SpringJUnitConfig
@@ -31,11 +32,10 @@ class CourseDaoTest {
 	@Test
 	@DirtiesContext
 	void givenNewCourse_whenCreate_thenCreated() {
-		Course expected = new Course.CourseBuilder().setName("Astronomy").setDescription("Science about stars and deep space")
-				.build();
-		
+		Course expected = Course.builder().name("Astronomy").description("Science about stars and deep space").build();
+
 		courseDao.create(expected);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
@@ -43,9 +43,9 @@ class CourseDaoTest {
 	@Test
 	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
-		
+
 		courseDao.deleteById(1);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", "id = 1");
 		assertEquals(0, actual);
 	}
@@ -53,26 +53,26 @@ class CourseDaoTest {
 	@Test
 	@DirtiesContext
 	void givenId_whenGetById_thenCourseFound() {
-		Course expected = new Course.CourseBuilder().setId(1).setName("Astronomy")
-				.setDescription("Science about stars and deep space").build();
-		
+		Course expected = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
+				.build();
+
 		Course actual = courseDao.getById(1);
-		
+
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	@DirtiesContext
 	void givenCourses_whenGetAll_thenCoursesListFound() {
-		Course course1 = new Course.CourseBuilder().setId(1).setName("Astronomy")
-				.setDescription("Science about stars and deep space").build();
-		Course course2 = new Course.CourseBuilder().setId(2).setName("Math").setDescription("Science about numbers").build();
+		Course course1 = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
+				.build();
+		Course course2 = Course.builder().id(2).name("Math").description("Science about numbers").build();
 		List<Course> expected = new ArrayList<>();
 		expected.add(course1);
 		expected.add(course2);
-		
+
 		List<Course> actual = courseDao.getAll();
-		
+
 		assertEquals(expected, actual);
 	}
 }

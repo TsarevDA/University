@@ -46,7 +46,7 @@ public class LessonRowMapper implements RowMapper<Lesson> {
 		Auditorium auditorium = auditoriumDao.getById(rs.getInt("auditorium_id"));
 		List<Group> groups = groupDao.getByLessonId(rs.getInt("id"));
 
-		return new Lesson.LessonBuilder().setId(rs.getInt("id")).setCourse(course).setTeacher(teacher)
-				.setDay(rs.getDate("day").toLocalDate()).setTime(lessonTime).setAuditorium(auditorium).setGroup(groups).build();
+		return new Lesson.LessonBuilder().id(rs.getInt("id")).course(course).teacher(teacher)
+				.day(rs.getDate("day").toLocalDate()).time(lessonTime).auditorium(auditorium).group(groups).build();
 	}
 }

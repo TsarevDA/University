@@ -13,7 +13,6 @@ public class Person {
 	private String phone;
 	private String address;
 
-	
 	public int getId() {
 		return id;
 	}
@@ -77,12 +76,13 @@ public class Person {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Person [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", gender=" + gender
 				+ ", birthDate=" + birthDate + ", email=" + email + ", phone=" + phone + ", address=" + address + "]";
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

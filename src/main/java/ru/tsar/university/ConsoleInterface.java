@@ -125,8 +125,8 @@ public class ConsoleInterface {
 
 		// Student student = new Student(firstName, lastName, gender, date, email,
 		// phone, address);
-		Student student = new Student.StudentBuilder().setFirstName(firstName).setLastName(lastName).setGender(gender)
-				.setBirthDate(date).setEmail(email).setPhone(phone).setAddress(address).build();
+		Student student = Student.builder().firstName(firstName).lastName(lastName).gender(gender)
+				.birthDate(date).email(email).phone(phone).address(address).build();
 		studentDao.create(student);
 
 		university.addStudent(student);
@@ -151,7 +151,7 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		System.out.println("Enter course description:");
 		String description = scanner.next();
-		Course course = new Course.CourseBuilder().setName(name).setDescription(description).build();
+		Course course = Course.builder().name(name).description(description).build();
 
 		courseDao.create(course);
 		university.addCourse(course);
@@ -193,10 +193,8 @@ public class ConsoleInterface {
 
 		List<Course> courses = university.getCourses().stream().filter(c -> coursesNames.contains(c.getName()))
 				.collect(Collectors.toList());
-		// Teacher teacher = new Teacher(firstName, lastName, gender, date, email,
-		// phone, address, courses);
-		Teacher teacher = new Teacher.TeacherBuilder().setFirstName(firstName).setLastName(lastName).setGender(gender)
-				.setBirthDate(date).setEmail(email).setPhone(phone).setAddress(address).setCourses(courses).build();
+		Teacher teacher = Teacher.builder().firstName(firstName).lastName(lastName).gender(gender)
+				.birthDate(date).email(email).phone(phone).address(address).courses(courses).build();
 
 		teacherDao.create(teacher);
 		university.addTeacher(teacher);
@@ -219,7 +217,7 @@ public class ConsoleInterface {
 		System.out.println("Enter group name:");
 		String name = scanner.next();
 		//Group group = new Group(name);
-		Group group = new Group.GroupBuilder().setName(name).build();
+		Group group = Group.builder().name(name).build();
 		groupDao.create(group);
 		university.addGroup(group);
 	}
@@ -243,7 +241,7 @@ public class ConsoleInterface {
 		System.out.println("Enter auditorium capacity:");
 		int capacity = scanner.nextInt();
 		//Auditorium auditorium = new Auditorium(name, capacity);
-		Auditorium auditorium = new Auditorium.AuditoriumBuilder().setName(name).setCapacity(capacity).build();
+		Auditorium auditorium = new Auditorium.AuditoriumBuilder().name(name).capacity(capacity).build();
 		auditoriumDao.create(auditorium);
 		university.addAuditorium(auditorium);
 	}
@@ -266,8 +264,7 @@ public class ConsoleInterface {
 		LocalTime endTime = LocalTime.parse("09:00");
 		ArrayList<LessonTime> lessonsTime = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
-			//lessonsTime.add(new LessonTime(i + 1, startTime.plusHours(i), endTime.plusHours(i)));
-			lessonsTime.add(new LessonTime.LessonTimeBuilder().setOrderNumber(i+1).setStartTime(startTime.plusHours(i)).setEndTime(endTime.plusHours(i)).build());
+			lessonsTime.add(LessonTime.builder().orderNumber(i+1).startTime(startTime.plusHours(i)).endTime(endTime.plusHours(i)).build());
 		}
 		lessonsTime.stream().forEach(lt -> lessonTimeDao.create(lt));
 		university.setLessonsTime(lessonsTime);
@@ -314,10 +311,9 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		Auditorium auditorium = auditoriumForAdding.get(0);
 
-		// Lesson lesson = new Lesson(course, teacher, groups, day, lessonTime,
-		// auditorium);
-		Lesson lesson = new Lesson.LessonBuilder().setCourse(course).setTeacher(teacher).setGroup(groups).setDay(day)
-				.setTime(lessonTime).setAuditorium(auditorium).build();
+
+		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day)
+				.time(lessonTime).auditorium(auditorium).build();
 
 		lessonDao.create(lesson);
 

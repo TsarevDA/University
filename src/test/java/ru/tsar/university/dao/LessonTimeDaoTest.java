@@ -36,11 +36,10 @@ class LessonTimeDaoTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("08:00", formatter);
 		LocalTime endTime = LocalTime.parse("09:00", formatter);
-		LessonTime expected = new LessonTime.LessonTimeBuilder().setOrderNumber(1).setStartTime(startTime).setEndTime(endTime)
-				.build();
-		
+		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
+
 		lessonTimeDao.create(expected);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons_time", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
@@ -50,7 +49,7 @@ class LessonTimeDaoTest {
 	void givenId_whenDeleteById_thenDeleted() {
 
 		lessonTimeDao.deleteById(1);
-		
+
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons_time", "id = 1");
 		assertEquals(0, actual);
 	}
@@ -61,11 +60,10 @@ class LessonTimeDaoTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);
 		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime expected = new LessonTime.LessonTimeBuilder().setId(1).setOrderNumber(2).setStartTime(startTime)
-				.setEndTime(endTime).build();
-		
+		LessonTime expected = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime).build();
+
 		LessonTime actual = lessonTimeDao.getByOrder(2);
-		
+
 		assertEquals(expected, actual);
 	}
 
@@ -75,18 +73,18 @@ class LessonTimeDaoTest {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);
 		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime lessonTime1 = new LessonTime.LessonTimeBuilder().setId(1).setOrderNumber(2).setStartTime(startTime)
-				.setEndTime(endTime).build();
+		LessonTime lessonTime1 = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime)
+				.build();
 		startTime = LocalTime.parse("10:00", formatter);
 		endTime = LocalTime.parse("11:00", formatter);
-		LessonTime lessonTime2 = new LessonTime.LessonTimeBuilder().setId(2).setOrderNumber(3).setStartTime(startTime)
-				.setEndTime(endTime).build();
+		LessonTime lessonTime2 = LessonTime.builder().id(2).orderNumber(3).startTime(startTime).endTime(endTime)
+				.build();
 		List<LessonTime> expected = new ArrayList<>();
 		expected.add(lessonTime1);
 		expected.add(lessonTime2);
 
 		List<LessonTime> actual = lessonTimeDao.getAll();
-		
+
 		assertEquals(expected, actual);
 	}
 }

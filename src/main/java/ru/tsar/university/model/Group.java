@@ -2,18 +2,18 @@ package ru.tsar.university.model;
 
 import java.util.List;
 
+import ru.tsar.university.model.Auditorium.AuditoriumBuilder;
+
 public class Group {
 
 	private int id;
 	private String name;
 	private List<Student> students;
 
-	public Group(GroupBuilder builder) {
-		id = builder.id;
-		name = builder.name;
-		students = builder.students;	
+	private Group() {
+
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -25,7 +25,7 @@ public class Group {
 	public List<Student> getStudents() {
 		return students;
 	}
-	
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -47,6 +47,7 @@ public class Group {
 		result = prime * result + ((students == null) ? 0 : students.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -70,37 +71,48 @@ public class Group {
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "Group [id=" + id + ", name=" + name + ", students=" + students + "]";
 	}
-	
+
+	public static GroupBuilder builder() {
+		return new GroupBuilder();
+	}
+
 	public static class GroupBuilder {
-		
+
 		private int id;
 		private String name;
 		private List<Student> students;
-		
+
 		public GroupBuilder() {
-			
+
 		}
-		
-		public GroupBuilder setId(int id) {
+
+		public GroupBuilder id(int id) {
 			this.id = id;
 			return this;
-				
+
 		}
-		public GroupBuilder setName(String name) {
+
+		public GroupBuilder name(String name) {
 			this.name = name;
 			return this;
 		}
-		public GroupBuilder setStudents(List<Student> students) {
+
+		public GroupBuilder students(List<Student> students) {
 			this.students = students;
 			return this;
 		}
-			
+
 		public Group build() {
-			return new Group(this);
+			Group group = new Group();
+			group.setId(id);
+			group.setName(name);
+			group.setStudents(students);
+			return group;
 		}
 	}
 

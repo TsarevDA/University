@@ -1,17 +1,16 @@
 package ru.tsar.university.model;
 
+import ru.tsar.university.model.Auditorium.AuditoriumBuilder;
+
 public class Course {
 
 	private int id;
 	private String name;
 	private String description;
 
-	public Course(CourseBuilder builder) {
-		id = builder.id;
-		name = builder.name;
-		description = builder.description;
+	private Course() {
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -23,7 +22,7 @@ public class Course {
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -74,32 +73,43 @@ public class Course {
 			return false;
 		return true;
 	}
-	
-	public static class CourseBuilder{
-		
+
+	public static CourseBuilder builder() {
+		return new CourseBuilder();
+	}
+
+	public static class CourseBuilder {
+
 		private int id;
 		private String name;
 		private String description;
-		
+
 		public CourseBuilder() {
 		}
-		
-		public CourseBuilder setId(int id) {
+
+		public CourseBuilder id(int id) {
 			this.id = id;
 			return this;
 		}
-		public CourseBuilder setName(String name) {
+
+		public CourseBuilder name(String name) {
 			this.name = name;
 			return this;
 		}
-		public CourseBuilder setDescription(String description) {
+
+		public CourseBuilder description(String description) {
 			this.description = description;
 			return this;
 		}
+
 		public Course build() {
-			return new Course(this);
+			Course course = new Course();
+			course.setId(id);
+			course.setName(name);
+			course.setDescription(description);
+			return course;
 		}
-		
+
 	}
 
 }

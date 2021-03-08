@@ -5,13 +5,11 @@ public class Auditorium {
 	private int id;
 	private String name;
 	private int capacity;
+	private AuditoriumBuilder builder;
 
-	private Auditorium (AuditoriumBuilder builder) {
-	id = builder.id;
-	name = builder.name;
-	capacity =builder.capacity;
+	private Auditorium() {
 	}
-	
+
 	public int getId() {
 		return id;
 	}
@@ -24,7 +22,6 @@ public class Auditorium {
 		return capacity;
 	}
 
-	
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -72,31 +69,41 @@ public class Auditorium {
 			return false;
 		return true;
 	}
-	
+
+	public static AuditoriumBuilder builder() {
+		return new AuditoriumBuilder();
+	}
+
 	public static class AuditoriumBuilder {
-		
+
 		private int id;
 		private String name;
 		private int capacity;
-		
+
 		public AuditoriumBuilder() {
-			
 		}
-		public AuditoriumBuilder setId(int id) {
+
+		public AuditoriumBuilder id(int id) {
 			this.id = id;
 			return this;
 		}
-		public AuditoriumBuilder setName(String name) {
+
+		public AuditoriumBuilder name(String name) {
 			this.name = name;
 			return this;
 		}
-		public AuditoriumBuilder setCapacity(int capacity) {
+
+		public AuditoriumBuilder capacity(int capacity) {
 			this.capacity = capacity;
 			return this;
 		}
-		
+
 		public Auditorium build() {
-			return new Auditorium(this);
+			Auditorium audtorium = new Auditorium();
+			audtorium.setId(id);
+			audtorium.setName(name);
+			audtorium.setCapacity(capacity);
+			return audtorium;
 		}
 	}
 

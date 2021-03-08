@@ -13,6 +13,6 @@ public class CourseRowMapper implements RowMapper<Course> {
 
 	@Override
 	public Course mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return new Course.CourseBuilder().setId(rs.getInt("id")).setName(rs.getString("name")).setDescription(rs.getString("description")).build();
+		return Course.builder().id(rs.getInt("id")).name(rs.getString("name")).description(rs.getString("description")).build();
 	}
 }

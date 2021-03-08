@@ -14,9 +14,9 @@ public class LessonTimeRowMapper implements RowMapper<LessonTime> {
 
 	@Override
 	public LessonTime mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return new LessonTime.LessonTimeBuilder().setId(rs.getInt("id"))
-				.setOrderNumber(rs.getInt("order_number")).setStartTime(rs.getObject("start_time", LocalTime.class))
-				.setEndTime(rs.getObject("end_time", LocalTime.class)).build();
+		return LessonTime.builder().id(rs.getInt("id"))
+				.orderNumber(rs.getInt("order_number")).startTime(rs.getObject("start_time", LocalTime.class))
+				.endTime(rs.getObject("end_time", LocalTime.class)).build();
 	}
 
 }
