@@ -10,7 +10,6 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.AuditoriumDao;
@@ -123,8 +122,6 @@ public class ConsoleInterface {
 		System.out.println("Enter student address:");
 		String address = scanner.next();
 
-		// Student student = new Student(firstName, lastName, gender, date, email,
-		// phone, address);
 		Student student = Student.builder().firstName(firstName).lastName(lastName).gender(gender)
 				.birthDate(date).email(email).phone(phone).address(address).build();
 		studentDao.create(student);
@@ -240,8 +237,8 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		System.out.println("Enter auditorium capacity:");
 		int capacity = scanner.nextInt();
-		//Auditorium auditorium = new Auditorium(name, capacity);
-		Auditorium auditorium = new Auditorium.AuditoriumBuilder().name(name).capacity(capacity).build();
+		
+		Auditorium auditorium = Auditorium.builder().name(name).capacity(capacity).build();
 		auditoriumDao.create(auditorium);
 		university.addAuditorium(auditorium);
 	}
@@ -310,7 +307,6 @@ public class ConsoleInterface {
 		List<Auditorium> auditoriumForAdding = auditoriums.stream().filter(t -> t.getId() == auditoriumId)
 				.collect(Collectors.toList());
 		Auditorium auditorium = auditoriumForAdding.get(0);
-
 
 		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day)
 				.time(lessonTime).auditorium(auditorium).build();

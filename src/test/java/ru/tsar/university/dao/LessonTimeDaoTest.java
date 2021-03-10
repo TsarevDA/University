@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -22,6 +23,7 @@ import ru.tsar.university.model.LessonTime;
 @SpringJUnitConfig
 @ContextConfiguration(classes = SpringTestConfig.class)
 @Sql("/lessonTimeData.sql")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 
 class LessonTimeDaoTest {
 
@@ -31,7 +33,6 @@ class LessonTimeDaoTest {
 	private LessonTimeDao lessonTimeDao;
 
 	@Test
-	@DirtiesContext
 	void givenNewLessonTime_whenCreate_thenCreated() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("08:00", formatter);
@@ -45,7 +46,6 @@ class LessonTimeDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
 
 		lessonTimeDao.deleteById(1);
@@ -55,7 +55,6 @@ class LessonTimeDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenOrder_whenGetByOrder_thenLessonTimeFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);
@@ -68,7 +67,6 @@ class LessonTimeDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenLessonsTime_whenGetAll_thenLessonsTimeListFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);

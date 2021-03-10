@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -25,6 +26,7 @@ import ru.tsar.university.model.Teacher;
 @SpringJUnitConfig
 @ContextConfiguration(classes = SpringTestConfig.class)
 @Sql("/teacherData.sql")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class TeacherDaoTest {
 
 	@Autowired
@@ -33,7 +35,6 @@ class TeacherDaoTest {
 	private TeacherDao teacherDao;
 
 	@Test
-	@DirtiesContext
 	void givenTeacher_whenCreate_thenCreated() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		Teacher expected = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
@@ -47,7 +48,6 @@ class TeacherDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
 
 		teacherDao.deleteById(1);
@@ -57,7 +57,6 @@ class TeacherDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenGetById_thenTeacherFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		Teacher expected = Teacher.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
@@ -70,7 +69,6 @@ class TeacherDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenTeachers_whenGetAll_thenTeachersListFound() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		List<Course> courses = new ArrayList<>();

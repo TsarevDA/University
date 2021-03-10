@@ -9,19 +9,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
-import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 
 @SpringJUnitConfig
 @ContextConfiguration(classes = SpringTestConfig.class)
-@DirtiesContext
 @Sql("/courseData.sql")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class CourseDaoTest {
 
 	@Autowired
@@ -30,7 +30,6 @@ class CourseDaoTest {
 	private CourseDao courseDao;
 
 	@Test
-	@DirtiesContext
 	void givenNewCourse_whenCreate_thenCreated() {
 		Course expected = Course.builder().name("Astronomy").description("Science about stars and deep space").build();
 
@@ -41,9 +40,8 @@ class CourseDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
-
+		
 		courseDao.deleteById(1);
 
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", "id = 1");
@@ -51,7 +49,6 @@ class CourseDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenGetById_thenCourseFound() {
 		Course expected = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
 				.build();
@@ -62,7 +59,6 @@ class CourseDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenCourses_whenGetAll_thenCoursesListFound() {
 		Course course1 = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
 				.build();

@@ -4,17 +4,13 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.CourseRowMapper;
-import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Teacher;
+
 
 @Component
 public class CourseDao {

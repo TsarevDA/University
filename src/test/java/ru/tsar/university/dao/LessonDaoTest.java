@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -29,6 +30,7 @@ import ru.tsar.university.model.Teacher;
 @SpringJUnitConfig
 @ContextConfiguration(classes = SpringTestConfig.class)
 @Sql("/lessonData.sql")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class LessonDaoTest {
 
 	@Autowired
@@ -37,9 +39,7 @@ class LessonDaoTest {
 	private LessonDao lessonDao;
 
 	@Test
-	@DirtiesContext
 	void givenNewLesson_whenCreate_thenCreated() {
-
 		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("Name").capacity(100).build();
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -70,9 +70,8 @@ class LessonDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenDeleteById_thenDeleted() {
-
+		
 		lessonDao.deleteById(1);
 
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons", "id = 1");
@@ -80,7 +79,6 @@ class LessonDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenId_whenGetById_thenLessonFound() {
 		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
@@ -111,7 +109,6 @@ class LessonDaoTest {
 	}
 
 	@Test
-	@DirtiesContext
 	void givenLesson_whenGetAll_thenLessonsListFound() {
 		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();

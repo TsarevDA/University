@@ -22,7 +22,6 @@ public class LessonDao {
 	private static final String DELETE_LESSON_QUERY = "DELETE FROM lessons where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons WHERE id =?";
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
-	private static final String UPDATE_LESSONS_GROUPS_QUERY = "UPDATE lessons_groups SET group_id=? WHERE lesson_id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
 
 	private JdbcTemplate jdbcTemplate;
