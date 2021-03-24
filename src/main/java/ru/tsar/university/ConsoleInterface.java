@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.dao.CourseDao;
-import ru.tsar.university.dao.GroupDao;
-import ru.tsar.university.dao.LessonDao;
-import ru.tsar.university.dao.LessonTimeDao;
-import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.dao.TeacherDao;
+import ru.tsar.university.service.AuditoriumService;
+import ru.tsar.university.service.CourseService;
+import ru.tsar.university.service.GroupService;
+import ru.tsar.university.service.LessonService;
+import ru.tsar.university.service.LessonTimeService;
+import ru.tsar.university.service.StudentService;
+import ru.tsar.university.service.TeacherService;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
@@ -36,19 +36,19 @@ public class ConsoleInterface {
 	private University university;
 
 	@Autowired
-	private StudentDao studentDao;
+	private StudentService studentService;
 	@Autowired
-	private CourseDao courseDao;
+	private CourseService courseService;
 	@Autowired
-	private TeacherDao teacherDao;
+	private TeacherService teacherService;
 	@Autowired
-	private GroupDao groupDao;
+	private GroupService groupService;
 	@Autowired
-	private AuditoriumDao auditoriumDao;
+	private AuditoriumService auditoriumService;
 	@Autowired
-	private LessonTimeDao lessonTimeDao;
+	private LessonTimeService lessonTimeService;
 	@Autowired
-	private LessonDao lessonDao;
+	private LessonService lessonService;
 
 	public void startMenu() {
 
@@ -124,7 +124,7 @@ public class ConsoleInterface {
 
 		Student student = Student.builder().firstName(firstName).lastName(lastName).gender(gender)
 				.birthDate(date).email(email).phone(phone).address(address).build();
-		studentDao.create(student);
+		studentService.create(student);
 
 		university.addStudent(student);
 	}
@@ -137,7 +137,7 @@ public class ConsoleInterface {
 		List<Student> studentsForRemoving = students.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 
 		for (Student student : studentsForRemoving) {
-			studentDao.deleteById(student.getId());
+			studentService.deleteById(student);
 			university.deleteStudent(student);
 		}
 	}
@@ -150,7 +150,7 @@ public class ConsoleInterface {
 		String description = scanner.next();
 		Course course = Course.builder().name(name).description(description).build();
 
-		courseDao.create(course);
+		courseService.create(course);
 		university.addCourse(course);
 	}
 
@@ -162,7 +162,7 @@ public class ConsoleInterface {
 		List<Course> coursesForRemoving = courses.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Course course : coursesForRemoving) {
 			university.deleteCourse(course);
-			courseDao.deleteById(course.getId());
+			courseService.deleteById(course);
 		}
 	}
 
@@ -193,7 +193,7 @@ public class ConsoleInterface {
 		Teacher teacher = Teacher.builder().firstName(firstName).lastName(lastName).gender(gender)
 				.birthDate(date).email(email).phone(phone).address(address).courses(courses).build();
 
-		teacherDao.create(teacher);
+		teacherService.create(teacher);
 		university.addTeacher(teacher);
 	}
 
@@ -205,7 +205,7 @@ public class ConsoleInterface {
 		List<Teacher> teachersForRemoving = teachers.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Teacher teacher : teachersForRemoving) {
 			university.deleteTeacher(teacher);
-			teacherDao.deleteById(teacher.getId());
+			teacherService.deleteById(teacher);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		//Group group = new Group(name);
 		Group group = Group.builder().name(name).build();
-		groupDao.create(group);
+		groupService.create(group);
 		university.addGroup(group);
 	}
 
@@ -227,7 +227,7 @@ public class ConsoleInterface {
 		List<Group> groupsForRemoving = groups.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Group group : groupsForRemoving) {
 			university.deleteGroup(group);
-			groupDao.deleteById(group.getId());
+			groupService.deleteById(group);
 		}
 	}
 
@@ -239,7 +239,7 @@ public class ConsoleInterface {
 		int capacity = scanner.nextInt();
 		
 		Auditorium auditorium = Auditorium.builder().name(name).capacity(capacity).build();
-		auditoriumDao.create(auditorium);
+		auditoriumService.create(auditorium);
 		university.addAuditorium(auditorium);
 	}
 
@@ -252,7 +252,7 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		for (Auditorium auditorium : auditoriumsForRemoving) {
 			university.deleteAuditorium(auditorium);
-			auditoriumDao.deleteById(auditorium.getId());
+			auditoriumService.deleteById(auditorium);
 		}
 	}
 
@@ -263,7 +263,7 @@ public class ConsoleInterface {
 		for (int i = 0; i < 5; i++) {
 			lessonsTime.add(LessonTime.builder().orderNumber(i+1).startTime(startTime.plusHours(i)).endTime(endTime.plusHours(i)).build());
 		}
-		lessonsTime.stream().forEach(lt -> lessonTimeDao.create(lt));
+		lessonsTime.stream().forEach(lt -> lessonTimeService.create(lt));
 		university.setLessonsTime(lessonsTime);
 
 	}
@@ -311,7 +311,7 @@ public class ConsoleInterface {
 		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day)
 				.time(lessonTime).auditorium(auditorium).build();
 
-		lessonDao.create(lesson);
+		lessonService.create(lesson);
 
 	}
 
@@ -324,7 +324,7 @@ public class ConsoleInterface {
 
 		for (Lesson lesson : lessonForRemoving) {
 			university.deleteLesson(lesson);
-			lessonDao.deleteById(lesson.getId());
+			lessonService.deleteById(lesson);
 		}
 
 	}

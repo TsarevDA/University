@@ -1,7 +1,7 @@
-ALTER TABLE IF EXISTS lessons DROP CONSTRAINT lessons_course_id_fkey;
-ALTER TABLE IF EXISTS lessons DROP CONSTRAINT lessons_teacher_id_fkey;
-ALTER TABLE IF EXISTS lessons DROP CONSTRAINT lessons_lesson_time_fkey;
-ALTER TABLE IF EXISTS lessons DROP CONSTRAINT lessons_auditorium_fkey;
+ALTER TABLE IF EXISTS lessons DROP CONSTRAINT IF EXISTS lessons_course_id_fkey;
+ALTER TABLE IF EXISTS lessons DROP CONSTRAINT IF EXISTS lessons_teacher_id_fkey;
+ALTER TABLE IF EXISTS lessons DROP CONSTRAINT IF EXISTS lessons_lesson_time_fkey;
+ALTER TABLE IF EXISTS lessons DROP CONSTRAINT IF EXISTS lessons_auditorium_fkey;
 DROP TABLE IF EXISTS groups_students;
 DROP TABLE IF EXISTS teachers_courses;
 DROP TABLE IF EXISTS lessons_groups;
