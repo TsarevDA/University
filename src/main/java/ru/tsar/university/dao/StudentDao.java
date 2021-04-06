@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.StudentRowMapper;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
@@ -21,6 +22,7 @@ public class StudentDao {
 	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
 	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM students ";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM students WHERE id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
@@ -67,6 +69,11 @@ public class StudentDao {
 
 	public List<Student> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
 	}
 
 }

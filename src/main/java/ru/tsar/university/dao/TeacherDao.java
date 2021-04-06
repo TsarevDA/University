@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.TeacherRowMapper;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
+import ru.tsar.university.model.Lesson;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 
@@ -26,7 +28,9 @@ public class TeacherDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
 	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM teachers ";
-
+	private static final String GET_BY_DAY_TIME_TEACHER_QUERY = " SELECT count(*) FROM lessons WHERE day=? AND lesson_time_id = ? AND teacher_id =?";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM teachers WHERE id=?";
+	
 	private JdbcTemplate jdbcTemplate;
 	private TeacherRowMapper rowMapper;
 	private CourseDao courseDao;
@@ -81,5 +85,16 @@ public class TeacherDao {
 
 	public List<Teacher> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
+	
+	public boolean checkTeacherFree(Lesson lesson) {
+		int count = jdbcTemplate.queryForObject(GET_BY_DAY_TIME_TEACHER_QUERY, Integer.class, lesson.getDay(),
+				lesson.getTime().getId(), lesson.getTeacher().getId());
+		return (count==0) ? true: false;
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
 	}
 }

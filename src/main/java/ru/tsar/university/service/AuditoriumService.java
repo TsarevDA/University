@@ -3,37 +3,48 @@ package ru.tsar.university.service;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import ru.tsar.university.University;
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.model.Auditorium;
 
-@Component
+@Service
 public class AuditoriumService {
-	
+
 	private AuditoriumDao auditoriumDao;
-	
+
 	public AuditoriumService(AuditoriumDao auditoriumDao) {
 		this.auditoriumDao = auditoriumDao;
 	}
 
-	public void create(Auditorium auditorium) { 
-		auditoriumDao.create(auditorium);
+	public void create(Auditorium auditorium) {
+		if (!auditoriumDao.checkNameExist(auditorium)) {
+			auditoriumDao.create(auditorium);
+		}
 	}
-	
-	public Auditorium getById(Auditorium auditorium) {
-		return auditoriumDao.getById(auditorium.getId());
+
+	public Auditorium getById(int id) {
+		if (auditoriumDao.checkIdExist(id)) {
+		return auditoriumDao.getById(id);
+		} else {
+			return null;
+		}
 	}
-	
+
 	public List<Auditorium> getAll() {
 		return auditoriumDao.getAll();
 	}
-	
+
 	public void update(Auditorium auditorium) {
+		if (auditoriumDao.checkIdExist(auditorium.getId())) {
 		auditoriumDao.update(auditorium);
+		}
 	}
-	
-	public void deleteById(Auditorium auditorium) {
-		auditoriumDao.deleteById(auditorium.getId());
-	}	
+
+	public void deleteById(int id) {
+		if (auditoriumDao.checkIdExist(id)) {
+		auditoriumDao.deleteById(id);
+		}
+	}
 }

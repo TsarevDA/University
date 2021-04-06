@@ -2,6 +2,7 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,7 +12,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.LessonRowMapper;
+import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Lesson;
+import ru.tsar.university.model.Teacher;
 
 @Component
 public class LessonDao {
@@ -23,6 +28,7 @@ public class LessonDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons WHERE id =?";
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM lessons WHERE id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
@@ -48,7 +54,7 @@ public class LessonDao {
 
 		lesson.setId((int) holder.getKeys().get("id"));
 
-		lesson.getGroup().stream()
+		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
 	}
 
@@ -67,13 +73,18 @@ public class LessonDao {
 		jdbcTemplate.update(UPDATE_LESSON_QUERY, lesson.getCourse().getId(), lesson.getTeacher().getId(),
 				lesson.getDay(), lesson.getTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, lesson.getId());
-		lesson.getGroup().stream()
+		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
 
 	}
 
 	public List<Lesson> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
 	}
 
 }

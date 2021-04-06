@@ -122,8 +122,8 @@ public class ConsoleInterface {
 		System.out.println("Enter student address:");
 		String address = scanner.next();
 
-		Student student = Student.builder().firstName(firstName).lastName(lastName).gender(gender)
-				.birthDate(date).email(email).phone(phone).address(address).build();
+		Student student = Student.builder().firstName(firstName).lastName(lastName).gender(gender).birthDate(date)
+				.email(email).phone(phone).address(address).build();
 		studentService.create(student);
 
 		university.addStudent(student);
@@ -137,7 +137,7 @@ public class ConsoleInterface {
 		List<Student> studentsForRemoving = students.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 
 		for (Student student : studentsForRemoving) {
-			studentService.deleteById(student);
+			studentService.deleteById(student.getId());
 			university.deleteStudent(student);
 		}
 	}
@@ -162,7 +162,7 @@ public class ConsoleInterface {
 		List<Course> coursesForRemoving = courses.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Course course : coursesForRemoving) {
 			university.deleteCourse(course);
-			courseService.deleteById(course);
+			courseService.deleteById(course.getId());
 		}
 	}
 
@@ -190,8 +190,8 @@ public class ConsoleInterface {
 
 		List<Course> courses = university.getCourses().stream().filter(c -> coursesNames.contains(c.getName()))
 				.collect(Collectors.toList());
-		Teacher teacher = Teacher.builder().firstName(firstName).lastName(lastName).gender(gender)
-				.birthDate(date).email(email).phone(phone).address(address).courses(courses).build();
+		Teacher teacher = Teacher.builder().firstName(firstName).lastName(lastName).gender(gender).birthDate(date)
+				.email(email).phone(phone).address(address).courses(courses).build();
 
 		teacherService.create(teacher);
 		university.addTeacher(teacher);
@@ -205,7 +205,7 @@ public class ConsoleInterface {
 		List<Teacher> teachersForRemoving = teachers.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Teacher teacher : teachersForRemoving) {
 			university.deleteTeacher(teacher);
-			teacherService.deleteById(teacher);
+			teacherService.deleteById(teacher.getId());
 		}
 	}
 
@@ -213,7 +213,7 @@ public class ConsoleInterface {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter group name:");
 		String name = scanner.next();
-		//Group group = new Group(name);
+		// Group group = new Group(name);
 		Group group = Group.builder().name(name).build();
 		groupService.create(group);
 		university.addGroup(group);
@@ -227,7 +227,7 @@ public class ConsoleInterface {
 		List<Group> groupsForRemoving = groups.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Group group : groupsForRemoving) {
 			university.deleteGroup(group);
-			groupService.deleteById(group);
+			groupService.deleteById(group.getId());
 		}
 	}
 
@@ -237,7 +237,7 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		System.out.println("Enter auditorium capacity:");
 		int capacity = scanner.nextInt();
-		
+
 		Auditorium auditorium = Auditorium.builder().name(name).capacity(capacity).build();
 		auditoriumService.create(auditorium);
 		university.addAuditorium(auditorium);
@@ -252,7 +252,7 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		for (Auditorium auditorium : auditoriumsForRemoving) {
 			university.deleteAuditorium(auditorium);
-			auditoriumService.deleteById(auditorium);
+			auditoriumService.deleteById(auditorium.getId());
 		}
 	}
 
@@ -261,7 +261,8 @@ public class ConsoleInterface {
 		LocalTime endTime = LocalTime.parse("09:00");
 		ArrayList<LessonTime> lessonsTime = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
-			lessonsTime.add(LessonTime.builder().orderNumber(i+1).startTime(startTime.plusHours(i)).endTime(endTime.plusHours(i)).build());
+			lessonsTime.add(LessonTime.builder().orderNumber(i + 1).startTime(startTime.plusHours(i))
+					.endTime(endTime.plusHours(i)).build());
 		}
 		lessonsTime.stream().forEach(lt -> lessonTimeService.create(lt));
 		university.setLessonsTime(lessonsTime);
@@ -308,8 +309,8 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		Auditorium auditorium = auditoriumForAdding.get(0);
 
-		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day)
-				.time(lessonTime).auditorium(auditorium).build();
+		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+				.auditorium(auditorium).build();
 
 		lessonService.create(lesson);
 
@@ -324,7 +325,7 @@ public class ConsoleInterface {
 
 		for (Lesson lesson : lessonForRemoving) {
 			university.deleteLesson(lesson);
-			lessonService.deleteById(lesson);
+			lessonService.deleteById(lesson.getId());
 		}
 
 	}

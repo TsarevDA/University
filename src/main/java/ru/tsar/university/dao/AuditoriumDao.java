@@ -2,6 +2,7 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.AuditoriumRowMapper;
 import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.model.Lesson;
 
 @Component
 public class AuditoriumDao {
@@ -19,7 +21,10 @@ public class AuditoriumDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums ";
 	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?, capacity=? WHERE id=?";
-
+	private static final String EXIST_NAME_QUERY ="SELECT count(*) FROM auditoriums WHERE name = ?";
+	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT count(*) FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id =?";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM auditoriums WHERE id=?";
+	
 	private JdbcTemplate jdbcTemplate;
 	private AuditoriumRowMapper rowMapper;
 
@@ -57,4 +62,21 @@ public class AuditoriumDao {
 		jdbcTemplate.update(UPDATE_AUDITORIUMS_QUERY, auditorium.getName(), auditorium.getCapacity(),
 				auditorium.getId());
 	}
+	
+	public boolean checkNameExist(Auditorium auditorium) {
+		int count = jdbcTemplate.queryForObject(EXIST_NAME_QUERY, Integer.class, auditorium.getName());
+		return (count==0) ? false: true;
+	}
+	
+	public boolean checkAuditoriumFree(Lesson lesson) {
+		int count = jdbcTemplate.queryForObject(GET_BY_DAY_TIME_AUDITORIUM_QUERY, Integer.class, lesson.getDay(),
+				lesson.getTime().getId(), lesson.getAuditorium().getId());
+		return (count==0) ? true: false;
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
+	}
+	
 }

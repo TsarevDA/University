@@ -9,7 +9,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.CourseRowMapper;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Group;
 
 
 @Component
@@ -21,7 +23,9 @@ public class CourseDao {
 	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
 	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?, description=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM courses ";
-
+	private static final String EXIST_NAME_QUERY ="SELECT count(*) FROM courses WHERE name = ?";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM courses WHERE id=?";
+	
 	private JdbcTemplate jdbcTemplate;
 	private CourseRowMapper rowMapper;
 
@@ -60,4 +64,18 @@ public class CourseDao {
 	public List<Course> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
+	
+	public boolean checkNameExist(Course course) {
+		int count = jdbcTemplate.queryForObject(EXIST_NAME_QUERY, Integer.class, course.getName());
+		System.out.println(count);
+		return (count==0) ? false: true;
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		
+	
+		return (count==0) ? false: true;
+	}
+	
 }

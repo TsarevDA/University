@@ -9,7 +9,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.GroupRowMapper;
+import ru.tsar.university.model.Auditorium;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
+import ru.tsar.university.model.Lesson;
 
 @Component
 public class GroupDao {
@@ -21,7 +24,10 @@ public class GroupDao {
 	private static final String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
 	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM groups ";
-
+	private static final String EXIST_NAME_QUERY = "SELECT count(*) FROM groups WHERE name = ?";
+	private static final String GET_BY_DAY_TIME_GROUP_QUERY = "SELECT count(*) FROM lessons l left join lessons_groups lg on l.id = lg.lesson_id WHERE day=? AND lesson_time_id = ? AND group_id =?";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM groups WHERE id=?";
+	
 	private JdbcTemplate jdbcTemplate;
 	private GroupRowMapper rowMapper;
 	private StudentDao studentDao;
@@ -68,5 +74,27 @@ public class GroupDao {
 
 	public List<Group> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
+	
+	public boolean checkNameExist(Group group) {
+		int count = jdbcTemplate.queryForObject(EXIST_NAME_QUERY, Integer.class, group.getName());
+		return (count==0) ? false: true;
+	}
+	
+	public boolean checkGroupFree(Lesson lesson) {
+		List<Group> groups = lesson.getGroups();
+		for (Group group : groups) {
+			int count = jdbcTemplate.queryForObject(GET_BY_DAY_TIME_GROUP_QUERY, Integer.class, lesson.getDay(),
+					lesson.getTime().getId(), group.getId());
+			if (count != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
 	}
 }

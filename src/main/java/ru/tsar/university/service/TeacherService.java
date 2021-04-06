@@ -1,35 +1,47 @@
 package ru.tsar.university.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.TeacherDao;
 import ru.tsar.university.model.Teacher;
 
-@Component
+@Service
 public class TeacherService {
-	
+
 	private TeacherDao teacherDao;
-	
-	public TeacherService (TeacherDao teacherDao) {
+
+	public TeacherService(TeacherDao teacherDao) {
 		this.teacherDao = teacherDao;
 	}
-	
+
 	public void create(Teacher teacher) {
 		teacherDao.create(teacher);
 	}
-	
-	public void getById(int id) {
-		teacherDao.getById(id);
+
+	public Teacher getById(int id) {
+		if (teacherDao.checkIdExist(id)) {
+		return teacherDao.getById(id);
+		} else {
+			return null;
+		}
 	}
-	
-	public void getAll() {
-		teacherDao.getAll();
+
+	public List<Teacher> getAll() {
+		return teacherDao.getAll();
 	}
+
 	public void update(Teacher teacher) {
-		teacherDao.update(teacher);
+		if (teacherDao.checkIdExist(teacher.getId())) {
+			teacherDao.update(teacher);
+		}
 	}
-	
-	public void deleteById(Teacher teacher) {
-		teacherDao.deleteById(teacher.getId());
+
+	public void deleteById(int id) {
+		if (teacherDao.checkIdExist(id)) {
+			teacherDao.deleteById(id);
+		}
 	}
 }

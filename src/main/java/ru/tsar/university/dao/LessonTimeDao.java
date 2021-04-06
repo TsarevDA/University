@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.LessonTimeRowMapper;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.LessonTime;
 
@@ -23,6 +24,7 @@ public class LessonTimeDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons_time WHERE id=?";
 	private static final String UPDATE_LESSON_TIME_QUERY = "UPDATE lessons_time SET start_time=?,end_time=?, WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons_time ";
+	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM lessons_time WHERE id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonTimeRowMapper rowMapper;
@@ -66,6 +68,11 @@ public class LessonTimeDao {
 
 	public List<LessonTime> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	}
+	
+	public boolean checkIdExist(int id) {
+		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
+		return (count==0) ? false: true;
 	}
 
 }

@@ -10,7 +10,7 @@ public class Lesson {
 	private int id;
 	private Course course;
 	private Teacher teacher;
-	private List<Group> group;
+	private List<Group> groups;
 	private LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
@@ -30,8 +30,8 @@ public class Lesson {
 		return teacher;
 	}
 
-	public List<Group> getGroup() {
-		return group;
+	public List<Group> getGroups() {
+		return groups;
 	}
 
 	public LocalDate getDay() {
@@ -58,8 +58,8 @@ public class Lesson {
 		this.teacher = teacher;
 	}
 
-	public void setGroup(List<Group> group) {
-		this.group = group;
+	public void setGroups(List<Group> group) {
+		this.groups = group;
 	}
 
 	public void setDay(LocalDate day) {
@@ -81,7 +81,7 @@ public class Lesson {
 		result = prime * result + ((auditorium == null) ? 0 : auditorium.hashCode());
 		result = prime * result + ((course == null) ? 0 : course.hashCode());
 		result = prime * result + ((day == null) ? 0 : day.hashCode());
-		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + ((groups == null) ? 0 : groups.hashCode());
 		result = prime * result + id;
 		result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
 		result = prime * result + ((time == null) ? 0 : time.hashCode());
@@ -112,10 +112,10 @@ public class Lesson {
 				return false;
 		} else if (!day.equals(other.day))
 			return false;
-		if (group == null) {
-			if (other.group != null)
+		if (groups == null) {
+			if (other.groups != null)
 				return false;
-		} else if (!group.equals(other.group))
+		} else if (!groups.equals(other.groups))
 			return false;
 		if (id != other.id)
 			return false;
@@ -134,7 +134,7 @@ public class Lesson {
 
 	@Override
 	public String toString() {
-		return "Lesson [id=" + id + ", course=" + course + ", teacher=" + teacher + ", group=" + group + ", day=" + day
+		return "Lesson [id=" + id + ", course=" + course + ", teacher=" + teacher + ", group=" + groups + ", day=" + day
 				+ ", time=" + time + ", auditorium=" + auditorium + "]";
 	}
 
@@ -195,7 +195,7 @@ public class Lesson {
 			lesson.setId(id);
 			lesson.setCourse(course);
 			lesson.setTeacher(teacher);
-			lesson.setGroup(group);
+			lesson.setGroups(group);
 			lesson.setDay(day);
 			lesson.setTime(time);
 			lesson.setAuditorium(auditorium);
