@@ -8,66 +8,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.jdbc.JdbcTestUtils;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import ru.tsar.university.config.SpringTestConfig;
+import ru.tsar.university.dao.LessonTimeDao;
 import ru.tsar.university.model.LessonTime;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
-@Sql("/lessonTimeData.sql")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-
+@ExtendWith(MockitoExtension.class)
 class LessonTimeServiceTest {
 
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
+	@InjectMocks
 	private LessonTimeService lessonTimeService;
+	@Mock 
+	private LessonTimeDao lessonTimeDao;
 
 	@Test
-	void givenNewLessonTime_whenCreate_thenCreated() {
+	void givenNewLessonTime_whenCreate_thenCallDaoMethod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("08:00", formatter);
 		LocalTime endTime = LocalTime.parse("09:00", formatter);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
-
+		
 		lessonTimeService.create(expected);
 
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons_time", "id = " + expected.getId());
-		assertEquals(1, actual);
+		Mockito.verify(lessonTimeDao).create(expected);
 	}
-
+	
 	@Test
-	void givenId_whenDeleteById_thenDeleted() {
-
-		lessonTimeService.deleteById(1);
-
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lessons_time", "id = 1");
-		assertEquals(0, actual);
-	}
-
-	@Test
-	void givenOrder_whenGetByOrder_thenLessonTimeFound() {
+	void givenWrongLessonTime_whenCreate_thenNoAction() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-		LocalTime startTime = LocalTime.parse("09:00", formatter);
-		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime expected = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime).build();
+		LocalTime startTime = LocalTime.parse("17:00", formatter);
+		LocalTime endTime = LocalTime.parse("09:00", formatter);
+		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
+		
+		lessonTimeService.create(expected);
 
-		LessonTime actual = lessonTimeService.getByOrder(2);
-
-		assertEquals(expected, actual);
+		Mockito.verify(lessonTimeDao, Mockito.never()).create(expected);
 	}
 
 	@Test
-	void givenLessonsTime_whenGetAll_thenLessonsTimeListFound() {
+	void givenLessonsTime_whenGetAll_thenCallDaoMEthod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);
 		LocalTime endTime = LocalTime.parse("10:00", formatter);
@@ -81,8 +64,62 @@ class LessonTimeServiceTest {
 		expected.add(lessonTime1);
 		expected.add(lessonTime2);
 
+		Mockito.when(lessonTimeDao.getAll()).thenReturn(expected);
+		
 		List<LessonTime> actual = lessonTimeService.getAll();
 
 		assertEquals(expected, actual);
+	}
+	
+	@Test
+	void givenNewLessonTime_whenUpdate_thenCallDaoMethod() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("08:00", formatter);
+		LocalTime endTime = LocalTime.parse("09:00", formatter);
+		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(startTime).endTime(endTime).build();
+		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(3).startTime(startTime).endTime(endTime).build();
+		
+		Mockito.when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
+		lessonTimeService.update(newLessonTime);
+
+		Mockito.verify(lessonTimeDao).update(newLessonTime);
+	}
+	
+	@Test
+	void givenWrongLessonTime_whenUpdate_thenNoAction() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime oldStartTime = LocalTime.parse("09:00", formatter);
+		LocalTime oldEndTime = LocalTime.parse("09:00", formatter);
+		LocalTime newStartTime = LocalTime.parse("17:00", formatter);
+		LocalTime newEndTime = LocalTime.parse("09:00", formatter);
+		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(oldStartTime).endTime(oldEndTime).build();
+		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(newStartTime).endTime(newEndTime).build();
+		
+		Mockito.when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
+		lessonTimeService.update(newLessonTime);
+
+		Mockito.verify(lessonTimeDao,Mockito.never()).update(newLessonTime);
+	}
+	
+	@Test
+	void givenId_whenDeleteById_thenCallDaoMethod() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("09:00", formatter);
+		LocalTime endTime = LocalTime.parse("10:00", formatter);
+		LessonTime lessonTime = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime)
+				.build();
+		
+		Mockito.when(lessonTimeDao.getById(1)).thenReturn(lessonTime);
+		lessonTimeService.deleteById(1);
+
+		Mockito.verify(lessonTimeDao).deleteById(1);
+	}
+	
+	@Test
+	void givenId_whenDeleteById_thenNoAction() {
+
+		lessonTimeService.deleteById(1);
+
+		Mockito.verify(lessonTimeDao, Mockito.never()).deleteById(1);
 	}
 }

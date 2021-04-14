@@ -6,72 +6,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.DatabasePopulator;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.annotation.DirtiesContext.MethodMode;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.jdbc.JdbcTestUtils;
-
-import ru.tsar.university.config.SpringTestConfig;
+import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.model.Auditorium;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
-@Sql("/auditoriumData.sql")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ExtendWith(MockitoExtension.class)
 class AuditoriumServiceTest {
 
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	@Autowired
+	@InjectMocks
 	private AuditoriumService auditoriumService;
+	@Mock
+	private AuditoriumDao auditoriumDao;
 
 	@Test
-	void givenNewAuditorium_whenCreate_thenCreated() {
-		Auditorium expected = Auditorium.builder().name("A1000").capacity(100).build();
-		
-		auditoriumService.create(expected);
-		
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums", "id = " + expected.getId());
-		assertEquals(1, actual);
+	void givenExistAuditorium_whenCreate_thenNoAction() {
+		Auditorium auditorium = Auditorium.builder().name("A1000").capacity(100).build();
+
+		Mockito.when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium);
+
+		auditoriumService.create(auditorium);
+
+		Mockito.verify(auditoriumDao, Mockito.never()).create(auditorium);
 	}
 
 	@Test
-	void givenId_whenDeleteById_thenDeleted() {	
-		
-		auditoriumService.deleteById(1);
-		
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums", "id = 1");
-		assertEquals(0, actual);
+	void givenNewAuditorium_whenCreate_thenCallDaoMethod() {
+		Auditorium expected = Auditorium.builder().name("A1000").capacity(100).build();
+
+		Mockito.when(auditoriumDao.getByName(expected)).thenReturn(null);
+
+		auditoriumService.create(expected);
+
+		Mockito.verify(auditoriumDao).create(expected);
 	}
 
 	@Test
 	void givenId_whenGetById_thenAuditoriumFound() {
 		Auditorium expected = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
-		
+
+		Mockito.when(auditoriumDao.getById(Mockito.anyInt())).thenReturn(expected);
+
 		Auditorium actual = auditoriumService.getById(1);
-		
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	void givenAuditorium_whenUpdate_thenUpdated() {
-		Auditorium expected = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
-				
-		auditoriumService.update(expected);
-		
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "auditoriums",
-				"name = 'newAuditorium' and id = 1");
-		assertEquals(1, actual);
-	}
-
-	@Test	
 	void givenAuditoriums_whenGetAll_thenAuditoriumsListFound() {
 		Auditorium auditorium1 = Auditorium.builder().id(1).name("First").capacity(100).build();
 		Auditorium auditorium2 = Auditorium.builder().id(2).name("Second").capacity(500).build();
@@ -79,9 +63,48 @@ class AuditoriumServiceTest {
 		expected.add(auditorium1);
 		expected.add(auditorium2);
 
+		Mockito.when(auditoriumDao.getAll()).thenReturn(expected);
+
 		List<Auditorium> actual = auditoriumService.getAll();
-		
+
 		assertEquals(expected, actual);
 	}
 
+	@Test
+	void givenAuditorium_whenUpdate_thenCallDaoMethod() {
+		Auditorium expected = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
+		Auditorium oldValue = Auditorium.builder().id(1).name("newAuditorium").capacity(100).build();
+
+		Mockito.when(auditoriumDao.getById(1)).thenReturn(oldValue);
+		Mockito.when(auditoriumDao.getByName(expected)).thenReturn(oldValue);
+
+		auditoriumService.update(expected);
+		Mockito.verify(auditoriumDao).update(expected);
+		;
+
+	}
+
+	@Test
+	void givenNameDublicateAuditorium_whenUpdate_thenNoAction() {
+		Auditorium newAuditorium = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
+		Auditorium oldAuditorium = Auditorium.builder().id(1).name("Auditorium").capacity(100).build();
+		Auditorium dublicateAuditorium = Auditorium.builder().id(2).name("newAuditorium").capacity(100).build();
+
+		Mockito.when(auditoriumDao.getById(1)).thenReturn(oldAuditorium);
+		Mockito.when(auditoriumDao.getByName(newAuditorium)).thenReturn(dublicateAuditorium);
+
+		auditoriumService.update(newAuditorium);
+		Mockito.verify(auditoriumDao, Mockito.never()).update(newAuditorium);
+	}
+
+	@Test
+	void givenId_whenDeleteById_thenCallDaoMethod() {
+		Auditorium auditorium = Auditorium.builder().id(1).name("A1000").capacity(100).build();
+
+		Mockito.when(auditoriumDao.getById(1)).thenReturn(auditorium);
+
+		auditoriumService.deleteById(1);
+
+		Mockito.verify(auditoriumDao).getById(1);
+	}
 }

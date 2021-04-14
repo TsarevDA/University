@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,6 @@ import ru.tsar.university.dao.mapper.CourseRowMapper;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
-
 
 @Component
 public class CourseDao {
@@ -23,9 +23,8 @@ public class CourseDao {
 	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
 	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?, description=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM courses ";
-	private static final String EXIST_NAME_QUERY ="SELECT count(*) FROM courses WHERE name = ?";
-	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM courses WHERE id=?";
-	
+	private static final String GET_BY_NAME_QUERY = "SELECT * FROM courses WHERE name = ?";
+
 	private JdbcTemplate jdbcTemplate;
 	private CourseRowMapper rowMapper;
 
@@ -50,7 +49,11 @@ public class CourseDao {
 	}
 
 	public Course getById(int id) {
-		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		try {
+			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public List<Course> getByTeacherId(int id) {
@@ -64,18 +67,12 @@ public class CourseDao {
 	public List<Course> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
-	
-	public boolean checkNameExist(Course course) {
-		int count = jdbcTemplate.queryForObject(EXIST_NAME_QUERY, Integer.class, course.getName());
-		System.out.println(count);
-		return (count==0) ? false: true;
+
+	public Course getByName(Course course) {
+		try {
+			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, course.getName());
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
-	
-	public boolean checkIdExist(int id) {
-		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
-		
-	
-		return (count==0) ? false: true;
-	}
-	
 }

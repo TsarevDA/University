@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -28,8 +29,8 @@ public class LessonDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons WHERE id =?";
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
-	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM lessons WHERE id=?";
-
+	private static final String GET_BY_DAY_TIME_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? ";
+	
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
 
@@ -65,7 +66,11 @@ public class LessonDao {
 	}
 
 	public Lesson getById(int id) {
+		try {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
@@ -82,9 +87,8 @@ public class LessonDao {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 	
-	public boolean checkIdExist(int id) {
-		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
-		return (count==0) ? false: true;
+	public List<Lesson> getByDayTime(Lesson lesson) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, lesson.getDay(),
+				lesson.getTime().getId());
 	}
-
 }

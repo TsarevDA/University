@@ -18,11 +18,13 @@ public class LessonTimeService {
 	}
 
 	public void create(LessonTime lessonTime) {
+		if ( lessonTime.getStartTime().isBefore(lessonTime.getEndTime()) ) {
 		lessonTimeDao.create(lessonTime);
+		}
 	}
 
 	public LessonTime getById(int id) {
-		if (lessonTimeDao.checkIdExist(id)) {
+		if (lessonTimeDao.getById(id) != null) {
 		return lessonTimeDao.getById(id);
 		} else {
 			return null;
@@ -38,13 +40,14 @@ public class LessonTimeService {
 	}
 
 	public void update(LessonTime lessonTime) {
-		if (lessonTimeDao.checkIdExist(lessonTime.getId())) {
+		if (lessonTimeDao.getById(lessonTime.getId()) != null && lessonTime.getStartTime().isBefore(lessonTime.getEndTime()) ) {
 		lessonTimeDao.update(lessonTime);
 		}
+		
 	}
 
 	public void deleteById(int id) {
-		if (lessonTimeDao.checkIdExist(id)) {
+		if (lessonTimeDao.getById(id) != null) {
 		lessonTimeDao.deleteById(id);
 		}
 	}

@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,6 @@ public class LessonTimeDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons_time WHERE id=?";
 	private static final String UPDATE_LESSON_TIME_QUERY = "UPDATE lessons_time SET start_time=?,end_time=?, WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons_time ";
-	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM lessons_time WHERE id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonTimeRowMapper rowMapper;
@@ -54,7 +54,11 @@ public class LessonTimeDao {
 	}
 	
 	public LessonTime getById(int id) {
+		try {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public LessonTime getByOrder(int order) {
@@ -69,10 +73,4 @@ public class LessonTimeDao {
 	public List<LessonTime> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
-	
-	public boolean checkIdExist(int id) {
-		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
-		return (count==0) ? false: true;
-	}
-
 }

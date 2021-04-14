@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -22,7 +23,6 @@ public class StudentDao {
 	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
 	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM students ";
-	private static final String EXIST_ID_QUERY = "SELECT count(*) FROM students WHERE id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
@@ -54,12 +54,20 @@ public class StudentDao {
 	}
 
 	public Student getById(int id) {
+		try {
 		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
-	public List<Student> getByGroup(Group group) {
-		return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, group.getId());
-	}
+	public List<Student> getByGroupId(int id) {
+		try {
+		return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
+		}
 
 	public void update(Student student) {
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
@@ -69,11 +77,6 @@ public class StudentDao {
 
 	public List<Student> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
-	}
-	
-	public boolean checkIdExist(int id) {
-		int count = jdbcTemplate.queryForObject(EXIST_ID_QUERY, Integer.class, id);
-		return (count==0) ? false: true;
 	}
 
 }

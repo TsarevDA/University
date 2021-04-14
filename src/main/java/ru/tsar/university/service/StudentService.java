@@ -22,7 +22,7 @@ public class StudentService {
 	}
 
 	public Student getById(int id) {
-		if (studentDao.checkIdExist(id)) {
+		if (studentDao.getById(id) != null) {
 		return studentDao.getById(id);
 		} else {
 			return null;
@@ -34,13 +34,13 @@ public class StudentService {
 	}
 
 	public void update(Student student) {
-		if (studentDao.checkIdExist(student.getId())) {
+		if (studentDao.getById(student.getId()) != null) {
 		studentDao.update(student);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (studentDao.checkIdExist(id)) {
+		if (studentDao.getById(id) != null) {
 		studentDao.deleteById(id);
 		}
 	}

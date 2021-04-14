@@ -52,14 +52,6 @@ class GroupDaoTest {
 	}
 
 	@Test
-	void givenGroupWithStudents_whenDeleteById_thenNoAction() {
-		groupDao.deleteById(1);
-
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", "id = 1");
-		assertEquals(1, actual);
-	}
-
-	@Test
 	void givenId_whenGetById_thenGroupFound() {
 		Group expected = Group.builder().id(2).name("A7-98").build();
 		ArrayList<Student> students = new ArrayList<>();
