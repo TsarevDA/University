@@ -2,7 +2,6 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,11 +12,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.LessonRowMapper;
-import ru.tsar.university.model.Auditorium;
-import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Lesson;
-import ru.tsar.university.model.Teacher;
 
 @Component
 public class LessonDao {
@@ -30,6 +25,8 @@ public class LessonDao {
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
 	private static final String GET_BY_DAY_TIME_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? ";
+	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id = ?";
+	private static final String GET_BY_DAY_TIME_TEACHER_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND teacher_id = ?";
 	
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
@@ -67,7 +64,7 @@ public class LessonDao {
 
 	public Lesson getById(int id) {
 		try {
-		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -86,9 +83,15 @@ public class LessonDao {
 	public List<Lesson> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
-	
+
 	public List<Lesson> getByDayTime(Lesson lesson) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, lesson.getDay(),
-				lesson.getTime().getId());
+		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
+	}
+	public List<Lesson> getByDayTimeAuditorium(Lesson lesson) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
+	}
+
+	public List<Lesson> getByDayTimeTeacher(Lesson lesson) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
 	}
 }

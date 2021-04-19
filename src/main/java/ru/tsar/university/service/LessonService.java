@@ -3,35 +3,23 @@ package ru.tsar.university.service;
 import java.time.DayOfWeek;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.LessonDao;
-import ru.tsar.university.dao.TeacherDao;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Lesson;
-import ru.tsar.university.model.Student;
-import ru.tsar.university.model.Teacher;
 
 @Service
 public class LessonService {
 
 	private LessonDao lessonDao;
-	private AuditoriumDao auditoriumDao;
-	private TeacherDao teacherDao;
-	private GroupDao groupDao;
 
-	public LessonService(LessonDao lessonDao, AuditoriumDao auditoriumDao, TeacherDao teacherDao, GroupDao groupDao) {
+	public LessonService(LessonDao lessonDao) {
 		this.lessonDao = lessonDao;
-		this.auditoriumDao = auditoriumDao;
-		this.teacherDao = teacherDao;
-		this.groupDao = groupDao;
 	}
 
 	public void create(Lesson lesson) {
-
+		lesson.setId(0);
 		if (checkAuditoriumCapacity(lesson) && checkTeacherCompetence(lesson) && checkDayOff(lesson)
 				&& checkAuditoriumFree(lesson) && checkTeacherFree(lesson) && checkGroupFree(lesson)) {
 			lessonDao.create(lesson);
@@ -39,8 +27,9 @@ public class LessonService {
 	}
 
 	public Lesson getById(int id) {
-		if (lessonDao.getById(id) != null) {
-			return lessonDao.getById(id);
+		Lesson lesson = lessonDao.getById(id);
+		if (lesson != null) {
+			return lesson;
 		} else {
 			return null;
 		}
@@ -51,62 +40,61 @@ public class LessonService {
 	}
 
 	public void update(Lesson lesson) {
-		if (lessonDao.getById(lesson.getId()) != null && checkAuditoriumCapacity(lesson)
-				&& checkTeacherCompetence(lesson) && checkDayOff(lesson) && checkAuditoriumFree(lesson)
-				&& checkTeacherFree(lesson) && checkGroupFree(lesson)) {
+		if (isExistId(lesson.getId()) && checkAuditoriumCapacity(lesson) && checkTeacherCompetence(lesson)
+				&& checkDayOff(lesson) && checkAuditoriumFree(lesson) && checkTeacherFree(lesson)
+				&& checkGroupFree(lesson)) {
 			lessonDao.update(lesson);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (lessonDao.getById(id) != null) {
+		if (isExistId(id)) {
 			lessonDao.deleteById(id);
 		}
 	}
 
 	public int countStudents(List<Group> groups) {
-		int counter = 0;
-		if (groups != null) {
-			for (Group group : groups) {
-				if (group.getStudents() != null) {
-					counter = counter + group.getStudents().size();
-				}
-			}
-		}
-		return counter;
+		return groups.stream().mapToInt(g -> g.getStudents().size()).sum();
 	}
 
 	public boolean checkAuditoriumCapacity(Lesson lesson) {
-		return (lesson.getAuditorium().getCapacity() >= countStudents(lesson.getGroups())) ? true : false;
+		System.out.println(countStudents(lesson.getGroups()));
+		return (lesson.getAuditorium().getCapacity() >= countStudents(lesson.getGroups()));
 	}
 
 	public boolean checkTeacherCompetence(Lesson lesson) {
-		return (lesson.getTeacher().getCourses().contains(lesson.getCourse())) ? true : false;
+		return (lesson.getTeacher().getCourses().contains(lesson.getCourse()));
 	}
 
 	public boolean checkDayOff(Lesson lesson) {
-		return (lesson.getDay().getDayOfWeek() != (DayOfWeek.SATURDAY)
-				&& lesson.getDay().getDayOfWeek() != DayOfWeek.SUNDAY) ? true : false;
+		return (lesson.getDay().getDayOfWeek() != DayOfWeek.SATURDAY
+				&& lesson.getDay().getDayOfWeek() != DayOfWeek.SUNDAY);
 	}
 
 	public boolean checkAuditoriumFree(Lesson lesson) {
-		List<Lesson> lessons = lessonDao.getByDayTime(lesson);
-		return (lessons.stream().filter(l -> l.getAuditorium().equals(lesson.getAuditorium())).count() == 0) ? true
-				: false;
+		List<Lesson> lessons = lessonDao.getByDayTimeAuditorium(lesson);
+		Lesson lessonById = lessonDao.getById(lesson.getId());
+		return (lessons.size() == 0 || lessons.contains(lessonById));
 	}
 
 	public boolean checkTeacherFree(Lesson lesson) {
-		List<Lesson> lessons = lessonDao.getByDayTime(lesson);
-		return (lessons.stream().filter(l -> l.getTeacher().equals(lesson.getTeacher())).count() == 0) ? true : false;
+		List<Lesson> lessons = lessonDao.getByDayTimeTeacher(lesson);
+		Lesson lessonById = lessonDao.getById(lesson.getId());
+		return (lessons.size() == 0 || lessons.contains(lessonById));
 	}
 
 	public boolean checkGroupFree(Lesson lesson) {
 		List<Lesson> lessons = lessonDao.getByDayTime(lesson);
+		Lesson lessonById = lessonDao.getById(lesson.getId());
 		long count = 0;
 		for (Group group : lesson.getGroups()) {
-			count = count + lessons.stream().filter(l -> l.getGroups().contains(group)).count();
+			count = count + lessons.stream().filter(l -> l.getGroups().contains(group) && l.getId() != lesson.getId())
+					.count();
 		}
+		return count == 0;
+	}
 
-		return count == 0 ? true : false;
+	public boolean isExistId(int id) {
+		return lessonDao.getById(id) != null;
 	}
 }

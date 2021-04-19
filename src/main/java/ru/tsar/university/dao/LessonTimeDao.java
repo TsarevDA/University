@@ -5,15 +5,12 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.LessonTimeRowMapper;
-import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Group;
 import ru.tsar.university.model.LessonTime;
 
 @Component
@@ -52,10 +49,10 @@ public class LessonTimeDao {
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_LESSON_TIME_QUERY, id);
 	}
-	
+
 	public LessonTime getById(int id) {
 		try {
-		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}

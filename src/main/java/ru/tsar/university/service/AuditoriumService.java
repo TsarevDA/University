@@ -19,14 +19,16 @@ public class AuditoriumService {
 	}
 
 	public void create(Auditorium auditorium) {
-		if (auditoriumDao.getByName(auditorium) == null) {
+		auditorium.setId(0);
+		if (isUniqueName(auditorium)) {
 			auditoriumDao.create(auditorium);
 		}
 	}
 
 	public Auditorium getById(int id) {
-		if (auditoriumDao.getById(id) != null) {
-			return auditoriumDao.getById(id);
+		Auditorium auditorium = auditoriumDao.getById(id);
+		if (auditorium != null) {
+			return auditorium;
 		} else {
 			return null;
 		}
@@ -37,27 +39,23 @@ public class AuditoriumService {
 	}
 
 	public void update(Auditorium auditorium) {
-		
-		if (auditoriumDao.getById(auditorium.getId()) != null  && checkAuditoriumNameFree(auditorium)) {
+		if (isIdExist(auditorium.getId()) && isUniqueName(auditorium)) {
 			auditoriumDao.update(auditorium);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (auditoriumDao.getById(id) != null) {
+		if (isIdExist(id)) {
 			auditoriumDao.deleteById(id);
 		}
 	}
 
-	public boolean checkAuditoriumNameFree(Auditorium auditorium) {
+	public boolean isUniqueName(Auditorium auditorium) {
 		Auditorium auditoriumByName = auditoriumDao.getByName(auditorium);
-		if (auditoriumByName == null) {
-			return true;
-		} else {
-			if (auditoriumByName.getId() == auditorium.getId()) {
-				return true;
-			}
-			return false;
-		}
+		return (auditoriumByName == null || auditoriumByName.getId() == auditorium.getId());
+	}
+
+	public boolean isIdExist(int id) {
+		return auditoriumDao.getById(id) != null;
 	}
 }

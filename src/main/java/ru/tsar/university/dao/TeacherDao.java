@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -13,10 +12,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.TeacherRowMapper;
-import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Group;
-import ru.tsar.university.model.Lesson;
-import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 
 @Component
@@ -29,16 +24,13 @@ public class TeacherDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
 	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM teachers ";
-	private static final String GET_BY_DAY_TIME_TEACHER_QUERY = " SELECT count(*) FROM lessons WHERE day=? AND lesson_time_id = ? AND teacher_id =?";
-	
+
 	private JdbcTemplate jdbcTemplate;
 	private TeacherRowMapper rowMapper;
-	private CourseDao courseDao;
 
 	public TeacherDao(JdbcTemplate jdbcTemplate, TeacherRowMapper rowMapper, CourseDao courseDao) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.rowMapper = rowMapper;
-		this.courseDao = courseDao;
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
@@ -70,7 +62,7 @@ public class TeacherDao {
 
 	public Teacher getById(int id) {
 		try {
-		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}

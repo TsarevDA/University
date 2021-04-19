@@ -12,18 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.jdbc.JdbcTestUtils;
 
-import ru.tsar.university.config.SpringTestConfig;
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.LessonDao;
@@ -89,7 +80,7 @@ class LessonServiceTest {
 
 		lessonService.create(expected);
 
-		Mockito.verify(lessonDao).create(expected);
+		verify(lessonDao).create(expected);
 	}
 
 	
@@ -161,11 +152,11 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 		
-		Mockito.when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
+		when(lessonDao.getByDayTimeAuditorium(expected)).thenReturn(lessonList);
 		
 		lessonService.create(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).create(expected);
+		verify(lessonDao, never()).create(expected);
 	}
 	
 	@Test
@@ -237,11 +228,11 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 		
-		Mockito.when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
+		when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
 		
 		lessonService.create(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).create(expected);
+		verify(lessonDao, never()).create(expected);
 	}
 	
 	@Test
@@ -281,7 +272,7 @@ class LessonServiceTest {
 
 		lessonService.create(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).create(expected);
+		verify(lessonDao, never()).create(expected);
 	}
 
 	@Test
@@ -310,7 +301,7 @@ class LessonServiceTest {
 				.auditorium(auditorium).build();
 
 		
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getById(1)).thenReturn(expected);
 		Lesson actual = lessonService.getById(1);
 
 		assertEquals(expected, actual);
@@ -354,7 +345,7 @@ class LessonServiceTest {
 
 		lessonService.create(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).create(expected);
+		verify(lessonDao, never()).create(expected);
 	}
 
 	@Test
@@ -383,7 +374,7 @@ class LessonServiceTest {
 		List<Lesson> expected = new ArrayList<>();
 		expected.add(lesson1);
 		
-		Mockito.when(lessonDao.getAll()).thenReturn(expected);
+		when(lessonDao.getAll()).thenReturn(expected);
 
 		List<Lesson> actual = lessonService.getAll();
 
@@ -425,11 +416,11 @@ class LessonServiceTest {
 		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 		
-		Mockito.when(lessonDao.getById(1)).thenReturn(lesson);
+		when(lessonDao.getById(1)).thenReturn(lesson);
 		
 		lessonService.deleteById(1);
 
-		Mockito.verify(lessonDao).deleteById(1);
+		verify(lessonDao).deleteById(1);
 	}
 	
 	@Test
@@ -468,11 +459,11 @@ class LessonServiceTest {
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getById(1)).thenReturn(expected);
 		
 		lessonService.update(expected);
 
-		Mockito.verify(lessonDao).update(expected);
+		verify(lessonDao).update(expected);
 	}
 
 	
@@ -544,13 +535,13 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 		
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getById(1)).thenReturn(expected);
 		
-		Mockito.when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
+		when(lessonDao.getByDayTimeAuditorium(expected)).thenReturn(lessonList);
 		
 		lessonService.update(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).update(expected);
+		verify(lessonDao, never()).update(expected);
 	}
 	
 	@Test
@@ -622,12 +613,12 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 		
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
-		Mockito.when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
+		when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
 		
 		lessonService.update(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).update(expected);
+		verify(lessonDao, never()).update(expected);
 	}
 	
 	@Test
@@ -665,10 +656,10 @@ class LessonServiceTest {
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getById(1)).thenReturn(expected);
 		lessonService.update(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).update(expected);
+		verify(lessonDao, never()).update(expected);
 	}
 
 	@Test
@@ -707,11 +698,11 @@ class LessonServiceTest {
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 
-		Mockito.when(lessonDao.getById(1)).thenReturn(expected);
+		when(lessonDao.getById(1)).thenReturn(expected);
 		
 		lessonService.update(expected);
 
-		Mockito.verify(lessonDao, Mockito.never()).update(expected);
+		verify(lessonDao, never()).update(expected);
 	}
 	
 	
@@ -720,6 +711,6 @@ class LessonServiceTest {
 		
 		lessonService.deleteById(1);
 
-		Mockito.verify(lessonDao, Mockito.never()).deleteById(1);
+		verify(lessonDao, never()).deleteById(1);
 	}
 }

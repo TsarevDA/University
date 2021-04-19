@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.TeacherDao;
@@ -35,8 +35,8 @@ class TeacherServiceTest {
 				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
 
 		teacherService.create(teacher);
-		
-		Mockito.verify(teacherDao).create(teacher);
+
+		verify(teacherDao).create(teacher);
 	}
 
 	@Test
@@ -46,8 +46,8 @@ class TeacherServiceTest {
 				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
 				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
 
-		Mockito.when(teacherDao.getById(1)).thenReturn(expected);
-		
+		when(teacherDao.getById(1)).thenReturn(expected);
+
 		Teacher actual = teacherService.getById(1);
 
 		assertEquals(expected, actual);
@@ -69,12 +69,12 @@ class TeacherServiceTest {
 		expected.add(teacher1);
 		expected.add(teacher2);
 
-		Mockito.when(teacherDao.getAll()).thenReturn(expected);
+		when(teacherDao.getAll()).thenReturn(expected);
 		List<Teacher> actual = teacherService.getAll();
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	void givenTeacher_whenUpdate_thenCallDaoMethod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -83,36 +83,35 @@ class TeacherServiceTest {
 				.address("Ivanov street, 25-5").build();
 		Teacher oldValue = Teacher.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
 				.birthDate(LocalDate.parse("1991-01-01", formatter)).email("100@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();;
+				.address("Ivanov street, 25-5").build();
+		;
 
-		Mockito.when(teacherDao.getById(1)).thenReturn(oldValue);
-		
+		when(teacherDao.getById(1)).thenReturn(oldValue);
 
 		teacherService.update(expected);
-		Mockito.verify(teacherDao).update(expected);
-	
+		verify(teacherDao).update(expected);
 
 	}
-	
+
 	@Test
 	void givenId_whenDeleteById_thenCallDaoMethod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		Teacher student = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
 				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
 				.address("Ivanov street, 25-5").build();
-		
-		Mockito.when(teacherDao.getById(1)).thenReturn(student);
-		
+
+		when(teacherDao.getById(1)).thenReturn(student);
+
 		teacherService.deleteById(1);
-		
-		Mockito.verify(teacherDao).deleteById(1);
+
+		verify(teacherDao).deleteById(1);
 	}
-	
+
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
-	
+
 		teacherService.deleteById(1);
-		
-		Mockito.verify(teacherDao, Mockito.never()).deleteById(1);
+
+		verify(teacherDao, never()).deleteById(1);
 	}
 }

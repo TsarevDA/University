@@ -10,9 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.CourseRowMapper;
-import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Group;
 
 @Component
 public class CourseDao {

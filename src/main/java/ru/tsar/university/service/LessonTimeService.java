@@ -18,14 +18,15 @@ public class LessonTimeService {
 	}
 
 	public void create(LessonTime lessonTime) {
-		if ( lessonTime.getStartTime().isBefore(lessonTime.getEndTime()) ) {
-		lessonTimeDao.create(lessonTime);
+		if (isTimeCorrect(lessonTime)) {
+			lessonTimeDao.create(lessonTime);
 		}
 	}
 
 	public LessonTime getById(int id) {
-		if (lessonTimeDao.getById(id) != null) {
-		return lessonTimeDao.getById(id);
+		LessonTime lessonTime = lessonTimeDao.getById(id);
+		if (lessonTime != null) {
+			return lessonTime;
 		} else {
 			return null;
 		}
@@ -34,21 +35,29 @@ public class LessonTimeService {
 	public LessonTime getByOrder(int order) {
 		return lessonTimeDao.getByOrder(order);
 	}
-	
+
 	public List<LessonTime> getAll() {
 		return lessonTimeDao.getAll();
 	}
 
 	public void update(LessonTime lessonTime) {
-		if (lessonTimeDao.getById(lessonTime.getId()) != null && lessonTime.getStartTime().isBefore(lessonTime.getEndTime()) ) {
-		lessonTimeDao.update(lessonTime);
+		if (isExistId(lessonTime.getId()) && isTimeCorrect(lessonTime)) {
+			lessonTimeDao.update(lessonTime);
 		}
-		
+
 	}
 
 	public void deleteById(int id) {
-		if (lessonTimeDao.getById(id) != null) {
-		lessonTimeDao.deleteById(id);
+		if (isExistId(id)) {
+			lessonTimeDao.deleteById(id);
 		}
+	}
+
+	public boolean isExistId(int id) {
+		return lessonTimeDao.getById(id) != null;
+	}
+
+	public boolean isTimeCorrect(LessonTime lessonTime) {
+		return lessonTime.getStartTime().isBefore(lessonTime.getEndTime());
 	}
 }

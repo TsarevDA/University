@@ -15,21 +15,23 @@ public class GroupService {
 
 	private GroupDao groupDao;
 	private StudentDao studentDao;
-	
+
 	public GroupService(GroupDao groupDao, StudentDao studentDao) {
 		this.groupDao = groupDao;
 		this.studentDao = studentDao;
 	}
 
 	public void create(Group group) {
+		group.setId(0);
 		if (groupDao.getByName(group) == null) {
 			groupDao.create(group);
 		}
 	}
 
 	public Group getById(int id) {
-		if (groupDao.getById(id) != null) {
-		return groupDao.getById(id);
+		Group group = groupDao.getById(id);
+		if (group != null) {
+			return group;
 		} else {
 			return null;
 		}
@@ -40,34 +42,27 @@ public class GroupService {
 	}
 
 	public void update(Group group) {
-		if (groupDao.getById(group.getId()) != null && checkGroupNameFree(group)) {
+		if (isExistId(group.getId()) && isUniqueName(group)) {
 			groupDao.update(group);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (groupDao.getById(id) != null && !checkExistStudentsInGroup(id)) { 
-		groupDao.deleteById(id);
+		if (isExistId(id) && !isExistStudentsInGroup(id)) {
+			groupDao.deleteById(id);
 		}
 	}
-	
-	public boolean checkGroupNameFree(Group group) {
+
+	public boolean isUniqueName(Group group) {
 		Group groupByName = groupDao.getByName(group);
-		if (groupByName == null) {
-			return true;
-		} else {
-			if (groupByName.getId() == group.getId()) {
-				return true;
-			}
-			return false;
-		}
+		return (groupByName == null || groupByName.getId() == group.getId());
 	}
-	
-	public boolean checkExistStudentsInGroup(int id) {
-		if (studentDao.getByGroupId(id) == null) {
-			return true;
-		}
-		return false;
-		
+
+	public boolean isExistStudentsInGroup(int id) {
+		return (studentDao.getByGroupId(id) == null);
+	}
+
+	public boolean isExistId(int id) {
+		return groupDao.getById(id) != null;
 	}
 }

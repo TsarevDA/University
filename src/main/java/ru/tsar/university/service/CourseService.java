@@ -20,21 +20,22 @@ public class CourseService {
 	}
 
 	public void create(Course course) {
-		if (courseDao.getByName(course) == null) {
+		course.setId(0);
+		if (isUniqueName(course)) {
 			courseDao.create(course);
 		}
-
 	}
 
 	public void update(Course course) {
-		if (courseDao.getById(course.getId()) != null && checkCourseNameFree(course)) {
+		if (isExistId(course.getId()) && isUniqueName(course)) {
 			courseDao.update(course);
 		}
 	}
 
 	public Course getById(int id) {
-		if (courseDao.getById(id) != null) {
-			return courseDao.getById(id);
+		Course course = courseDao.getById(id);
+		if (course != null) {
+			return course;
 		} else {
 			return null;
 		}
@@ -49,21 +50,18 @@ public class CourseService {
 	}
 
 	public void deleteById(int id) {
-		if (courseDao.getById(id) != null) {
+		if (isExistId(id)) {
 			courseDao.deleteById(id);
 		}
 	}
 
-	public boolean checkCourseNameFree(Course course) {
+	public boolean isExistId(int id) {
+		return courseDao.getById(id) != null;
+	}
+
+	public boolean isUniqueName(Course course) {
 		Course courseByName = courseDao.getByName(course);
-		if (courseByName == null) {
-			return true;
-		} else {
-			if (courseByName.getId() == course.getId()) {
-				return true;
-			}
-			return false;
-		}
+		return (courseByName == null || courseByName.getId() == course.getId());
 	}
 
 }

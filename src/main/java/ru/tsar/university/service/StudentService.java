@@ -22,8 +22,9 @@ public class StudentService {
 	}
 
 	public Student getById(int id) {
-		if (studentDao.getById(id) != null) {
-		return studentDao.getById(id);
+		Student student = studentDao.getById(id);
+		if (student != null) {
+			return student;
 		} else {
 			return null;
 		}
@@ -34,14 +35,18 @@ public class StudentService {
 	}
 
 	public void update(Student student) {
-		if (studentDao.getById(student.getId()) != null) {
-		studentDao.update(student);
+		if (isExistId(student.getId())) {
+			studentDao.update(student);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (studentDao.getById(id) != null) {
-		studentDao.deleteById(id);
+		if (isExistId(id)) {
+			studentDao.deleteById(id);
 		}
+	}
+
+	public boolean isExistId(int id) {
+		return studentDao.getById(id) != null;
 	}
 }

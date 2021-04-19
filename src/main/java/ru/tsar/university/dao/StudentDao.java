@@ -10,8 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.StudentRowMapper;
-import ru.tsar.university.model.Course;
-import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
 @Component
@@ -55,7 +53,7 @@ public class StudentDao {
 
 	public Student getById(int id) {
 		try {
-		return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
@@ -63,11 +61,11 @@ public class StudentDao {
 
 	public List<Student> getByGroupId(int id) {
 		try {
-		return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
 			return null;
 		}
-		}
+	}
 
 	public void update(Student student) {
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),

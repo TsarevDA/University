@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.LessonTimeDao;
@@ -22,7 +22,7 @@ class LessonTimeServiceTest {
 
 	@InjectMocks
 	private LessonTimeService lessonTimeService;
-	@Mock 
+	@Mock
 	private LessonTimeDao lessonTimeDao;
 
 	@Test
@@ -31,22 +31,22 @@ class LessonTimeServiceTest {
 		LocalTime startTime = LocalTime.parse("08:00", formatter);
 		LocalTime endTime = LocalTime.parse("09:00", formatter);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
-		
+
 		lessonTimeService.create(expected);
 
-		Mockito.verify(lessonTimeDao).create(expected);
+		verify(lessonTimeDao).create(expected);
 	}
-	
+
 	@Test
 	void givenWrongLessonTime_whenCreate_thenNoAction() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("17:00", formatter);
 		LocalTime endTime = LocalTime.parse("09:00", formatter);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
-		
+
 		lessonTimeService.create(expected);
 
-		Mockito.verify(lessonTimeDao, Mockito.never()).create(expected);
+		verify(lessonTimeDao, never()).create(expected);
 	}
 
 	@Test
@@ -64,27 +64,29 @@ class LessonTimeServiceTest {
 		expected.add(lessonTime1);
 		expected.add(lessonTime2);
 
-		Mockito.when(lessonTimeDao.getAll()).thenReturn(expected);
-		
+		when(lessonTimeDao.getAll()).thenReturn(expected);
+
 		List<LessonTime> actual = lessonTimeService.getAll();
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	void givenNewLessonTime_whenUpdate_thenCallDaoMethod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("08:00", formatter);
 		LocalTime endTime = LocalTime.parse("09:00", formatter);
-		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(startTime).endTime(endTime).build();
-		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(3).startTime(startTime).endTime(endTime).build();
-		
-		Mockito.when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
+		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(startTime).endTime(endTime)
+				.build();
+		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(3).startTime(startTime).endTime(endTime)
+				.build();
+
+		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
 		lessonTimeService.update(newLessonTime);
 
-		Mockito.verify(lessonTimeDao).update(newLessonTime);
+		verify(lessonTimeDao).update(newLessonTime);
 	}
-	
+
 	@Test
 	void givenWrongLessonTime_whenUpdate_thenNoAction() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -92,34 +94,35 @@ class LessonTimeServiceTest {
 		LocalTime oldEndTime = LocalTime.parse("09:00", formatter);
 		LocalTime newStartTime = LocalTime.parse("17:00", formatter);
 		LocalTime newEndTime = LocalTime.parse("09:00", formatter);
-		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(oldStartTime).endTime(oldEndTime).build();
-		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(newStartTime).endTime(newEndTime).build();
-		
-		Mockito.when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
+		LessonTime oldLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(oldStartTime).endTime(oldEndTime)
+				.build();
+		LessonTime newLessonTime = LessonTime.builder().id(1).orderNumber(1).startTime(newStartTime).endTime(newEndTime)
+				.build();
+
+		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
 		lessonTimeService.update(newLessonTime);
 
-		Mockito.verify(lessonTimeDao,Mockito.never()).update(newLessonTime);
+		verify(lessonTimeDao, never()).update(newLessonTime);
 	}
-	
+
 	@Test
 	void givenId_whenDeleteById_thenCallDaoMethod() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 		LocalTime startTime = LocalTime.parse("09:00", formatter);
 		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime lessonTime = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime)
-				.build();
-		
-		Mockito.when(lessonTimeDao.getById(1)).thenReturn(lessonTime);
+		LessonTime lessonTime = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime).build();
+
+		when(lessonTimeDao.getById(1)).thenReturn(lessonTime);
 		lessonTimeService.deleteById(1);
 
-		Mockito.verify(lessonTimeDao).deleteById(1);
+		verify(lessonTimeDao).deleteById(1);
 	}
-	
+
 	@Test
 	void givenId_whenDeleteById_thenNoAction() {
 
 		lessonTimeService.deleteById(1);
 
-		Mockito.verify(lessonTimeDao, Mockito.never()).deleteById(1);
+		verify(lessonTimeDao, never()).deleteById(1);
 	}
 }
