@@ -20,25 +20,19 @@ public class CourseService {
 	}
 
 	public void create(Course course) {
-		course.setId(0);
 		if (isUniqueName(course)) {
 			courseDao.create(course);
 		}
 	}
 
 	public void update(Course course) {
-		if (isExistId(course.getId()) && isUniqueName(course)) {
+		if (isCourseExist(course.getId()) && isUniqueName(course)) {
 			courseDao.update(course);
 		}
 	}
 
 	public Course getById(int id) {
-		Course course = courseDao.getById(id);
-		if (course != null) {
-			return course;
-		} else {
-			return null;
-		}
+		return courseDao.getById(id);
 	}
 
 	public List<Course> getAll() {
@@ -50,12 +44,12 @@ public class CourseService {
 	}
 
 	public void deleteById(int id) {
-		if (isExistId(id)) {
+		if (isCourseExist(id)) {
 			courseDao.deleteById(id);
 		}
 	}
 
-	public boolean isExistId(int id) {
+	public boolean isCourseExist(int id) {
 		return courseDao.getById(id) != null;
 	}
 

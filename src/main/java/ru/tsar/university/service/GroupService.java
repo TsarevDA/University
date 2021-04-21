@@ -22,19 +22,13 @@ public class GroupService {
 	}
 
 	public void create(Group group) {
-		group.setId(0);
 		if (groupDao.getByName(group) == null) {
 			groupDao.create(group);
 		}
 	}
 
 	public Group getById(int id) {
-		Group group = groupDao.getById(id);
-		if (group != null) {
-			return group;
-		} else {
-			return null;
-		}
+		return groupDao.getById(id);
 	}
 
 	public List<Group> getAll() {
@@ -42,13 +36,13 @@ public class GroupService {
 	}
 
 	public void update(Group group) {
-		if (isExistId(group.getId()) && isUniqueName(group)) {
+		if (isGroupExist(group.getId()) && isUniqueName(group)) {
 			groupDao.update(group);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (isExistId(id) && !isExistStudentsInGroup(id)) {
+		if (isGroupExist(id) && !isStudentsInGroupExist(id)) {
 			groupDao.deleteById(id);
 		}
 	}
@@ -58,11 +52,11 @@ public class GroupService {
 		return (groupByName == null || groupByName.getId() == group.getId());
 	}
 
-	public boolean isExistStudentsInGroup(int id) {
+	public boolean isStudentsInGroupExist(int id) {
 		return (studentDao.getByGroupId(id) == null);
 	}
 
-	public boolean isExistId(int id) {
+	public boolean isGroupExist(int id) {
 		return groupDao.getById(id) != null;
 	}
 }

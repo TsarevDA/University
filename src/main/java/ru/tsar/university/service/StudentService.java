@@ -22,12 +22,7 @@ public class StudentService {
 	}
 
 	public Student getById(int id) {
-		Student student = studentDao.getById(id);
-		if (student != null) {
-			return student;
-		} else {
-			return null;
-		}
+		return studentDao.getById(id);
 	}
 
 	public List<Student> getAll() {
@@ -35,18 +30,18 @@ public class StudentService {
 	}
 
 	public void update(Student student) {
-		if (isExistId(student.getId())) {
+		if (isStudentExist(student.getId())) {
 			studentDao.update(student);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (isExistId(id)) {
+		if (isStudentExist(id)) {
 			studentDao.deleteById(id);
 		}
 	}
 
-	public boolean isExistId(int id) {
+	public boolean isStudentExist(int id) {
 		return studentDao.getById(id) != null;
 	}
 }

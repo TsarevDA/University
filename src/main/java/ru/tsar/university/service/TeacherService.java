@@ -22,12 +22,7 @@ public class TeacherService {
 	}
 
 	public Teacher getById(int id) {
-		Teacher teacher = teacherDao.getById(id);
-		if (teacher != null) {
-			return teacher;
-		} else {
-			return null;
-		}
+		return teacherDao.getById(id);
 	}
 
 	public List<Teacher> getAll() {
@@ -35,18 +30,18 @@ public class TeacherService {
 	}
 
 	public void update(Teacher teacher) {
-		if (isExistId(teacher.getId())) {
+		if (isTeacherExist(teacher.getId())) {
 			teacherDao.update(teacher);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (isExistId(id)) {
+		if (isTeacherExist(id)) {
 			teacherDao.deleteById(id);
 		}
 	}
 
-	public boolean isExistId(int id) {
+	public boolean isTeacherExist(int id) {
 		return teacherDao.getById(id) != null;
 	}
 }

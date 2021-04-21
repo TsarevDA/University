@@ -13,10 +13,10 @@ public class GroupRowMapper implements RowMapper<Group> {
 
 	@Override
 	public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
-		return Group.builder().
-				id(rs.getInt("id")).
-				name(rs.getString("name")).
-				build();
+		return Group.builder()
+				.id(rs.getInt("id"))
+				.name(rs.getString("name"))
+				.build();
 	}
 
 }

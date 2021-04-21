@@ -19,19 +19,13 @@ public class AuditoriumService {
 	}
 
 	public void create(Auditorium auditorium) {
-		auditorium.setId(0);
 		if (isUniqueName(auditorium)) {
 			auditoriumDao.create(auditorium);
 		}
 	}
 
 	public Auditorium getById(int id) {
-		Auditorium auditorium = auditoriumDao.getById(id);
-		if (auditorium != null) {
-			return auditorium;
-		} else {
-			return null;
-		}
+		return auditoriumDao.getById(id);
 	}
 
 	public List<Auditorium> getAll() {
@@ -39,13 +33,13 @@ public class AuditoriumService {
 	}
 
 	public void update(Auditorium auditorium) {
-		if (isIdExist(auditorium.getId()) && isUniqueName(auditorium)) {
+		if (isAuditoriumExist(auditorium.getId()) && isUniqueName(auditorium)) {
 			auditoriumDao.update(auditorium);
 		}
 	}
 
 	public void deleteById(int id) {
-		if (isIdExist(id)) {
+		if (isAuditoriumExist(id)) {
 			auditoriumDao.deleteById(id);
 		}
 	}
@@ -55,7 +49,7 @@ public class AuditoriumService {
 		return (auditoriumByName == null || auditoriumByName.getId() == auditorium.getId());
 	}
 
-	public boolean isIdExist(int id) {
+	public boolean isAuditoriumExist(int id) {
 		return auditoriumDao.getById(id) != null;
 	}
 }

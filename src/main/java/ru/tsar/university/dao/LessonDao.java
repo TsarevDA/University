@@ -2,6 +2,7 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,7 +13,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.tsar.university.dao.mapper.LessonRowMapper;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Lesson;
+import ru.tsar.university.model.LessonTime;
+import ru.tsar.university.model.Teacher;
 
 @Component
 public class LessonDao {
@@ -84,14 +88,15 @@ public class LessonDao {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 
-	public List<Lesson> getByDayTime(Lesson lesson) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
+	public List<Lesson> getByDayTime(LocalDate day, LessonTime lessonTime) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, day, lessonTime.getId());
 	}
-	public List<Lesson> getByDayTimeAuditorium(Lesson lesson) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
+	
+	public List<Lesson> getByDayTimeAuditorium(LocalDate day, LessonTime lessonTime, Auditorium auditorium) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper,  day, lessonTime.getId(), auditorium.getId());
 	}
 
-	public List<Lesson> getByDayTimeTeacher(Lesson lesson) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, lesson.getDay(), lesson.getTime().getId());
+	public List<Lesson> getByDayTimeTeacher(LocalDate day, LessonTime lessonTime, Teacher teacher) {
+		return jdbcTemplate.query(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper,  day, lessonTime.getId(), teacher.getId());
 	}
 }

@@ -24,12 +24,7 @@ public class LessonTimeService {
 	}
 
 	public LessonTime getById(int id) {
-		LessonTime lessonTime = lessonTimeDao.getById(id);
-		if (lessonTime != null) {
-			return lessonTime;
-		} else {
-			return null;
-		}
+		return lessonTimeDao.getById(id);
 	}
 
 	public LessonTime getByOrder(int order) {
@@ -41,19 +36,19 @@ public class LessonTimeService {
 	}
 
 	public void update(LessonTime lessonTime) {
-		if (isExistId(lessonTime.getId()) && isTimeCorrect(lessonTime)) {
+		if (isLessonTimeExist(lessonTime.getId()) && isTimeCorrect(lessonTime)) {
 			lessonTimeDao.update(lessonTime);
 		}
 
 	}
 
 	public void deleteById(int id) {
-		if (isExistId(id)) {
+		if (isLessonTimeExist(id)) {
 			lessonTimeDao.deleteById(id);
 		}
 	}
 
-	public boolean isExistId(int id) {
+	public boolean isLessonTimeExist(int id) {
 		return lessonTimeDao.getById(id) != null;
 	}
 

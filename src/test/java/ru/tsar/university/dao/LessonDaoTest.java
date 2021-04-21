@@ -138,4 +138,100 @@ class LessonDaoTest {
 
 		assertEquals(expected, actual);
 	}
+	
+	@Test
+	void givenDayTime_whenGetByDayTime_thenLessonListFound() {
+		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
+		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Course course = new Course.CourseBuilder().id(1).name("Astronomy")
+				.description("Science about stars and deep space").build();
+
+		List<Course> teacherCourses = new ArrayList<>();
+		teacherCourses.add(course);
+		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses)
+				.build();
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("09:00", timeFormatter);
+		LocalTime endTime = LocalTime.parse("10:00", timeFormatter);
+		LessonTime lessonTime = new LessonTime.LessonTimeBuilder().id(1).orderNumber(2).startTime(startTime)
+				.endTime(endTime).build();
+		ArrayList<Group> groups = new ArrayList<>();
+		groups.add(group);
+		LocalDate day = LocalDate.parse("2020-12-08", dateFormatter);
+		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+				.auditorium(auditorium).build();
+		List<Lesson> expected = new ArrayList<>();
+		expected.add(lesson);
+		
+		List<Lesson> actual = lessonDao.getByDayTime(day, lessonTime);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	void givenDayTimeAuditorium_whenGetByDayTimeAuditorium_thenLessonListFound() {
+		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
+		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Course course = new Course.CourseBuilder().id(1).name("Astronomy")
+				.description("Science about stars and deep space").build();
+
+		List<Course> teacherCourses = new ArrayList<>();
+		teacherCourses.add(course);
+		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses)
+				.build();
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("09:00", timeFormatter);
+		LocalTime endTime = LocalTime.parse("10:00", timeFormatter);
+		LessonTime lessonTime = new LessonTime.LessonTimeBuilder().id(1).orderNumber(2).startTime(startTime)
+				.endTime(endTime).build();
+		ArrayList<Group> groups = new ArrayList<>();
+		groups.add(group);
+		LocalDate day = LocalDate.parse("2020-12-08", dateFormatter);
+		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+				.auditorium(auditorium).build();
+		List<Lesson> expected = new ArrayList<>();
+		expected.add(lesson);
+		
+		List<Lesson> actual = lessonDao.getByDayTimeAuditorium(day, lessonTime, auditorium);
+		
+		assertEquals(expected, actual);
+	}
+	
+	@Test
+	void givenDayTimeTeacher_whenGetByDayTimeTeacher_thenLessonListFound() {
+		Group group = new Group.GroupBuilder().id(1).name("T7-09").build();
+		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		Course course = new Course.CourseBuilder().id(1).name("Astronomy")
+				.description("Science about stars and deep space").build();
+
+		List<Course> teacherCourses = new ArrayList<>();
+		teacherCourses.add(course);
+		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses)
+				.build();
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		LocalTime startTime = LocalTime.parse("09:00", timeFormatter);
+		LocalTime endTime = LocalTime.parse("10:00", timeFormatter);
+		LessonTime lessonTime = new LessonTime.LessonTimeBuilder().id(1).orderNumber(2).startTime(startTime)
+				.endTime(endTime).build();
+		ArrayList<Group> groups = new ArrayList<>();
+		groups.add(group);
+		LocalDate day = LocalDate.parse("2020-12-08", dateFormatter);
+		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+				.auditorium(auditorium).build();
+		List<Lesson> expected = new ArrayList<>();
+		expected.add(lesson);
+		
+		List<Lesson> actual = lessonDao.getByDayTimeTeacher(day, lessonTime, teacher);
+		
+		assertEquals(expected, actual);
+	}
 }

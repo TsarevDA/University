@@ -41,7 +41,7 @@ class LessonServiceTest {
 	private TeacherDao teacherDao;
 	@Mock
 	private GroupDao groupDao;
-	
+
 	@Test
 	void givenNewLesson_whenCreate_thenCallDaoMethod() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -57,9 +57,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -83,7 +82,6 @@ class LessonServiceTest {
 		verify(lessonDao).create(expected);
 	}
 
-	
 	@Test
 	void givenNewLessonAuditoriumBusy_whenCreate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -99,9 +97,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -119,27 +116,26 @@ class LessonServiceTest {
 		LocalDate day = LocalDate.parse("2021-12-08", dateFormatter);
 		Lesson expected = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
-		
+
 		Group group2 = new Group.GroupBuilder().id(2).name("A7-03").build();
-		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail111@mail.ru").phone("88008080")
-				.address("Petrov street, 25-5").build();
+		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail@mail.ru").phone("88008080").address("Ivanov street, 25-5").build();
+		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail111@mail.ru").phone("88008080").address("Petrov street, 25-5").build();
 		ArrayList<Student> students2 = new ArrayList<>();
 		students.add(student3);
 		students.add(student4);
 		group.setStudents(students2);
-		
-		Course course2 = new Course.CourseBuilder().id(2).name("Math")
-				.description("Science about plants").build();
+
+		Course course2 = new Course.CourseBuilder().id(2).name("Math").description("Science about plants").build();
 		List<Course> teacherCourses2 = new ArrayList<>();
 		teacherCourses.add(course2);
 		Teacher teacher2 = new Teacher.TeacherBuilder().id(2).firstName("Arnold").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
-				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses2)
-				.build();
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5")
+				.courses(teacherCourses2).build();
 		LocalTime startTime2 = LocalTime.parse("09:00", timeFormatter);
 		LocalTime endTime2 = LocalTime.parse("10:00", timeFormatter);
 		LessonTime lessonTime2 = new LessonTime.LessonTimeBuilder().id(2).orderNumber(2).startTime(startTime2)
@@ -147,18 +143,19 @@ class LessonServiceTest {
 		ArrayList<Group> groups2 = new ArrayList<>();
 		groups.add(group);
 		LocalDate day2 = LocalDate.parse("2021-12-08", dateFormatter);
-		Lesson lesson2 = Lesson.builder().id(1).course(course2).teacher(teacher2).group(groups2).day(day2).time(lessonTime2)
-				.auditorium(auditorium).build();
+		Lesson lesson2 = Lesson.builder().id(1).course(course2).teacher(teacher2).group(groups2).day(day2)
+				.time(lessonTime2).auditorium(auditorium).build();
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
-		
-		when(lessonDao.getByDayTimeAuditorium(expected)).thenReturn(lessonList);
-		
+
+		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getTime(), expected.getAuditorium()))
+				.thenReturn(lessonList);
+
 		lessonService.create(expected);
 
 		verify(lessonDao, never()).create(expected);
 	}
-	
+
 	@Test
 	void givenNewLessonGroupBusy_whenCreate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -174,9 +171,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -194,28 +190,27 @@ class LessonServiceTest {
 		LocalDate day = LocalDate.parse("2021-12-08", dateFormatter);
 		Lesson expected = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
-		
+
 		Group group2 = new Group.GroupBuilder().id(2).name("A7-03").build();
-		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail111@mail.ru").phone("88008080")
-				.address("Petrov street, 25-5").build();
+		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail@mail.ru").phone("88008080").address("Ivanov street, 25-5").build();
+		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail111@mail.ru").phone("88008080").address("Petrov street, 25-5").build();
 		ArrayList<Student> students2 = new ArrayList<>();
 		students.add(student3);
 		students.add(student4);
 		group.setStudents(students2);
 		Auditorium auditorium2 = new Auditorium.AuditoriumBuilder().id(2).name("A100").capacity(100).build();
-		
-		Course course2 = new Course.CourseBuilder().id(2).name("Math")
-				.description("Science about plants").build();
+
+		Course course2 = new Course.CourseBuilder().id(2).name("Math").description("Science about plants").build();
 		List<Course> teacherCourses2 = new ArrayList<>();
 		teacherCourses.add(course2);
 		Teacher teacher2 = new Teacher.TeacherBuilder().id(2).firstName("Arnold").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
-				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses2)
-				.build();
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5")
+				.courses(teacherCourses2).build();
 		LocalTime startTime2 = LocalTime.parse("09:00", timeFormatter);
 		LocalTime endTime2 = LocalTime.parse("10:00", timeFormatter);
 		LessonTime lessonTime2 = new LessonTime.LessonTimeBuilder().id(2).orderNumber(2).startTime(startTime2)
@@ -223,18 +218,18 @@ class LessonServiceTest {
 		ArrayList<Group> groups2 = new ArrayList<>();
 		groups.add(group);
 		LocalDate day2 = LocalDate.parse("2021-12-08", dateFormatter);
-		Lesson lesson2 = Lesson.builder().id(1).course(course2).teacher(teacher2).group(groups).day(day2).time(lessonTime2)
-				.auditorium(auditorium2).build();
+		Lesson lesson2 = Lesson.builder().id(1).course(course2).teacher(teacher2).group(groups).day(day2)
+				.time(lessonTime2).auditorium(auditorium2).build();
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
-		
-		when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
-		
+
+		when(lessonDao.getByDayTime(expected.getDay(), expected.getTime())).thenReturn(lessonList);
+
 		lessonService.create(expected);
 
 		verify(lessonDao, never()).create(expected);
 	}
-	
+
 	@Test
 	void givenNewLessonTeacherNotCompetence_whenCreate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -250,9 +245,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
@@ -300,13 +294,12 @@ class LessonServiceTest {
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 
-		
 		when(lessonDao.getById(1)).thenReturn(expected);
 		Lesson actual = lessonService.getById(1);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	void givenNewLessonDayOff_whenCreate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -322,9 +315,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -373,14 +365,14 @@ class LessonServiceTest {
 				.auditorium(auditorium).build();
 		List<Lesson> expected = new ArrayList<>();
 		expected.add(lesson1);
-		
+
 		when(lessonDao.getAll()).thenReturn(expected);
 
 		List<Lesson> actual = lessonService.getAll();
 
 		assertEquals(expected, actual);
 	}
-	
+
 	@Test
 	void givenId_whenDeleteById_thenCallDaoMethod() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -396,9 +388,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -415,14 +406,14 @@ class LessonServiceTest {
 		LocalDate day = LocalDate.parse("2021-12-08", dateFormatter);
 		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
-		
+
 		when(lessonDao.getById(1)).thenReturn(lesson);
-		
+
 		lessonService.deleteById(1);
 
 		verify(lessonDao).deleteById(1);
 	}
-	
+
 	@Test
 	void givenNewLesson_whenUpdate_thenCallDaoMethod() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -438,9 +429,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -460,13 +450,12 @@ class LessonServiceTest {
 				.auditorium(auditorium).build();
 
 		when(lessonDao.getById(1)).thenReturn(expected);
-		
+
 		lessonService.update(expected);
 
 		verify(lessonDao).update(expected);
 	}
 
-	
 	@Test
 	void givenNewLessonAuditoriumBusy_whenUpdate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -482,9 +471,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -502,27 +490,26 @@ class LessonServiceTest {
 		LocalDate day = LocalDate.parse("2021-12-08", dateFormatter);
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
-		
+
 		Group group2 = new Group.GroupBuilder().id(2).name("A7-03").build();
-		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail111@mail.ru").phone("88008080")
-				.address("Petrov street, 25-5").build();
+		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail@mail.ru").phone("88008080").address("Ivanov street, 25-5").build();
+		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail111@mail.ru").phone("88008080").address("Petrov street, 25-5").build();
 		ArrayList<Student> students2 = new ArrayList<>();
 		students.add(student3);
 		students.add(student4);
 		group.setStudents(students2);
-		
-		Course course2 = new Course.CourseBuilder().id(2).name("Math")
-				.description("Science about plants").build();
+
+		Course course2 = new Course.CourseBuilder().id(2).name("Math").description("Science about plants").build();
 		List<Course> teacherCourses2 = new ArrayList<>();
 		teacherCourses.add(course2);
 		Teacher teacher2 = new Teacher.TeacherBuilder().id(2).firstName("Arnold").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
-				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses2)
-				.build();
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5")
+				.courses(teacherCourses2).build();
 		LocalTime startTime2 = LocalTime.parse("09:00", timeFormatter);
 		LocalTime endTime2 = LocalTime.parse("10:00", timeFormatter);
 		LessonTime lessonTime2 = new LessonTime.LessonTimeBuilder().id(2).orderNumber(2).startTime(startTime2)
@@ -530,20 +517,21 @@ class LessonServiceTest {
 		ArrayList<Group> groups2 = new ArrayList<>();
 		groups.add(group);
 		LocalDate day2 = LocalDate.parse("2021-12-08", dateFormatter);
-		Lesson lesson2 = Lesson.builder().id(2).course(course2).teacher(teacher2).group(groups2).day(day2).time(lessonTime2)
-				.auditorium(auditorium).build();
+		Lesson lesson2 = Lesson.builder().id(2).course(course2).teacher(teacher2).group(groups2).day(day2)
+				.time(lessonTime2).auditorium(auditorium).build();
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
-		
+
 		when(lessonDao.getById(1)).thenReturn(expected);
-		
-		when(lessonDao.getByDayTimeAuditorium(expected)).thenReturn(lessonList);
-		
+
+		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getTime(),
+				expected.getAuditorium())).thenReturn(lessonList);
+
 		lessonService.update(expected);
 
 		verify(lessonDao, never()).update(expected);
 	}
-	
+
 	@Test
 	void givenNewLessonGroupBusy_whenUpdate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -559,9 +547,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -579,28 +566,27 @@ class LessonServiceTest {
 		LocalDate day = LocalDate.parse("2021-12-08", dateFormatter);
 		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
-		
+
 		Group group2 = new Group.GroupBuilder().id(2).name("A7-03").build();
-		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", dateFormatter)).email("mail111@mail.ru").phone("88008080")
-				.address("Petrov street, 25-5").build();
+		Student student3 = Student.builder().id(2).firstName("Michail").lastName("Ivanov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail@mail.ru").phone("88008080").address("Ivanov street, 25-5").build();
+		Student student4 = Student.builder().id(2).firstName("Silvestr").lastName("Petrov")
+				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1990-01-01", dateFormatter))
+				.email("mail111@mail.ru").phone("88008080").address("Petrov street, 25-5").build();
 		ArrayList<Student> students2 = new ArrayList<>();
 		students.add(student3);
 		students.add(student4);
 		group.setStudents(students2);
 		Auditorium auditorium2 = new Auditorium.AuditoriumBuilder().id(2).name("A100").capacity(100).build();
-		
-		Course course2 = new Course.CourseBuilder().id(2).name("Math")
-				.description("Science about plants").build();
+
+		Course course2 = new Course.CourseBuilder().id(2).name("Math").description("Science about plants").build();
 		List<Course> teacherCourses2 = new ArrayList<>();
 		teacherCourses.add(course2);
 		Teacher teacher2 = new Teacher.TeacherBuilder().id(2).firstName("Arnold").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
-				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5").courses(teacherCourses2)
-				.build();
+				.email("mail11111@mail.ru").phone("880899908080").address("Petrov street, 25-5")
+				.courses(teacherCourses2).build();
 		LocalTime startTime2 = LocalTime.parse("09:00", timeFormatter);
 		LocalTime endTime2 = LocalTime.parse("10:00", timeFormatter);
 		LessonTime lessonTime2 = new LessonTime.LessonTimeBuilder().id(2).orderNumber(2).startTime(startTime2)
@@ -608,19 +594,19 @@ class LessonServiceTest {
 		ArrayList<Group> groups2 = new ArrayList<>();
 		groups.add(group);
 		LocalDate day2 = LocalDate.parse("2021-12-08", dateFormatter);
-		Lesson lesson2 = Lesson.builder().id(2).course(course2).teacher(teacher2).group(groups).day(day2).time(lessonTime2)
-				.auditorium(auditorium2).build();
+		Lesson lesson2 = Lesson.builder().id(2).course(course2).teacher(teacher2).group(groups).day(day2)
+				.time(lessonTime2).auditorium(auditorium2).build();
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
-		
+
 		when(lessonDao.getById(1)).thenReturn(expected);
-		when(lessonDao.getByDayTime(expected)).thenReturn(lessonList);
-		
+		when(lessonDao.getByDayTime(expected.getDay(), expected.getTime())).thenReturn(lessonList);
+
 		lessonService.update(expected);
 
 		verify(lessonDao, never()).update(expected);
 	}
-	
+
 	@Test
 	void givenNewLessonTeacherNotCompetence_whenUpdate_thenNoAction() {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -636,9 +622,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
 				.gender(Gender.valueOf("MALE")).birthDate(LocalDate.parse("1992-05-03", dateFormatter))
@@ -677,9 +662,8 @@ class LessonServiceTest {
 		students.add(student2);
 		group.setStudents(students);
 		Auditorium auditorium = new Auditorium.AuditoriumBuilder().id(1).name("A1000").capacity(100).build();
-		
-		Course course = new Course.CourseBuilder().id(1).name("Biology")
-				.description("Science about plants").build();
+
+		Course course = new Course.CourseBuilder().id(1).name("Biology").description("Science about plants").build();
 		List<Course> teacherCourses = new ArrayList<>();
 		teacherCourses.add(course);
 		Teacher teacher = new Teacher.TeacherBuilder().id(1).firstName("Petr").lastName("Ivanov")
@@ -699,16 +683,15 @@ class LessonServiceTest {
 				.auditorium(auditorium).build();
 
 		when(lessonDao.getById(1)).thenReturn(expected);
-		
+
 		lessonService.update(expected);
 
 		verify(lessonDao, never()).update(expected);
 	}
-	
-	
+
 	@Test
 	void givenId_whenDeleteById_thenNoAction() {
-		
+
 		lessonService.deleteById(1);
 
 		verify(lessonDao, never()).deleteById(1);
