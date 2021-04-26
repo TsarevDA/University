@@ -1,9 +1,9 @@
 package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.tsar.university.dao.LessonTimeDaoTest.TestData.*;
 
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +34,11 @@ class LessonTimeDaoTest {
 
 	@Test
 	void givenNewLessonTime_whenCreate_thenCreated() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-		LocalTime startTime = LocalTime.parse("08:00", formatter);
-		LocalTime endTime = LocalTime.parse("09:00", formatter);
-		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
+		LessonTime expected = LessonTime.builder()
+				.orderNumber(1)
+				.startTime(startTime_1)
+				.endTime(endTime_2)
+				.build();
 
 		lessonTimeDao.create(expected);
 
@@ -56,10 +57,7 @@ class LessonTimeDaoTest {
 
 	@Test
 	void givenOrder_whenGetByOrder_thenLessonTimeFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-		LocalTime startTime = LocalTime.parse("09:00", formatter);
-		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime expected = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime).build();
+		LessonTime expected = lessonTime_1;
 
 		LessonTime actual = lessonTimeDao.getByOrder(2);
 
@@ -68,21 +66,31 @@ class LessonTimeDaoTest {
 
 	@Test
 	void givenLessonsTime_whenGetAll_thenLessonsTimeListFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-		LocalTime startTime = LocalTime.parse("09:00", formatter);
-		LocalTime endTime = LocalTime.parse("10:00", formatter);
-		LessonTime lessonTime1 = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime)
-				.build();
-		startTime = LocalTime.parse("10:00", formatter);
-		endTime = LocalTime.parse("11:00", formatter);
-		LessonTime lessonTime2 = LessonTime.builder().id(2).orderNumber(3).startTime(startTime).endTime(endTime)
-				.build();
 		List<LessonTime> expected = new ArrayList<>();
-		expected.add(lessonTime1);
-		expected.add(lessonTime2);
+		expected.add(lessonTime_1);
+		expected.add(lessonTime_2);
 
 		List<LessonTime> actual = lessonTimeDao.getAll();
 
 		assertEquals(expected, actual);
+	}
+
+	interface TestData {
+		LocalTime startTime_1 = LocalTime.of(9, 0);
+		LocalTime endTime_1 = LocalTime.of(10, 0);
+		LessonTime lessonTime_1 = LessonTime.builder()
+				.id(1)
+				.orderNumber(2)
+				.startTime(startTime_1)
+				.endTime(endTime_1)
+				.build();
+		LocalTime startTime_2 = LocalTime.of(10, 0);
+		LocalTime endTime_2 = LocalTime.of(11, 0);
+		LessonTime lessonTime_2 = LessonTime
+				.builder().id(2)
+				.orderNumber(3)
+				.startTime(startTime_2)
+				.endTime(endTime_2)
+				.build();
 	}
 }

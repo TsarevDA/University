@@ -1,6 +1,7 @@
 package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.tsar.university.dao.CourseDaoTest.TestData.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +32,13 @@ class CourseDaoTest {
 
 	@Test
 	void givenNewCourse_whenCreate_thenCreated() {
-		Course expected = Course.builder().name("Astronomy").description("Science about stars and deep space").build();
-
+		Course expected = Course.builder()
+				.name("Astronomy")
+				.description("Science about stars and deep space")
+				.build();
+		
 		courseDao.create(expected);
-
+		
 		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "courses", "id = " + expected.getId());
 		assertEquals(1, actual);
 	}
@@ -50,8 +54,7 @@ class CourseDaoTest {
 
 	@Test
 	void givenId_whenGetById_thenCourseFound() {
-		Course expected = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
-				.build();
+		Course expected = course_1;
 
 		Course actual = courseDao.getById(1);
 
@@ -60,15 +63,26 @@ class CourseDaoTest {
 
 	@Test
 	void givenCourses_whenGetAll_thenCoursesListFound() {
-		Course course1 = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
-				.build();
-		Course course2 = Course.builder().id(2).name("Math").description("Science about numbers").build();
 		List<Course> expected = new ArrayList<>();
-		expected.add(course1);
-		expected.add(course2);
+		expected.add(course_1);
+		expected.add(course_2);
 
 		List<Course> actual = courseDao.getAll();
 
 		assertEquals(expected, actual);
+	}
+	
+	interface TestData {
+		
+		Course course_1 = Course.builder()
+				.id(1)
+				.name("Astronomy")
+				.description("Science about stars and deep space")
+				.build();
+		Course course_2 = Course.builder()
+				.id(2)
+				.name("Math")
+				.description("Science about numbers")
+				.build();	
 	}
 }

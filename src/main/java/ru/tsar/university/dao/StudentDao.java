@@ -18,7 +18,7 @@ public class StudentDao {
 	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 	private static final String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
-	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT * FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
+	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT s.* FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
 	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM students ";
 

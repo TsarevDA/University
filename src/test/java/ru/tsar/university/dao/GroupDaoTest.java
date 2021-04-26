@@ -1,10 +1,12 @@
 package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.tsar.university.dao.GroupDaoTest.TestData.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -35,7 +37,9 @@ class GroupDaoTest {
 
 	@Test
 	void givenNewGroup_whenCreate_thenCreated() {
-		Group expected = Group.builder().name("T7-09").build();
+		Group expected = Group.builder()
+				.name("T7-09")
+				.build();
 
 		groupDao.create(expected);
 
@@ -45,17 +49,15 @@ class GroupDaoTest {
 
 	@Test
 	void givenId_whenDeleteById_thenDeleted() {
-		groupDao.deleteById(2);
+		groupDao.deleteById(1);
 
-		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", "id = 2 ");
+		int actual = JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "groups", "id = 1 ");
 		assertEquals(0, actual);
 	}
 
 	@Test
 	void givenId_whenGetById_thenGroupFound() {
-		Group expected = Group.builder().id(2).name("A7-98").build();
-		ArrayList<Student> students = new ArrayList<>();
-		expected.setStudents(students);
+		Group expected = group_2;
 
 		Group actual = groupDao.getById(2);
 
@@ -64,14 +66,38 @@ class GroupDaoTest {
 
 	@Test
 	void givenGroups_whenGetAll_thenGroupsListFound() {
-		Group first = Group.builder().id(1).name("T7-09").build();
-		Group second = Group.builder().id(2).name("A7-98").build();
+
 		List<Group> expected = new ArrayList<>();
-		expected.add(first);
-		expected.add(second);
+		expected.add(group_1);
+		expected.add(group_2);
 
 		List<Group> actual = groupDao.getAll();
 
 		assertEquals(expected, actual);
+	}
+	
+	interface TestData {
+		Student student = Student.builder()
+				.id(1)
+				.firstName("Ivan")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
+				.email("mail@mail.ru")
+				.phone("88008080")
+				.address("Ivanov street, 25-5")
+				.build();
+		List<Student> students_1 = new ArrayList<>();
+		List<Student> students_2 = Arrays.asList(student);
+		Group group_1 = Group.builder()
+				.id(1)
+				.name("T7-09")
+				.students(students_1)
+				.build();
+		Group group_2 = Group.builder()
+				.id(2)
+				.name("A7-98")
+				.students(students_2)
+				.build();
 	}
 }

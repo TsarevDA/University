@@ -1,9 +1,10 @@
 package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.tsar.university.dao.StudentDaoTest.TestData.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,15 @@ class StudentDaoTest {
 
 	@Test
 	void givenStudent_whenCreate_thenCreated() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student expected = Student.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
+		Student expected = Student.builder()
+				.firstName("Ivan")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
+				.email("mail@mail.ru")
+				.phone("88008080")
+				.address("Ivanov street, 25-5")
+				.build();
 
 		studentDao.create(expected);
 
@@ -56,10 +62,7 @@ class StudentDaoTest {
 
 	@Test
 	void givenId_whenGetById_thenStudentFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student expected = Student.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
+		Student expected = student_1;
 
 		Student actual = studentDao.getById(1);
 
@@ -68,19 +71,36 @@ class StudentDaoTest {
 
 	@Test
 	void givenStudents_whenGetAll_thenStudentsListFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Student student1 = Student.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		Student student2 = Student.builder().id(2).firstName("Petr").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1992-05-03", formatter)).email("mail11111@mail.ru").phone("880899908080")
-				.address("Petrov street, 25-5").build();
 		List<Student> expected = new ArrayList<>();
-		expected.add(student1);
-		expected.add(student2);
+		expected.add(student_1);
+		expected.add(student_2);
 
 		List<Student> actual = studentDao.getAll();
 
 		assertEquals(expected, actual);
+	}
+
+	interface TestData {
+
+		Student student_1 = Student.builder()
+				.id(1)
+				.firstName("Ivan")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
+				.email("mail@mail.ru")
+				.phone("88008080")
+				.address("Ivanov street, 25-5")
+				.build();
+		Student student_2 = Student.builder()
+				.id(2)
+				.firstName("Petr")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1992, Month.MAY, 3))
+				.email("mail11111@mail.ru")
+				.phone("880899908080")
+				.address("Petrov street, 25-5")
+				.build();
 	}
 }

@@ -12,6 +12,8 @@ import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
+import static ru.tsar.university.service.AuditoriumServiceTest.TestData.*;
+
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.model.Auditorium;
 
@@ -25,10 +27,13 @@ class AuditoriumServiceTest {
 
 	@Test
 	void givenExistAuditorium_whenCreate_thenNoAction() {
-		Auditorium auditorium = Auditorium.builder().name("A1000").capacity(100).build();
-		Auditorium existAuditorium = Auditorium.builder().id(1).name("A1000").capacity(100).build();
+		Auditorium auditorium = Auditorium
+				.builder()
+				.name("Auditorium")
+				.capacity(1000)
+				.build();
 		
-		when(auditoriumDao.getByName(auditorium)).thenReturn(existAuditorium);
+		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
 
 		auditoriumService.create(auditorium);
 
@@ -37,7 +42,10 @@ class AuditoriumServiceTest {
 
 	@Test
 	void givenNewAuditorium_whenCreate_thenCallDaoMethod() {
-		Auditorium expected = Auditorium.builder().name("A1000").capacity(100).build();
+		Auditorium expected = Auditorium.builder()
+				.name("A1000")
+				.capacity(100)
+				.build();
 
 		when(auditoriumDao.getByName(expected)).thenReturn(null);
 
@@ -48,21 +56,17 @@ class AuditoriumServiceTest {
 
 	@Test
 	void givenId_whenGetById_thenAuditoriumFound() {
-		Auditorium expected = new Auditorium.AuditoriumBuilder().id(1).name("First").capacity(100).build();
-
-		when(auditoriumDao.getById(anyInt())).thenReturn(expected);
+		when(auditoriumDao.getById(anyInt())).thenReturn(auditorium_1);
 
 		Auditorium actual = auditoriumService.getById(1);
-		assertEquals(expected, actual);
+		assertEquals(auditorium_1, actual);
 	}
 
 	@Test
 	void givenAuditoriums_whenGetAll_thenAuditoriumsListFound() {
-		Auditorium auditorium1 = Auditorium.builder().id(1).name("First").capacity(100).build();
-		Auditorium auditorium2 = Auditorium.builder().id(2).name("Second").capacity(500).build();
 		List<Auditorium> expected = new ArrayList<>();
-		expected.add(auditorium1);
-		expected.add(auditorium2);
+		expected.add(auditorium_1);
+		expected.add(dublicateAuditorium_2);
 
 		when(auditoriumDao.getAll()).thenReturn(expected);
 
@@ -73,39 +77,49 @@ class AuditoriumServiceTest {
 
 	@Test
 	void givenAuditorium_whenUpdate_thenCallDaoMethod() {
-		Auditorium expected = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
-		Auditorium oldValue = Auditorium.builder().id(1).name("newAuditorium").capacity(100).build();
+		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
+		when(auditoriumDao.getByName(auditorium_2)).thenReturn(auditorium_1);
 
-		when(auditoriumDao.getById(1)).thenReturn(oldValue);
-		when(auditoriumDao.getByName(expected)).thenReturn(oldValue);
-
-		auditoriumService.update(expected);
-		verify(auditoriumDao).update(expected);
+		auditoriumService.update(auditorium_2);
+		verify(auditoriumDao).update(auditorium_2);
 		;
 
 	}
 
 	@Test
 	void givenNameDublicateAuditorium_whenUpdate_thenNoAction() {
-		Auditorium newAuditorium = Auditorium.builder().id(1).name("newAuditorium").capacity(1000).build();
-		Auditorium oldAuditorium = Auditorium.builder().id(1).name("Auditorium").capacity(100).build();
-		Auditorium dublicateAuditorium = Auditorium.builder().id(2).name("newAuditorium").capacity(100).build();
+		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
+		when(auditoriumDao.getByName(auditorium_2)).thenReturn(dublicateAuditorium_2);
 
-		when(auditoriumDao.getById(1)).thenReturn(oldAuditorium);
-		when(auditoriumDao.getByName(newAuditorium)).thenReturn(dublicateAuditorium);
-
-		auditoriumService.update(newAuditorium);
-		verify(auditoriumDao, never()).update(newAuditorium);
+		auditoriumService.update(auditorium_2);
+		verify(auditoriumDao, never()).update(auditorium_2);
 	}
 
 	@Test
 	void givenId_whenDeleteById_thenCallDaoMethod() {
-		Auditorium auditorium = Auditorium.builder().id(1).name("A1000").capacity(100).build();
-
-		when(auditoriumDao.getById(1)).thenReturn(auditorium);
+		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 
 		auditoriumService.deleteById(1);
 
 		verify(auditoriumDao).getById(1);
+	}
+	
+	interface TestData {
+		Auditorium auditorium_1 = Auditorium
+				.builder()
+				.id(1)
+				.name("Auditorium")
+				.capacity(1000)
+				.build();
+		Auditorium auditorium_2 = Auditorium.builder()
+				.id(1)
+				.name("newAuditorium")
+				.capacity(100)
+				.build();
+		Auditorium dublicateAuditorium_2 = Auditorium.builder()
+				.id(2)
+				.name("newAuditorium")
+				.capacity(100)
+				.build();
 	}
 }

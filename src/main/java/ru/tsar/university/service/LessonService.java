@@ -48,7 +48,7 @@ public class LessonService {
 	}
 
 	public int countStudents(List<Group> groups) {
-		return groups.stream().mapToInt(g -> g.getStudents().size()).sum();
+		return groups.stream().map(Group::getStudents).mapToInt(List::size).sum();
 	}
 
 	public boolean isCapacityEnough(Lesson lesson) {
@@ -65,22 +65,26 @@ public class LessonService {
 	}
 
 	public boolean isAuditoriumFree(Lesson lesson) {
-		List<Lesson> lessons = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(), lesson.getAuditorium());
-		return lessons.size() == 0 || lessons.contains(lessonDao.getById(lesson.getId()));
+		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(), lesson.getAuditorium());
+		if (lessonFromDao == null) {
+			return true;
+		} else {
+			return lessonFromDao.getId() == lesson.getId();
+		}
 	}
 
 	public boolean isTeacherFree(Lesson lesson) {
-		List<Lesson> lessons = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(),lesson.getTeacher());
-		return lessons.size() == 0 || lessons.get(0).getId() == lesson.getId();
+		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(),lesson.getTeacher());
+		if (lessonFromDao == null) {
+			return true;
+		} else {
+			return lessonFromDao.getId() == lesson.getId();
+		}
 	}
 
 	public boolean isGroupFree(Lesson lesson) {
 		List<Lesson> lessons = lessonDao.getByDayTime(lesson.getDay(), lesson.getTime());
-		long count = 0;
-		for (Group group : lesson.getGroups()) {
-			count = count + lessons.stream().filter(l -> l.getGroups().contains(group) && l.getId() != lesson.getId())
-					.count();
-		}
+		long count = lessons.stream().filter(l -> l.getId() != lesson.getId()).map(Lesson::getGroups).mapToInt(List::size).sum();
 		return count == 0;
 	}
 

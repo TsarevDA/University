@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
+import static ru.tsar.university.service.CourseServiceTest.TestData.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.CourseDao;
@@ -25,7 +27,10 @@ class CourseServiceTest {
 
 	@Test
 	void givenNewCourse_whenCreate_thenCallDaoMethod() {
-		Course course = Course.builder().name("Biology").description("Science about plants").build();
+		Course course = Course.builder()
+				.name("Biology")
+				.description("Science about plants")
+				.build();
 
 		courseService.create(course);
 
@@ -34,10 +39,12 @@ class CourseServiceTest {
 
 	@Test
 	void givenExistCourse_whenCreate_thenNoAction() {
-		Course course = Course.builder().name("Biology").description("Science about plants").build();
-		Course existCourse = Course.builder().id(1).name("Biology").description("Science about plants").build();
-
-		when(courseDao.getByName(course)).thenReturn(existCourse);
+		Course course = Course.builder()
+				.name("Math")
+				.description("Science about numbers")
+				.build();
+	
+		when(courseDao.getByName(course)).thenReturn(course_1);
 
 		courseService.create(course);
 
@@ -46,24 +53,18 @@ class CourseServiceTest {
 
 	@Test
 	void givenId_whenGetById_thenCourseFound() {
-		Course expected = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
-				.build();
-
-		when(courseDao.getById(1)).thenReturn(expected);
+		when(courseDao.getById(1)).thenReturn(course_1);
 
 		Course actual = courseService.getById(1);
 
-		assertEquals(expected, actual);
+		assertEquals(course_1, actual);
 	}
 
 	@Test
 	void givenCourses_whenGetAll_thenCoursesListFound() {
-		Course course1 = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
-				.build();
-		Course course2 = Course.builder().id(2).name("Math").description("Science about numbers").build();
 		List<Course> expected = new ArrayList<>();
-		expected.add(course1);
-		expected.add(course2);
+		expected.add(course_1);
+		expected.add(course_2);
 
 		when(courseDao.getAll()).thenReturn(expected);
 
@@ -74,28 +75,21 @@ class CourseServiceTest {
 
 	@Test
 	void givenCourse_whenUpdate_thenCallDaoMethod() {
-		Course newCourse = Course.builder().id(1).name("Math").description("Science about numbers").build();
-		Course oldCourse = Course.builder().id(1).name("Math").description("Science").build();
+		when(courseDao.getById(1)).thenReturn(course_1);
+		when(courseDao.getByName(course_2)).thenReturn(course_1);
 
-		when(courseDao.getById(1)).thenReturn(oldCourse);
-		when(courseDao.getByName(newCourse)).thenReturn(oldCourse);
+		courseService.update(course_2);
 
-		courseService.update(newCourse);
-
-		verify(courseDao).update(newCourse);
+		verify(courseDao).update(course_2);
 	}
 
 	@Test
 	void givenNameDublicateCourse_whenUpdate_thenNoAction() {
-		Course newCourse = Course.builder().id(1).name("Math").description("Science about numbers").build();
-		Course oldCourse = Course.builder().id(1).name("Biology").description("Science about numbers").build();
-		Course dublicateCourse = Course.builder().id(2).name("Math").description("Science about numbers").build();
+		when(courseDao.getById(1)).thenReturn(course_1);
+		when(courseDao.getByName(course_2)).thenReturn(dublicatedCourse_1);
 
-		when(courseDao.getById(1)).thenReturn(oldCourse);
-		when(courseDao.getByName(newCourse)).thenReturn(dublicateCourse);
-
-		courseService.update(newCourse);
-		verify(courseDao, never()).update(newCourse);
+		courseService.update(course_2);
+		verify(courseDao, never()).update(course_2);
 	}
 
 	@Test
@@ -107,5 +101,22 @@ class CourseServiceTest {
 
 		verify(courseDao).deleteById(1);
 	}
-
+	
+	interface TestData {
+		Course course_1 = Course.builder()
+				.id(1)
+				.name("Math")
+				.description("Science about numbers")
+				.build();
+		Course course_2 = Course.builder()
+				.id(1)
+				.name("Biology")
+				.description("Science about numbers")
+				.build();
+		Course dublicatedCourse_1 = Course.builder()
+				.id(2)
+				.name("Math")
+				.description("Science about numbers")
+				.build();
+	}
 }

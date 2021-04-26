@@ -31,7 +31,7 @@ public class LessonDao {
 	private static final String GET_BY_DAY_TIME_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? ";
 	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id = ?";
 	private static final String GET_BY_DAY_TIME_TEACHER_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND teacher_id = ?";
-	
+
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
 
@@ -91,12 +91,22 @@ public class LessonDao {
 	public List<Lesson> getByDayTime(LocalDate day, LessonTime lessonTime) {
 		return jdbcTemplate.query(GET_BY_DAY_TIME_QUERY, rowMapper, day, lessonTime.getId());
 	}
-	
-	public List<Lesson> getByDayTimeAuditorium(LocalDate day, LessonTime lessonTime, Auditorium auditorium) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper,  day, lessonTime.getId(), auditorium.getId());
+
+	public Lesson getByDayTimeAuditorium(LocalDate day, LessonTime lessonTime, Auditorium auditorium) {
+		try {
+			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, day, lessonTime.getId(),
+					auditorium.getId());
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
-	public List<Lesson> getByDayTimeTeacher(LocalDate day, LessonTime lessonTime, Teacher teacher) {
-		return jdbcTemplate.query(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper,  day, lessonTime.getId(), teacher.getId());
+	public Lesson getByDayTimeTeacher(LocalDate day, LessonTime lessonTime, Teacher teacher) {
+		try {
+			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, day, lessonTime.getId(),
+					teacher.getId());
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 }

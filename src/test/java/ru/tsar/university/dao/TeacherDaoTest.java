@@ -1,10 +1,13 @@
 package ru.tsar.university.dao;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.tsar.university.dao.TeacherDaoTest.TestData.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Month;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -36,10 +39,16 @@ class TeacherDaoTest {
 
 	@Test
 	void givenTeacher_whenCreate_thenCreated() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Teacher expected = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
+		Teacher expected = Teacher.builder()
+				.firstName("Ivan")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
+				.email("mail@mail.ru")
+				.phone("88008080")
+				.address("Ivanov street, 25-5")
+				.courses(new ArrayList<Course>())
+				.build();
 
 		teacherDao.create(expected);
 
@@ -58,10 +67,7 @@ class TeacherDaoTest {
 
 	@Test
 	void givenId_whenGetById_thenTeacherFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		Teacher expected = Teacher.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
+		Teacher expected = teacher_1;
 
 		Teacher actual = teacherDao.getById(1);
 
@@ -70,23 +76,51 @@ class TeacherDaoTest {
 
 	@Test
 	void givenTeachers_whenGetAll_thenTeachersListFound() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		List<Course> courses = new ArrayList<>();
-		Teacher teacher1 = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1990-01-01", formatter)).email("mail@mail.ru").phone("88008080")
-				.address("Ivanov street, 25-5").build();
-		teacher1.setCourses(courses);
-		Teacher teacher2 = Teacher.builder().firstName("Petr").lastName("Ivanov").gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.parse("1992-05-03", formatter)).email("mail11111@mail.ru").phone("880899908080")
-				.address("Petrov street, 25-5").build();
-		teacher2.setCourses(courses);
+
 		List<Teacher> expected = new ArrayList<>();
-		expected.add(teacher1);
-		expected.add(teacher2);
+		expected.add(teacher_1);
+		expected.add(teacher_2);
 
 		List<Teacher> actual = teacherDao.getAll();
 
 		assertEquals(expected, actual);
 	}
-
+	
+	interface TestData {
+		
+		Course course_1 = Course.builder()
+				.id(1)
+				.name("Math")
+				.description("Science about numbers")
+				.build();
+		Course course_2 = Course.builder()
+				.id(2)
+				.name("Astronomy")
+				.description("Science about stars and deep space")
+				.build();
+		
+		List<Course> courses_1 = Arrays.asList(course_1);
+		List<Course> courses_2 = Arrays.asList(course_2);
+		Teacher teacher_1 = Teacher.builder()
+				.firstName("Ivan")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
+				.email("mail@mail.ru")
+				.phone("88008080")
+				.address("Ivanov street, 25-5")
+				.courses(courses_1)
+				.build();
+		
+		Teacher teacher_2 = Teacher.builder()
+				.firstName("Petr")
+				.lastName("Ivanov")
+				.gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1992,Month.MAY,3))
+				.email("mail11111@mail.ru")
+				.phone("880899908080")
+				.address("Petrov street, 25-5")
+				.courses(courses_2)
+				.build();
+	}
 }
