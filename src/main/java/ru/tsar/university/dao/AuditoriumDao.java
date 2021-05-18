@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.AuditoriumRowMapper;
 import ru.tsar.university.model.Auditorium;
-import ru.tsar.university.model.Lesson;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class AuditoriumDao {
@@ -27,7 +29,8 @@ public class AuditoriumDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private AuditoriumRowMapper rowMapper;
-
+	private final Logger log = LoggerFactory.getLogger(AuditoriumDao.class);
+	
 	public AuditoriumDao(JdbcTemplate jdbcTemplate, AuditoriumRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.rowMapper = rowMapper;
@@ -35,7 +38,7 @@ public class AuditoriumDao {
 
 	public void create(Auditorium auditorium) {
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
-
+		
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(CREATE_AUDITORIUM_QUERY,
 					Statement.RETURN_GENERATED_KEYS);
@@ -44,16 +47,19 @@ public class AuditoriumDao {
 			return ps;
 		}, holder);
 		auditorium.setId((int) holder.getKeys().get("id"));
+		log.info("Call create: {}", auditorium);
 	}
 
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_AUDITORIUM_QUERY, id);
+		log.info("Call deleteById, id: {}", id);
 	}
 
 	public Auditorium getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -65,12 +71,14 @@ public class AuditoriumDao {
 	public void update(Auditorium auditorium) {
 		jdbcTemplate.update(UPDATE_AUDITORIUMS_QUERY, auditorium.getName(), auditorium.getCapacity(),
 				auditorium.getId());
+		log.info("Call update: {}", auditorium);
 	}
 
 	public Auditorium getByName(Auditorium auditorium) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, auditorium.getName());
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByName: {}", auditorium.getName());
 			return null;
 		}
 	}

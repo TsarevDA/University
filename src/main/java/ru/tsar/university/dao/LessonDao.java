@@ -5,6 +5,8 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -34,6 +36,7 @@ public class LessonDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
+	private final Logger log = LoggerFactory.getLogger(LessonDao.class);
 
 	public LessonDao(JdbcTemplate jdbcTemplate, LessonRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -58,18 +61,21 @@ public class LessonDao {
 
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
+		log.info("Call create {}", lesson);
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, id);
 		jdbcTemplate.update(DELETE_LESSON_QUERY, id);
+		log.info("Call deleteById, id = {}", id);
 	}
 
 	public Lesson getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -81,7 +87,7 @@ public class LessonDao {
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, lesson.getId());
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
-
+		log.info("Call update {}", lesson);
 	}
 
 	public List<Lesson> getAll() {
@@ -97,6 +103,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, day, lessonTime.getId(),
 					auditorium.getId());
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByDayTimeAuditorium,day {}, lessonTime {},auditorium {}",day, lessonTime, auditorium);
 			return null;
 		}
 	}
@@ -106,6 +113,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, day, lessonTime.getId(),
 					teacher.getId());
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByDayTimeTeacher,day {}, lessonTime {},teacher {}",day, lessonTime, teacher);
 			return null;
 		}
 	}

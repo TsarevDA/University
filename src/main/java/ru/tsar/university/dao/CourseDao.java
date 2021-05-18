@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,6 +27,7 @@ public class CourseDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private CourseRowMapper rowMapper;
+	private final Logger log = LoggerFactory.getLogger(CourseDao.class);
 
 	public CourseDao(JdbcTemplate jdbcTemplate, CourseRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -40,16 +43,19 @@ public class CourseDao {
 			return ps;
 		}, holder);
 		course.setId((int) holder.getKeys().get("id"));
+		log.info("Call create {}", course);
 	}
 
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_COURSE_QUERY, id);
+		log.info("Call deleteById,id: {}",id);
 	}
 
 	public Course getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -60,6 +66,7 @@ public class CourseDao {
 
 	public void update(Course course) {
 		jdbcTemplate.update(UPDATE_COURSE_QUERY, course.getName(), course.getDescription(), course.getId());
+		log.info("Call update ", course);
 	}
 
 	public List<Course> getAll() {
@@ -70,6 +77,7 @@ public class CourseDao {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, course.getName());
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByName: {}", course.getName());
 			return null;
 		}
 	}

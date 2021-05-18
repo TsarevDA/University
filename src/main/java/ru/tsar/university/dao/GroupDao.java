@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -28,6 +30,7 @@ public class GroupDao {
 	private JdbcTemplate jdbcTemplate;
 	private GroupRowMapper rowMapper;
 	private StudentDao studentDao;
+	private final Logger log = LoggerFactory.getLogger(GroupDao.class);
 
 	public GroupDao(JdbcTemplate jdbcTemplate, GroupRowMapper rowMapper, StudentDao studentDao) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -43,13 +46,17 @@ public class GroupDao {
 			return ps;
 		}, holder);
 		group.setId((int) holder.getKeys().get("id"));
+		log.info("Call create {}", group);
 	}
 
 	public void deleteById(int id) {
 		Integer studentCount = jdbcTemplate.queryForObject(GET_STUDENTS_GROUPS_COUNT_QUERY, Integer.class, id);
-
+		
 		if (studentCount == 0) {
 			jdbcTemplate.update(DELETE_GROUP_QUERY, id);
+			log.info("Call deleteById id = {}", id);
+		} else {
+			log.warn("Group, id = {} have {} students", id, studentCount);
 		}
 
 	}
@@ -60,6 +67,7 @@ public class GroupDao {
 			group.setStudents(studentDao.getByGroupId(id));
 			return group;
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -70,6 +78,7 @@ public class GroupDao {
 
 	public void update(Group group) {
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
+		log.info("Call update {}", group);
 	}
 
 	public List<Group> getAll() {
@@ -80,6 +89,7 @@ public class GroupDao {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, group.getName());
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByName: {}", group.getName());
 			return null;
 		}
 	}

@@ -9,10 +9,14 @@ import ru.tsar.university.University;
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.model.Auditorium;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class AuditoriumService {
 
 	private AuditoriumDao auditoriumDao;
+	private final Logger log = LoggerFactory.getLogger(AuditoriumService.class);
 
 	public AuditoriumService(AuditoriumDao auditoriumDao) {
 		this.auditoriumDao = auditoriumDao;
@@ -21,6 +25,8 @@ public class AuditoriumService {
 	public void create(Auditorium auditorium) {
 		if (isUniqueName(auditorium)) {
 			auditoriumDao.create(auditorium);
+		} else {
+			log.warn("Create error, name {} is not unique", auditorium.getName());
 		}
 	}
 
@@ -33,14 +39,22 @@ public class AuditoriumService {
 	}
 
 	public void update(Auditorium auditorium) {
-		if (isAuditoriumExist(auditorium.getId()) && isUniqueName(auditorium)) {
+		if (isAuditoriumExist(auditorium.getId())) {
+			if (isUniqueName(auditorium)) {
 			auditoriumDao.update(auditorium);
+			} else {
+				log.warn("Update error, name {} is not unique", auditorium.getName());
+			}
+		} else {
+			log.warn("Auditorium {} is already exist", auditorium);
 		}
 	}
 
 	public void deleteById(int id) {
 		if (isAuditoriumExist(id)) {
 			auditoriumDao.deleteById(id);
+		} else {
+			log.warn("deteleById error, id = {} is not exist", id);
 		}
 	}
 

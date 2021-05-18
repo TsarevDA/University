@@ -2,6 +2,8 @@ package ru.tsar.university.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import ru.tsar.university.model.Teacher;
 public class TeacherService {
 
 	private TeacherDao teacherDao;
+	private final Logger log = LoggerFactory.getLogger(TeacherService.class);
 
 	public TeacherService(TeacherDao teacherDao) {
 		this.teacherDao = teacherDao;
@@ -32,12 +35,16 @@ public class TeacherService {
 	public void update(Teacher teacher) {
 		if (isTeacherExist(teacher.getId())) {
 			teacherDao.update(teacher);
+		} else {
+			log.warn("Update error, teacher, id = {} is not exist", teacher.getId());
 		}
 	}
 
 	public void deleteById(int id) {
 		if (isTeacherExist(id)) {
 			teacherDao.deleteById(id);
+		} else {
+			log.warn("deleteById error, teacher, id = {} is not exist", id);
 		}
 	}
 

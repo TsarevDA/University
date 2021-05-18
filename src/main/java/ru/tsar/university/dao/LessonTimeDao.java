@@ -5,6 +5,8 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -25,6 +27,7 @@ public class LessonTimeDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonTimeRowMapper rowMapper;
+	private final Logger log = LoggerFactory.getLogger(LessonTimeDao.class);
 
 	public LessonTimeDao(JdbcTemplate jdbcTemplate, LessonTimeRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -43,17 +46,19 @@ public class LessonTimeDao {
 			return ps;
 		}, holder);
 		lessonTime.setId((int) holder.getKeys().get("id"));
-
+		log.info("Call create {}", lessonTime);
 	}
 
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_LESSON_TIME_QUERY, id);
+		log.info("Call deleteById, id = {}",id);
 	}
 
 	public LessonTime getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -65,6 +70,7 @@ public class LessonTimeDao {
 	public void update(LessonTime lessonTime) {
 		jdbcTemplate.update(UPDATE_LESSON_TIME_QUERY, lessonTime.getStartTime(), lessonTime.getEndTime(),
 				lessonTime.getId());
+		log.info("Call update {}", lessonTime);
 	}
 
 	public List<LessonTime> getAll() {

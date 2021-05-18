@@ -3,6 +3,8 @@ package ru.tsar.university.service;
 import java.time.DayOfWeek;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonDao;
@@ -13,7 +15,8 @@ import ru.tsar.university.model.Lesson;
 public class LessonService {
 
 	private LessonDao lessonDao;
-
+	private final Logger log = LoggerFactory.getLogger(LessonService.class);
+	
 	public LessonService(LessonDao lessonDao) {
 		this.lessonDao = lessonDao;
 	}
@@ -22,6 +25,9 @@ public class LessonService {
 		if (isCapacityEnough(lesson) && isTeacherCompetent(lesson) && isNotDayOff(lesson)
 				&& isAuditoriumFree(lesson) && isTeacherFree(lesson) && isGroupFree(lesson)) {
 			lessonDao.create(lesson);
+		} else {
+			log.warn("Create error. Not all conditions are met, {}", lesson);
+			
 		}
 	}
 
@@ -38,12 +44,18 @@ public class LessonService {
 				&& isNotDayOff(lesson) && isAuditoriumFree(lesson) && isTeacherFree(lesson)
 				&& isGroupFree(lesson)) {
 			lessonDao.update(lesson);
+		} else {
+			log.warn("Update error. Not all conditions are met, {}", lesson);
+			
 		}
 	}
 
 	public void deleteById(int id) {
 		if (isLessonExist(id)) {
 			lessonDao.deleteById(id);
+		} else {
+			log.warn("deleteById error, lesson id = {} does not exist", id);
+			
 		}
 	}
 

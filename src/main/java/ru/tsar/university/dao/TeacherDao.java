@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -27,6 +29,7 @@ public class TeacherDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private TeacherRowMapper rowMapper;
+	private final Logger log = LoggerFactory.getLogger(TeacherDao.class);
 
 	public TeacherDao(JdbcTemplate jdbcTemplate, TeacherRowMapper rowMapper, CourseDao courseDao) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -51,6 +54,7 @@ public class TeacherDao {
 
 		teacher.getCourses().stream()
 				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
+		log.info("Call create {}", teacher);
 
 	}
 
@@ -58,12 +62,14 @@ public class TeacherDao {
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, id);
 		jdbcTemplate.update(DELETE_TEACHER_QUERY, id);
+		log.info("Call deleteById, id = {}", id);
 	}
 
 	public Teacher getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -76,7 +82,7 @@ public class TeacherDao {
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, teacher.getId());
 		teacher.getCourses().stream()
 				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
-
+		log.info("Call update {}", teacher);
 	}
 
 	public List<Teacher> getAll() {

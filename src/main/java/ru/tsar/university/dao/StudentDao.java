@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -24,6 +26,7 @@ public class StudentDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
+	private final Logger log = LoggerFactory.getLogger(StudentDao.class);
 
 	public StudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -45,16 +48,19 @@ public class StudentDao {
 			return ps;
 		}, holder);
 		student.setId((int) holder.getKeys().get("id"));
+		log.info("Call create {}", student);
 	}
 
 	public void deleteById(int id) {
 		jdbcTemplate.update(DELETE_STUDENT_QUERY, id);
+		log.info("Call deleteById, id = {}",id);
 	}
 
 	public Student getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getById: {}",id);
 			return null;
 		}
 	}
@@ -63,6 +69,7 @@ public class StudentDao {
 		try {
 			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
+			log.warn("EmptyResultSet, getByGrpoupId: {}",id);
 			return null;
 		}
 	}
@@ -71,6 +78,7 @@ public class StudentDao {
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
 				student.getGender().name(), student.getBirthDate(), student.getPhone(), student.getAddress(),
 				student.getId());
+		log.info("Call update {}", student);
 	}
 
 	public List<Student> getAll() {
