@@ -17,11 +17,20 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.LessonDao;
 import ru.tsar.university.dao.TeacherDao;
+import ru.tsar.university.exceptions.AuditoriumFreeException;
+import ru.tsar.university.exceptions.CapacityEnoughException;
+import ru.tsar.university.exceptions.DayOffException;
+import ru.tsar.university.exceptions.GroupFreeException;
+import ru.tsar.university.exceptions.LessonExistException;
+import ru.tsar.university.exceptions.TeacherCompetentException;
+import ru.tsar.university.exceptions.TeacherFreeException;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
@@ -34,6 +43,7 @@ import ru.tsar.university.model.Teacher;
 @ExtendWith(MockitoExtension.class)
 class LessonServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonServiceTest.class);
 	@InjectMocks
 	private LessonService lessonService;
 	@Mock
@@ -57,7 +67,12 @@ class LessonServiceTest {
 				.auditorium(auditorium_1)
 				.build();
 
-		lessonService.create(expected);
+		try {
+			lessonService.create(expected);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao).create(expected);
 	}
@@ -76,7 +91,12 @@ class LessonServiceTest {
 		when(lessonDao.getByDayTimeAuditorium(lesson1.getDay(), lesson1.getTime(), lesson1.getAuditorium()))
 				.thenReturn(lessonSameAuditorium);
 
-		lessonService.create(lesson1);
+		try {
+			lessonService.create(lesson1);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).create(lesson1);
 	}
@@ -97,7 +117,12 @@ class LessonServiceTest {
 
 		when(lessonDao.getByDayTime(lesson1.getDay(), lesson1.getTime())).thenReturn(lessonList);
 
-		lessonService.create(lesson1);
+		try {
+			lessonService.create(lesson1);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).create(lesson1);
 	}
@@ -113,7 +138,12 @@ class LessonServiceTest {
 				.auditorium(auditorium_1)
 				.build();
 
-		lessonService.create(lesson1);
+		try {
+			lessonService.create(lesson1);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).create(lesson1);
 	}
@@ -128,7 +158,12 @@ class LessonServiceTest {
 				.time(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
-		lessonService.create(lesson1);
+		try {
+			lessonService.create(lesson1);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).create(lesson1);
 	}
@@ -165,7 +200,11 @@ class LessonServiceTest {
 
 		when(lessonDao.getById(1)).thenReturn(lesson);
 
-		lessonService.deleteById(1);
+		try {
+			lessonService.deleteById(1);
+		} catch (LessonExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao).deleteById(1);
 	}
@@ -176,7 +215,12 @@ class LessonServiceTest {
 
 		when(lessonDao.getById(1)).thenReturn(expected);
 
-		lessonService.update(expected);
+		try {
+			lessonService.update(expected);
+		} catch (LessonExistException | CapacityEnoughException | TeacherCompetentException | DayOffException
+				| TeacherFreeException | AuditoriumFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao).update(expected);
 	}
@@ -190,7 +234,12 @@ class LessonServiceTest {
 		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getTime(), expected.getAuditorium()))
 				.thenReturn(lessonSameAuditorium);
 
-		lessonService.update(expected);
+		try {
+			lessonService.update(expected);
+		} catch (LessonExistException | CapacityEnoughException | TeacherCompetentException | DayOffException
+				| TeacherFreeException | AuditoriumFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).update(expected);
 	}
@@ -205,7 +254,12 @@ class LessonServiceTest {
 		when(lessonDao.getById(1)).thenReturn(lesson_1);
 		when(lessonDao.getByDayTime(expected.getDay(), expected.getTime())).thenReturn(lessonList);
 
-		lessonService.update(expected);
+		try {
+			lessonService.update(expected);
+		} catch (LessonExistException | CapacityEnoughException | TeacherCompetentException | DayOffException
+				| TeacherFreeException | AuditoriumFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).update(expected);
 	}
@@ -215,7 +269,12 @@ class LessonServiceTest {
 		Lesson expected = lessonNoCompetenceTeacher;
 
 		when(lessonDao.getById(2)).thenReturn(lessonNoCompetenceTeacher);
-		lessonService.update(expected);
+		try {
+			lessonService.update(expected);
+		} catch (LessonExistException | CapacityEnoughException | TeacherCompetentException | DayOffException
+				| TeacherFreeException | AuditoriumFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).update(expected);
 	}
@@ -226,7 +285,12 @@ class LessonServiceTest {
 
 		when(lessonDao.getById(1)).thenReturn(lesson_1);
 
-		lessonService.update(expected);
+		try {
+			lessonService.update(expected);
+		} catch (LessonExistException | CapacityEnoughException | TeacherCompetentException | DayOffException
+				| TeacherFreeException | AuditoriumFreeException | GroupFreeException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).update(expected);
 	}
@@ -234,7 +298,11 @@ class LessonServiceTest {
 	@Test
 	void givenId_whenDeleteById_thenNoAction() {
 
-		lessonService.deleteById(1);
+		try {
+			lessonService.deleteById(1);
+		} catch (LessonExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonDao, never()).deleteById(1);
 	}

@@ -18,6 +18,8 @@ import ru.tsar.university.model.Group;
 @Component
 public class GroupDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GroupDao.class);
+	
 	private static final String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
 	private static final String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
@@ -30,7 +32,6 @@ public class GroupDao {
 	private JdbcTemplate jdbcTemplate;
 	private GroupRowMapper rowMapper;
 	private StudentDao studentDao;
-	private final Logger log = LoggerFactory.getLogger(GroupDao.class);
 
 	public GroupDao(JdbcTemplate jdbcTemplate, GroupRowMapper rowMapper, StudentDao studentDao) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -39,6 +40,7 @@ public class GroupDao {
 	}
 
 	public void create(Group group) {
+		LOG.debug("Created group: {}", group);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(ADD_GROUP_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -46,17 +48,16 @@ public class GroupDao {
 			return ps;
 		}, holder);
 		group.setId((int) holder.getKeys().get("id"));
-		log.info("Call create {}", group);
 	}
 
 	public void deleteById(int id) {
 		Integer studentCount = jdbcTemplate.queryForObject(GET_STUDENTS_GROUPS_COUNT_QUERY, Integer.class, id);
 		
 		if (studentCount == 0) {
+			LOG.debug("Deleted group, id = {}", id);
 			jdbcTemplate.update(DELETE_GROUP_QUERY, id);
-			log.info("Call deleteById id = {}", id);
 		} else {
-			log.warn("Group, id = {} have {} students", id, studentCount);
+			LOG.warn("Group, id = {} have {} students", id, studentCount);
 		}
 
 	}
@@ -67,7 +68,7 @@ public class GroupDao {
 			group.setStudents(studentDao.getByGroupId(id));
 			return group;
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("Group not found by id = {}",id);
 			return null;
 		}
 	}
@@ -77,8 +78,8 @@ public class GroupDao {
 	}
 
 	public void update(Group group) {
+		LOG.debug("Updated to group: {}", group);
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
-		log.info("Call update {}", group);
 	}
 
 	public List<Group> getAll() {
@@ -89,7 +90,7 @@ public class GroupDao {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, group.getName());
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getByName: {}", group.getName());
+			LOG.warn("Group not found by name = {}", group.getName());
 			return null;
 		}
 	}

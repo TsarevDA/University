@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,21 @@ import ru.tsar.university.service.LessonService;
 import ru.tsar.university.service.LessonTimeService;
 import ru.tsar.university.service.StudentService;
 import ru.tsar.university.service.TeacherService;
+import ru.tsar.university.dao.AuditoriumDao;
+import ru.tsar.university.exceptions.AuditoriumFreeException;
+import ru.tsar.university.exceptions.AuditroiumExistException;
+import ru.tsar.university.exceptions.CapacityEnoughException;
+import ru.tsar.university.exceptions.CourseExistException;
+import ru.tsar.university.exceptions.DayOffException;
+import ru.tsar.university.exceptions.GroupExistException;
+import ru.tsar.university.exceptions.GroupFreeException;
+import ru.tsar.university.exceptions.LessonExistException;
+import ru.tsar.university.exceptions.StudentExistException;
+import ru.tsar.university.exceptions.TeacherCompetentException;
+import ru.tsar.university.exceptions.TeacherExistException;
+import ru.tsar.university.exceptions.TeacherFreeException;
+import ru.tsar.university.exceptions.TimeCorrectException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
@@ -30,7 +47,9 @@ import ru.tsar.university.model.Gender;
 
 @Component
 public class ConsoleInterface {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ConsoleInterface.class);
+	
 	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	@Autowired
 	private University university;
@@ -137,7 +156,12 @@ public class ConsoleInterface {
 		List<Student> studentsForRemoving = students.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 
 		for (Student student : studentsForRemoving) {
-			studentService.deleteById(student.getId());
+			try {
+				studentService.deleteById(student.getId());
+			} catch (StudentExistException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			university.deleteStudent(student);
 		}
 	}
@@ -150,7 +174,11 @@ public class ConsoleInterface {
 		String description = scanner.next();
 		Course course = Course.builder().name(name).description(description).build();
 
-		courseService.create(course);
+		try {
+			courseService.create(course);
+		} catch (UniqueNameException e) {
+			LOG.warn(e.getMessage());
+		}
 		university.addCourse(course);
 	}
 
@@ -162,7 +190,11 @@ public class ConsoleInterface {
 		List<Course> coursesForRemoving = courses.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Course course : coursesForRemoving) {
 			university.deleteCourse(course);
-			courseService.deleteById(course.getId());
+			try {
+				courseService.deleteById(course.getId());
+			} catch (CourseExistException e) {
+				LOG.warn(e.getMessage());
+			}
 		}
 	}
 
@@ -205,7 +237,11 @@ public class ConsoleInterface {
 		List<Teacher> teachersForRemoving = teachers.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Teacher teacher : teachersForRemoving) {
 			university.deleteTeacher(teacher);
-			teacherService.deleteById(teacher.getId());
+			try {
+				teacherService.deleteById(teacher.getId());
+			} catch (TeacherExistException e) {
+				LOG.warn(e.getMessage());
+			}
 		}
 	}
 
@@ -215,7 +251,11 @@ public class ConsoleInterface {
 		String name = scanner.next();
 		// Group group = new Group(name);
 		Group group = Group.builder().name(name).build();
-		groupService.create(group);
+		try {
+			groupService.create(group);
+		} catch (UniqueNameException e) {
+			LOG.warn(e.getMessage());
+		}
 		university.addGroup(group);
 	}
 
@@ -227,7 +267,11 @@ public class ConsoleInterface {
 		List<Group> groupsForRemoving = groups.stream().filter(s -> s.getId() == id).collect(Collectors.toList());
 		for (Group group : groupsForRemoving) {
 			university.deleteGroup(group);
-			groupService.deleteById(group.getId());
+			try {
+				groupService.deleteById(group.getId());
+			} catch (GroupExistException e) {
+				LOG.warn(e.getMessage());
+			}
 		}
 	}
 
@@ -239,7 +283,11 @@ public class ConsoleInterface {
 		int capacity = scanner.nextInt();
 
 		Auditorium auditorium = Auditorium.builder().name(name).capacity(capacity).build();
-		auditoriumService.create(auditorium);
+		try {
+			auditoriumService.create(auditorium);
+		} catch (UniqueNameException e) {
+			LOG.warn(e.getMessage());
+		}
 		university.addAuditorium(auditorium);
 	}
 
@@ -252,7 +300,11 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		for (Auditorium auditorium : auditoriumsForRemoving) {
 			university.deleteAuditorium(auditorium);
-			auditoriumService.deleteById(auditorium.getId());
+			try {
+				auditoriumService.deleteById(auditorium.getId());
+			} catch (AuditroiumExistException e) {
+				LOG.warn(e.getMessage());
+			}
 		}
 	}
 
@@ -264,7 +316,13 @@ public class ConsoleInterface {
 			lessonsTime.add(LessonTime.builder().orderNumber(i + 1).startTime(startTime.plusHours(i))
 					.endTime(endTime.plusHours(i)).build());
 		}
-		lessonsTime.stream().forEach(lt -> lessonTimeService.create(lt));
+		lessonsTime.stream().forEach(lt -> {
+			try {
+				lessonTimeService.create(lt);
+			} catch (TimeCorrectException e) {
+				LOG.warn(e.getMessage());
+			}
+		});
 		university.setLessonsTime(lessonsTime);
 
 	}
@@ -312,7 +370,12 @@ public class ConsoleInterface {
 		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
 				.auditorium(auditorium).build();
 
-		lessonService.create(lesson);
+		try {
+			lessonService.create(lesson);
+		} catch (CapacityEnoughException | TeacherCompetentException | DayOffException | AuditoriumFreeException
+				| TeacherFreeException | GroupFreeException e) {
+			LOG.warn(e.getMessage());
+		}
 
 	}
 
@@ -325,7 +388,11 @@ public class ConsoleInterface {
 
 		for (Lesson lesson : lessonForRemoving) {
 			university.deleteLesson(lesson);
-			lessonService.deleteById(lesson.getId());
+			try {
+				lessonService.deleteById(lesson.getId());
+			} catch (LessonExistException e) {
+				LOG.warn(e.getMessage());
+			}
 		}
 
 	}

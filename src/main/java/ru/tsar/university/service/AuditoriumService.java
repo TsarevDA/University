@@ -2,11 +2,11 @@ package ru.tsar.university.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import ru.tsar.university.University;
 import ru.tsar.university.dao.AuditoriumDao;
+import ru.tsar.university.exceptions.AuditroiumExistException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
 import org.slf4j.Logger;
@@ -15,18 +15,18 @@ import org.slf4j.LoggerFactory;
 @Service
 public class AuditoriumService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumService.class);
 	private AuditoriumDao auditoriumDao;
-	private final Logger log = LoggerFactory.getLogger(AuditoriumService.class);
 
 	public AuditoriumService(AuditoriumDao auditoriumDao) {
 		this.auditoriumDao = auditoriumDao;
 	}
 
-	public void create(Auditorium auditorium) {
+	public void create(Auditorium auditorium) throws UniqueNameException {
 		if (isUniqueName(auditorium)) {
 			auditoriumDao.create(auditorium);
 		} else {
-			log.warn("Create error, name {} is not unique", auditorium.getName());
+			throw new UniqueNameException(auditorium.getName());
 		}
 	}
 
@@ -38,23 +38,23 @@ public class AuditoriumService {
 		return auditoriumDao.getAll();
 	}
 
-	public void update(Auditorium auditorium) {
+	public void update(Auditorium auditorium) throws  AuditroiumExistException {
 		if (isAuditoriumExist(auditorium.getId())) {
 			if (isUniqueName(auditorium)) {
 			auditoriumDao.update(auditorium);
 			} else {
-				log.warn("Update error, name {} is not unique", auditorium.getName());
+				LOG.warn("Update error, name {} is not unique", auditorium.getName());
 			}
 		} else {
-			log.warn("Auditorium {} is already exist", auditorium);
+			throw new AuditroiumExistException(auditorium);
 		}
 	}
 
-	public void deleteById(int id) {
+	public void deleteById(int id) throws AuditroiumExistException {
 		if (isAuditoriumExist(id)) {
 			auditoriumDao.deleteById(id);
 		} else {
-			log.warn("deteleById error, id = {} is not exist", id);
+			throw new AuditroiumExistException(id);
 		}
 	}
 

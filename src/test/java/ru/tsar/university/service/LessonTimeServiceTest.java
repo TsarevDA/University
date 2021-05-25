@@ -14,13 +14,18 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonTimeServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.LessonTimeDao;
+import ru.tsar.university.exceptions.LessonTimeExistException;
+import ru.tsar.university.exceptions.TimeCorrectException;
 import ru.tsar.university.model.LessonTime;
 
 @ExtendWith(MockitoExtension.class)
 class LessonTimeServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeServiceTest.class);
 	@InjectMocks
 	private LessonTimeService lessonTimeService;
 	@Mock
@@ -32,7 +37,11 @@ class LessonTimeServiceTest {
 		LocalTime endTime = LocalTime.of(9,0);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
 
-		lessonTimeService.create(expected);
+		try {
+			lessonTimeService.create(expected);
+		} catch (TimeCorrectException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao).create(expected);
 	}
@@ -43,7 +52,11 @@ class LessonTimeServiceTest {
 		LocalTime endTime = LocalTime.of(9,0);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
 
-		lessonTimeService.create(expected);
+		try {
+			lessonTimeService.create(expected);
+		} catch (TimeCorrectException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao, never()).create(expected);
 	}
@@ -68,7 +81,11 @@ class LessonTimeServiceTest {
 		LessonTime newLessonTime = lessonTime_1;
 		LessonTime oldLessonTime = lessonTime_3;
 		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
-		lessonTimeService.update(newLessonTime);
+		try {
+			lessonTimeService.update(newLessonTime);
+		} catch (LessonTimeExistException | TimeCorrectException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao).update(newLessonTime);
 	}
@@ -79,7 +96,11 @@ class LessonTimeServiceTest {
 		LessonTime newLessonTime = lessonTime_4;
 
 		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
-		lessonTimeService.update(newLessonTime);
+		try {
+			lessonTimeService.update(newLessonTime);
+		} catch (LessonTimeExistException | TimeCorrectException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao, never()).update(newLessonTime);
 	}
@@ -89,7 +110,11 @@ class LessonTimeServiceTest {
 		LessonTime lessonTime = lessonTime_1;
 
 		when(lessonTimeDao.getById(1)).thenReturn(lessonTime);
-		lessonTimeService.deleteById(1);
+		try {
+			lessonTimeService.deleteById(1);
+		} catch (LessonTimeExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao).deleteById(1);
 	}
@@ -97,7 +122,11 @@ class LessonTimeServiceTest {
 	@Test
 	void givenId_whenDeleteById_thenNoAction() {
 		
-		lessonTimeService.deleteById(1);
+		try {
+			lessonTimeService.deleteById(1);
+		} catch (LessonTimeExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(lessonTimeDao, never()).deleteById(1);
 	}

@@ -23,6 +23,8 @@ import ru.tsar.university.model.Teacher;
 @Component
 public class LessonDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonDao.class);
+	
 	private static final String CREATE_LESSON_QUERY = "INSERT INTO lessons(course_id, teacher_id, day, lesson_time_id, auditorium_id) VALUES(?,?,?,?,?)";
 	private static final String CREATE_LESSONS_GROUPS_QUERY = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES(?,?)";
 	private static final String DELETE_LESSONS_GROUPS_QUERY = "DELETE FROM lessons_groups where lesson_id =?";
@@ -36,7 +38,6 @@ public class LessonDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonRowMapper rowMapper;
-	private final Logger log = LoggerFactory.getLogger(LessonDao.class);
 
 	public LessonDao(JdbcTemplate jdbcTemplate, LessonRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -45,8 +46,8 @@ public class LessonDao {
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void create(Lesson lesson) {
+		LOG.debug("Created lesson {}", lesson);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
-
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(CREATE_LESSON_QUERY, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, lesson.getCourse().getId());
@@ -61,33 +62,32 @@ public class LessonDao {
 
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
-		log.info("Call create {}", lesson);
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void deleteById(int id) {
+		LOG.debug("Deleted lesson, id = {}", id);
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, id);
 		jdbcTemplate.update(DELETE_LESSON_QUERY, id);
-		log.info("Call deleteById, id = {}", id);
 	}
 
 	public Lesson getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("Lesson not found by id = {}",id);
 			return null;
 		}
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void update(Lesson lesson) {
+		LOG.debug("Updated to lesson {}", lesson);
 		jdbcTemplate.update(UPDATE_LESSON_QUERY, lesson.getCourse().getId(), lesson.getTeacher().getId(),
 				lesson.getDay(), lesson.getTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, lesson.getId());
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
-		log.info("Call update {}", lesson);
 	}
 
 	public List<Lesson> getAll() {
@@ -103,7 +103,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, day, lessonTime.getId(),
 					auditorium.getId());
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getByDayTimeAuditorium,day {}, lessonTime {},auditorium {}",day, lessonTime, auditorium);
+			LOG.warn("Lesson not found by: day = {}, lessonTime = {},auditorium = {}",day, lessonTime, auditorium);
 			return null;
 		}
 	}
@@ -113,7 +113,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, day, lessonTime.getId(),
 					teacher.getId());
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getByDayTimeTeacher,day {}, lessonTime {},teacher {}",day, lessonTime, teacher);
+			LOG.warn("Lesson not found by: day = {}, lessonTime = {},teacher = {}",day, lessonTime, teacher);
 			return null;
 		}
 	}

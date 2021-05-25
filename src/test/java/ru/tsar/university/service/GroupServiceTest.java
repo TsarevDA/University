@@ -14,9 +14,13 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.GroupServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.StudentDao;
+import ru.tsar.university.exceptions.GroupExistException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
@@ -24,6 +28,7 @@ import ru.tsar.university.model.Student;
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GroupServiceTest.class);
 	@InjectMocks
 	private GroupService groupService;
 	@Mock
@@ -37,7 +42,11 @@ class GroupServiceTest {
 				.name("T5-03")
 				.build();
 
-		groupService.create(group);
+		try {
+			groupService.create(group);
+		} catch (UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(groupDao).create(group);
 	}
@@ -76,7 +85,11 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(oldGroup);
 
-		groupService.update(newGroup);
+		try {
+			groupService.update(newGroup);
+		} catch (GroupExistException | UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(groupDao).update(newGroup);
 	}
@@ -90,7 +103,11 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(dublicateGroup);
 
-		groupService.update(newGroup);
+		try {
+			groupService.update(newGroup);
+		} catch (GroupExistException | UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 		verify(groupDao, never()).update(newGroup);
 	}
 
@@ -100,7 +117,11 @@ class GroupServiceTest {
 
 		when(groupDao.getById(1)).thenReturn(group);
 		when(studentDao.getByGroupId(1)).thenReturn(students_3);
-		groupService.deleteById(1);
+		try {
+			groupService.deleteById(1);
+		} catch (GroupExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(groupDao).deleteById(1);
 	}
@@ -112,7 +133,11 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(group);
 		when(studentDao.getByGroupId(1)).thenReturn(students_1);
 
-		groupService.deleteById(1);
+		try {
+			groupService.deleteById(1);
+		} catch (GroupExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(studentDao, never()).deleteById(1);
 	}

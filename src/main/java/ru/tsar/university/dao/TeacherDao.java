@@ -19,6 +19,8 @@ import ru.tsar.university.model.Teacher;
 @Component
 public class TeacherDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TeacherDao.class);
+	
 	private static final String CREATE_TEACHER_QUERY = "INSERT INTO teachers(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 	private static final String CREATE_TEACHERS_COURSES_QUERY = "INSERT INTO teachers_courses(teacher_id, course_id) VALUES(?,?)";
 	private static final String DELETE_TEACHERS_COURSES_QUERY = "DELETE FROM teachers_courses where teacher_id = ?";
@@ -29,7 +31,6 @@ public class TeacherDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private TeacherRowMapper rowMapper;
-	private final Logger log = LoggerFactory.getLogger(TeacherDao.class);
 
 	public TeacherDao(JdbcTemplate jdbcTemplate, TeacherRowMapper rowMapper, CourseDao courseDao) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -38,6 +39,7 @@ public class TeacherDao {
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void create(Teacher teacher) {
+		LOG.debug("Creqated teacher: {}", teacher);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(CREATE_TEACHER_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -54,35 +56,34 @@ public class TeacherDao {
 
 		teacher.getCourses().stream()
 				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
-		log.info("Call create {}", teacher);
 
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void deleteById(int id) {
+		LOG.debug("Deleted teacher, id = {}", id);
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, id);
 		jdbcTemplate.update(DELETE_TEACHER_QUERY, id);
-		log.info("Call deleteById, id = {}", id);
 	}
 
 	public Teacher getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("Teacher not found by id = {}",id);
 			return null;
 		}
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void update(Teacher teacher) {
+		LOG.debug("Call update {}", teacher);
 		jdbcTemplate.update(UPDATE_TEACHER_QUERY, teacher.getFirstName(), teacher.getLastName(),
 				teacher.getGender().name(), teacher.getBirthDate(), teacher.getPhone(), teacher.getAddress(),
 				teacher.getId());
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, teacher.getId());
 		teacher.getCourses().stream()
 				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
-		log.info("Call update {}", teacher);
 	}
 
 	public List<Teacher> getAll() {

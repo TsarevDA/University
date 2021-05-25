@@ -2,7 +2,7 @@
 
 
 <configuration debug="true">
-<property name="LOGS" value="./src/main/resources/logs"/>
+<property name="LOGS" value="./logs"/>
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>

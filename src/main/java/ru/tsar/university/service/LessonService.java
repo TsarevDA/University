@@ -8,27 +8,47 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonDao;
+import ru.tsar.university.exceptions.AuditoriumFreeException;
+import ru.tsar.university.exceptions.CapacityEnoughException;
+import ru.tsar.university.exceptions.DayOffException;
+import ru.tsar.university.exceptions.GroupExistException;
+import ru.tsar.university.exceptions.GroupFreeException;
+import ru.tsar.university.exceptions.LessonExistException;
+import ru.tsar.university.exceptions.TeacherCompetentException;
+import ru.tsar.university.exceptions.TeacherFreeException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Lesson;
 
 @Service
 public class LessonService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonService.class);
 	private LessonDao lessonDao;
-	private final Logger log = LoggerFactory.getLogger(LessonService.class);
-	
+
 	public LessonService(LessonDao lessonDao) {
 		this.lessonDao = lessonDao;
 	}
 
-	public void create(Lesson lesson) {
-		if (isCapacityEnough(lesson) && isTeacherCompetent(lesson) && isNotDayOff(lesson)
-				&& isAuditoriumFree(lesson) && isTeacherFree(lesson) && isGroupFree(lesson)) {
+	public void create(Lesson lesson) throws CapacityEnoughException, TeacherCompetentException, DayOffException,
+			AuditoriumFreeException, TeacherFreeException, GroupFreeException {
+		if (isCapacityEnough(lesson) && isTeacherCompetent(lesson) && isNotDayOff(lesson) && isAuditoriumFree(lesson)
+				&& isTeacherFree(lesson) && isGroupFree(lesson)) {
 			lessonDao.create(lesson);
-		} else {
-			log.warn("Create error. Not all conditions are met, {}", lesson);
-			
+		} else if (!isCapacityEnough(lesson)) {
+			throw new CapacityEnoughException(lesson.getAuditorium());
+		} else if (!isTeacherCompetent(lesson)) {
+			throw new TeacherCompetentException(lesson);
+		} else if (!isNotDayOff(lesson)) {
+			throw new DayOffException(lesson.getDay());
+		} else if (!isAuditoriumFree(lesson)) {
+			throw new AuditoriumFreeException(lesson);
+		} else if (!isTeacherFree(lesson)) {
+			throw new TeacherFreeException(lesson);
+		} else if (!isGroupFree(lesson)) {
+			throw new GroupFreeException(lesson);
 		}
+
 	}
 
 	public Lesson getById(int id) {
@@ -39,23 +59,34 @@ public class LessonService {
 		return lessonDao.getAll();
 	}
 
-	public void update(Lesson lesson) {
+	public void update(Lesson lesson) throws LessonExistException, CapacityEnoughException, TeacherCompetentException,
+			DayOffException, TeacherFreeException, AuditoriumFreeException, GroupFreeException {
 		if (isLessonExist(lesson.getId()) && isCapacityEnough(lesson) && isTeacherCompetent(lesson)
-				&& isNotDayOff(lesson) && isAuditoriumFree(lesson) && isTeacherFree(lesson)
-				&& isGroupFree(lesson)) {
+				&& isNotDayOff(lesson) && isAuditoriumFree(lesson) && isTeacherFree(lesson) && isGroupFree(lesson)) {
 			lessonDao.update(lesson);
-		} else {
-			log.warn("Update error. Not all conditions are met, {}", lesson);
-			
+		} else if (!isLessonExist(lesson.getId())) {
+			throw new LessonExistException(lesson);
+		} else if (!isCapacityEnough(lesson)) {
+			throw new CapacityEnoughException(lesson.getAuditorium());
+		} else if (!isTeacherCompetent(lesson)) {
+			throw new TeacherCompetentException(lesson);
+		} else if (!isNotDayOff(lesson)) {
+			throw new DayOffException(lesson.getDay());
+		} else if (!isAuditoriumFree(lesson)) {
+			throw new AuditoriumFreeException(lesson);
+		} else if (!isTeacherFree(lesson)) {
+			throw new TeacherFreeException(lesson);
+		} else if (!isGroupFree(lesson)) {
+			throw new GroupFreeException(lesson);
 		}
 	}
 
-	public void deleteById(int id) {
+	public void deleteById(int id) throws LessonExistException {
 		if (isLessonExist(id)) {
 			lessonDao.deleteById(id);
 		} else {
-			log.warn("deleteById error, lesson id = {} does not exist", id);
-			
+			throw new LessonExistException(id);
+
 		}
 	}
 
@@ -77,7 +108,8 @@ public class LessonService {
 	}
 
 	public boolean isAuditoriumFree(Lesson lesson) {
-		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(), lesson.getAuditorium());
+		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(),
+				lesson.getAuditorium());
 		if (lessonFromDao == null) {
 			return true;
 		} else {
@@ -86,7 +118,7 @@ public class LessonService {
 	}
 
 	public boolean isTeacherFree(Lesson lesson) {
-		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(),lesson.getTeacher());
+		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(), lesson.getTeacher());
 		if (lessonFromDao == null) {
 			return true;
 		} else {
@@ -96,7 +128,8 @@ public class LessonService {
 
 	public boolean isGroupFree(Lesson lesson) {
 		List<Lesson> lessons = lessonDao.getByDayTime(lesson.getDay(), lesson.getTime());
-		long count = lessons.stream().filter(l -> l.getId() != lesson.getId()).map(Lesson::getGroups).mapToInt(List::size).sum();
+		long count = lessons.stream().filter(l -> l.getId() != lesson.getId()).map(Lesson::getGroups)
+				.mapToInt(List::size).sum();
 		return count == 0;
 	}
 

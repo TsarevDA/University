@@ -17,6 +17,8 @@ import ru.tsar.university.model.Student;
 @Component
 public class StudentDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StudentDao.class);
+	
 	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 	private static final String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
@@ -26,7 +28,6 @@ public class StudentDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
-	private final Logger log = LoggerFactory.getLogger(StudentDao.class);
 
 	public StudentDao(JdbcTemplate jdbcTemplate, StudentRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -34,7 +35,7 @@ public class StudentDao {
 	}
 
 	public void create(Student student) {
-
+		LOG.debug("Created student {}", student);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(ADD_STUDENT_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -48,19 +49,18 @@ public class StudentDao {
 			return ps;
 		}, holder);
 		student.setId((int) holder.getKeys().get("id"));
-		log.info("Call create {}", student);
 	}
 
 	public void deleteById(int id) {
+		LOG.debug("Deleted student, id = {}",id);
 		jdbcTemplate.update(DELETE_STUDENT_QUERY, id);
-		log.info("Call deleteById, id = {}",id);
 	}
 
 	public Student getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("Student not found by id = {}",id);
 			return null;
 		}
 	}
@@ -69,16 +69,16 @@ public class StudentDao {
 		try {
 			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getByGrpoupId: {}",id);
+			LOG.warn("Student not found by id = {}",id);
 			return null;
 		}
 	}
 
 	public void update(Student student) {
+		LOG.debug("Call update {}", student);
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
 				student.getGender().name(), student.getBirthDate(), student.getPhone(), student.getAddress(),
 				student.getId());
-		log.info("Call update {}", student);
 	}
 
 	public List<Student> getAll() {

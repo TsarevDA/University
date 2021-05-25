@@ -18,6 +18,8 @@ import ru.tsar.university.model.LessonTime;
 @Component
 public class LessonTimeDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeDao.class);
+	
 	private static final String ADD_LESSON_TIME_QUERY = "INSERT INTO lessons_time(order_number,start_time,end_time) VALUES(?,?,?)";
 	private static final String DELETE_LESSON_TIME_QUERY = "DELETE FROM lessons_time where id =?";
 	private static final String GET_BY_ORDER_NUMBER_QUERY = "SELECT * FROM lessons_time WHERE order_number=?";
@@ -27,7 +29,6 @@ public class LessonTimeDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private LessonTimeRowMapper rowMapper;
-	private final Logger log = LoggerFactory.getLogger(LessonTimeDao.class);
 
 	public LessonTimeDao(JdbcTemplate jdbcTemplate, LessonTimeRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -35,7 +36,7 @@ public class LessonTimeDao {
 	}
 
 	public void create(LessonTime lessonTime) {
-
+		LOG.debug("Created LessonTime {}", lessonTime);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(ADD_LESSON_TIME_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -46,19 +47,18 @@ public class LessonTimeDao {
 			return ps;
 		}, holder);
 		lessonTime.setId((int) holder.getKeys().get("id"));
-		log.info("Call create {}", lessonTime);
 	}
 
 	public void deleteById(int id) {
+		LOG.debug("Deleted lessonTime, id = {}",id);
 		jdbcTemplate.update(DELETE_LESSON_TIME_QUERY, id);
-		log.info("Call deleteById, id = {}",id);
 	}
 
 	public LessonTime getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("LessonTime not fount by id = {}",id);
 			return null;
 		}
 	}
@@ -68,9 +68,9 @@ public class LessonTimeDao {
 	}
 
 	public void update(LessonTime lessonTime) {
+		LOG.debug("Updated LessonTime {}", lessonTime);
 		jdbcTemplate.update(UPDATE_LESSON_TIME_QUERY, lessonTime.getStartTime(), lessonTime.getEndTime(),
 				lessonTime.getId());
-		log.info("Call update {}", lessonTime);
 	}
 
 	public List<LessonTime> getAll() {

@@ -15,14 +15,18 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.StudentServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.StudentDao;
+import ru.tsar.university.exceptions.StudentExistException;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Student;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StudentServiceTest.class);
 	@InjectMocks
 	private StudentService studentService;
 	@Mock
@@ -77,7 +81,11 @@ class StudentServiceTest {
 
 		when(studentDao.getById(1)).thenReturn(oldValue);
 
-		studentService.update(expected);
+		try {
+			studentService.update(expected);
+		} catch (StudentExistException e) {
+			LOG.debug(e.getMessage());
+		}
 		verify(studentDao).update(expected);
 
 	}
@@ -88,7 +96,11 @@ class StudentServiceTest {
 
 		when(studentDao.getById(1)).thenReturn(student);
 
-		studentService.deleteById(1);
+		try {
+			studentService.deleteById(1);
+		} catch (StudentExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(studentDao).deleteById(1);
 	}
@@ -96,7 +108,11 @@ class StudentServiceTest {
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
 
-		studentService.deleteById(1);
+		try {
+			studentService.deleteById(1);
+		} catch (StudentExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(studentDao, never()).deleteById(1);
 	}

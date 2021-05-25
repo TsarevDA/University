@@ -4,17 +4,17 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.TeacherDao;
+import ru.tsar.university.exceptions.StudentExistException;
+import ru.tsar.university.exceptions.TeacherExistException;
 import ru.tsar.university.model.Teacher;
 
 @Service
 public class TeacherService {
 
 	private TeacherDao teacherDao;
-	private final Logger log = LoggerFactory.getLogger(TeacherService.class);
 
 	public TeacherService(TeacherDao teacherDao) {
 		this.teacherDao = teacherDao;
@@ -32,19 +32,19 @@ public class TeacherService {
 		return teacherDao.getAll();
 	}
 
-	public void update(Teacher teacher) {
+	public void update(Teacher teacher) throws TeacherExistException {
 		if (isTeacherExist(teacher.getId())) {
 			teacherDao.update(teacher);
 		} else {
-			log.warn("Update error, teacher, id = {} is not exist", teacher.getId());
+			throw new TeacherExistException(teacher);
 		}
 	}
 
-	public void deleteById(int id) {
+	public void deleteById(int id) throws TeacherExistException {
 		if (isTeacherExist(id)) {
 			teacherDao.deleteById(id);
 		} else {
-			log.warn("deleteById error, teacher, id = {} is not exist", id);
+			throw new TeacherExistException(id);
 		}
 	}
 

@@ -11,15 +11,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.AuditoriumServiceTest.TestData.*;
 
 import ru.tsar.university.dao.AuditoriumDao;
+import ru.tsar.university.exceptions.AuditroiumExistException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
 @ExtendWith(MockitoExtension.class)
 class AuditoriumServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumServiceTest.class);
 	@InjectMocks
 	private AuditoriumService auditoriumService;
 	@Mock
@@ -35,7 +41,11 @@ class AuditoriumServiceTest {
 		
 		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
 
-		auditoriumService.create(auditorium);
+		try {
+			auditoriumService.create(auditorium);
+		} catch (UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(auditoriumDao, never()).create(auditorium);
 	}
@@ -49,7 +59,11 @@ class AuditoriumServiceTest {
 
 		when(auditoriumDao.getByName(expected)).thenReturn(null);
 
-		auditoriumService.create(expected);
+		try {
+			auditoriumService.create(expected);
+		} catch (UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(auditoriumDao).create(expected);
 	}
@@ -80,7 +94,11 @@ class AuditoriumServiceTest {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(auditorium_1);
 
-		auditoriumService.update(auditorium_2);
+		try {
+			auditoriumService.update(auditorium_2);
+		} catch (AuditroiumExistException e) {
+			LOG.debug(e.getMessage());
+		}
 		verify(auditoriumDao).update(auditorium_2);
 		;
 
@@ -91,7 +109,11 @@ class AuditoriumServiceTest {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(dublicateAuditorium_2);
 
-		auditoriumService.update(auditorium_2);
+		try {
+			auditoriumService.update(auditorium_2);
+		} catch (AuditroiumExistException e) {
+			LOG.debug(e.getMessage());
+		}
 		verify(auditoriumDao, never()).update(auditorium_2);
 	}
 
@@ -99,7 +121,11 @@ class AuditoriumServiceTest {
 	void givenId_whenDeleteById_thenCallDaoMethod() {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 
-		auditoriumService.deleteById(1);
+		try {
+			auditoriumService.deleteById(1);
+		} catch (AuditroiumExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(auditoriumDao).getById(1);
 	}

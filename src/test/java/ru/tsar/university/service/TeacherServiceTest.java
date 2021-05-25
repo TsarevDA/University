@@ -16,8 +16,11 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.TeacherServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.TeacherDao;
+import ru.tsar.university.exceptions.TeacherExistException;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
@@ -25,6 +28,7 @@ import ru.tsar.university.model.Teacher;
 @ExtendWith(MockitoExtension.class)
 class TeacherServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TeacherServiceTest.class);
 	@InjectMocks
 	private TeacherService teacherService;
 	@Mock
@@ -80,7 +84,12 @@ class TeacherServiceTest {
 
 		when(teacherDao.getById(1)).thenReturn(oldValue);
 
-		teacherService.update(expected);
+		try {
+			teacherService.update(expected);
+		} catch (TeacherExistException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		verify(teacherDao).update(expected);
 
 	}
@@ -91,7 +100,11 @@ class TeacherServiceTest {
 
 		when(teacherDao.getById(1)).thenReturn(teacher);
 
-		teacherService.deleteById(1);
+		try {
+			teacherService.deleteById(1);
+		} catch (TeacherExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(teacherDao).deleteById(1);
 	}
@@ -99,7 +112,11 @@ class TeacherServiceTest {
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
 
-		teacherService.deleteById(1);
+		try {
+			teacherService.deleteById(1);
+		} catch (TeacherExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(teacherDao, never()).deleteById(1);
 	}

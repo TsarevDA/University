@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 @Component
 public class AuditoriumDao {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumDao.class);
+	
 	private static final String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name, capacity) VALUES(?,?)";
 	private static final String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
@@ -29,7 +31,6 @@ public class AuditoriumDao {
 
 	private JdbcTemplate jdbcTemplate;
 	private AuditoriumRowMapper rowMapper;
-	private final Logger log = LoggerFactory.getLogger(AuditoriumDao.class);
 	
 	public AuditoriumDao(JdbcTemplate jdbcTemplate, AuditoriumRowMapper rowMapper) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -37,8 +38,8 @@ public class AuditoriumDao {
 	}
 
 	public void create(Auditorium auditorium) {
+		LOG.debug("Created auditorium: {}", auditorium);
 		GeneratedKeyHolder holder = new GeneratedKeyHolder();
-		
 		jdbcTemplate.update(connection -> {
 			PreparedStatement ps = connection.prepareStatement(CREATE_AUDITORIUM_QUERY,
 					Statement.RETURN_GENERATED_KEYS);
@@ -47,19 +48,18 @@ public class AuditoriumDao {
 			return ps;
 		}, holder);
 		auditorium.setId((int) holder.getKeys().get("id"));
-		log.info("Call create: {}", auditorium);
 	}
 
 	public void deleteById(int id) {
+		LOG.debug("Deleted auditorium, id = {}", id);
 		jdbcTemplate.update(DELETE_AUDITORIUM_QUERY, id);
-		log.info("Call deleteById, id: {}", id);
 	}
 
 	public Auditorium getById(int id) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getById: {}",id);
+			LOG.warn("Auditorium not found by id = {}",id);
 			return null;
 		}
 	}
@@ -69,16 +69,16 @@ public class AuditoriumDao {
 	}
 
 	public void update(Auditorium auditorium) {
+		LOG.debug("Uptated to auditorium: {}", auditorium);
 		jdbcTemplate.update(UPDATE_AUDITORIUMS_QUERY, auditorium.getName(), auditorium.getCapacity(),
 				auditorium.getId());
-		log.info("Call update: {}", auditorium);
 	}
 
 	public Auditorium getByName(Auditorium auditorium) {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_NAME_QUERY, rowMapper, auditorium.getName());
 		} catch (EmptyResultDataAccessException e) {
-			log.warn("EmptyResultSet, getByName: {}", auditorium.getName());
+			LOG.warn("Auditorium not found by name = {}", auditorium.getName());
 			return null;
 		}
 	}

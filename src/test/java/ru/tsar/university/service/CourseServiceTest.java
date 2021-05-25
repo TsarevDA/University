@@ -13,13 +13,18 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.CourseServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.CourseDao;
+import ru.tsar.university.exceptions.CourseExistException;
+import ru.tsar.university.exceptions.UniqueNameException;
 import ru.tsar.university.model.Course;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CourseServiceTest.class);
 	@InjectMocks
 	private CourseService courseService;
 	@Mock
@@ -32,7 +37,11 @@ class CourseServiceTest {
 				.description("Science about plants")
 				.build();
 
-		courseService.create(course);
+		try {
+			courseService.create(course);
+		} catch (UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(courseDao).create(course);
 	}
@@ -46,7 +55,11 @@ class CourseServiceTest {
 	
 		when(courseDao.getByName(course)).thenReturn(course_1);
 
-		courseService.create(course);
+		try {
+			courseService.create(course);
+		} catch (UniqueNameException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(courseDao, never()).create(course);
 	}
@@ -78,7 +91,11 @@ class CourseServiceTest {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(course_1);
 
-		courseService.update(course_2);
+		try {
+			courseService.update(course_2);
+		} catch (UniqueNameException | CourseExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(courseDao).update(course_2);
 	}
@@ -88,7 +105,11 @@ class CourseServiceTest {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(dublicatedCourse_1);
 
-		courseService.update(course_2);
+		try {
+			courseService.update(course_2);
+		} catch (UniqueNameException | CourseExistException e) {
+			LOG.debug(e.getMessage());
+		}
 		verify(courseDao, never()).update(course_2);
 	}
 
@@ -97,7 +118,11 @@ class CourseServiceTest {
 		Course course = Course.builder().id(1).name("Math").description("Science about numbers").build();
 
 		when(courseDao.getById(1)).thenReturn(course);
-		courseService.deleteById(1);
+		try {
+			courseService.deleteById(1);
+		} catch (CourseExistException e) {
+			LOG.debug(e.getMessage());
+		}
 
 		verify(courseDao).deleteById(1);
 	}
