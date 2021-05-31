@@ -84,12 +84,8 @@ class TeacherServiceTest {
 
 		when(teacherDao.getById(1)).thenReturn(oldValue);
 
-		try {
-			teacherService.update(expected);
-		} catch (TeacherExistException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		teacherService.update(expected);
+
 		verify(teacherDao).update(expected);
 
 	}
@@ -100,11 +96,7 @@ class TeacherServiceTest {
 
 		when(teacherDao.getById(1)).thenReturn(teacher);
 
-		try {
-			teacherService.deleteById(1);
-		} catch (TeacherExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		teacherService.deleteById(1);
 
 		verify(teacherDao).deleteById(1);
 	}
@@ -112,11 +104,7 @@ class TeacherServiceTest {
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
 
-		try {
-			teacherService.deleteById(1);
-		} catch (TeacherExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		teacherService.deleteById(1);
 
 		verify(teacherDao, never()).deleteById(1);
 	}

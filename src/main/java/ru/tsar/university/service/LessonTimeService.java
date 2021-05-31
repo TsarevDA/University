@@ -7,9 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonTimeDao;
-import ru.tsar.university.exceptions.GroupExistException;
-import ru.tsar.university.exceptions.LessonTimeExistException;
-import ru.tsar.university.exceptions.TimeCorrectException;
+import ru.tsar.university.exceptions.LessonTimeNotExistException;
+import ru.tsar.university.exceptions.TimeNotCorrectException;
 import ru.tsar.university.model.LessonTime;
 
 @Service
@@ -22,11 +21,12 @@ public class LessonTimeService {
 		this.lessonTimeDao = lessonTimeDao;
 	}
 
-	public void create(LessonTime lessonTime) throws TimeCorrectException {
-		if (isTimeCorrect(lessonTime)) {
+	public void create(LessonTime lessonTime) {
+		try {
+			isTimeCorrect(lessonTime);
 			lessonTimeDao.create(lessonTime);
-		} else {
-			throw new TimeCorrectException(lessonTime);
+		} catch (TimeNotCorrectException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
@@ -42,32 +42,34 @@ public class LessonTimeService {
 		return lessonTimeDao.getAll();
 	}
 
-	public void update(LessonTime lessonTime) throws LessonTimeExistException, TimeCorrectException {
-		if (isLessonTimeExist(lessonTime.getId()) && isTimeCorrect(lessonTime)) {
-			if (isTimeCorrect(lessonTime)) {
+	public void update(LessonTime lessonTime) {
+		try {
+			isLessonTimeExist(lessonTime.getId());
+			isTimeCorrect(lessonTime);
 			lessonTimeDao.update(lessonTime);
-			} else {
-				throw new TimeCorrectException(lessonTime);
-			}
-		} else {
-			throw new LessonTimeExistException(lessonTime);
+		} catch (LessonTimeNotExistException | TimeNotCorrectException e) {
+			LOG.warn(e.getMessage());
 		}
-
 	}
 
-	public void deleteById(int id) throws LessonTimeExistException {
-		if (isLessonTimeExist(id)) {
+	public void deleteById(int id) {
+		try {
+			isLessonTimeExist(id);
 			lessonTimeDao.deleteById(id);
-		} else {
-			throw new LessonTimeExistException(id);
+		} catch (LessonTimeNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public boolean isLessonTimeExist(int id) {
-		return lessonTimeDao.getById(id) != null;
+	public void isLessonTimeExist(int id) throws LessonTimeNotExistException {
+		if (lessonTimeDao.getById(id) == null) {
+			throw new LessonTimeNotExistException(id);
+		}
 	}
 
-	public boolean isTimeCorrect(LessonTime lessonTime) {
-		return lessonTime.getStartTime().isBefore(lessonTime.getEndTime());
+	public void isTimeCorrect(LessonTime lessonTime) throws TimeNotCorrectException {
+		if (lessonTime.getStartTime().isAfter(lessonTime.getEndTime())) {
+			throw new TimeNotCorrectException(lessonTime);
+		}
 	}
 }

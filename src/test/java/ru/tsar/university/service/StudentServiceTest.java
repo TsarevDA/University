@@ -81,11 +81,9 @@ class StudentServiceTest {
 
 		when(studentDao.getById(1)).thenReturn(oldValue);
 
-		try {
-			studentService.update(expected);
-		} catch (StudentExistException e) {
-			LOG.debug(e.getMessage());
-		}
+
+		studentService.update(expected);
+
 		verify(studentDao).update(expected);
 
 	}
@@ -96,11 +94,7 @@ class StudentServiceTest {
 
 		when(studentDao.getById(1)).thenReturn(student);
 
-		try {
-			studentService.deleteById(1);
-		} catch (StudentExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		studentService.deleteById(1);
 
 		verify(studentDao).deleteById(1);
 	}
@@ -108,11 +102,7 @@ class StudentServiceTest {
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
 
-		try {
-			studentService.deleteById(1);
-		} catch (StudentExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		studentService.deleteById(1);
 
 		verify(studentDao, never()).deleteById(1);
 	}

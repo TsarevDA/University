@@ -25,7 +25,6 @@ import ru.tsar.university.model.Auditorium;
 @ExtendWith(MockitoExtension.class)
 class AuditoriumServiceTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumServiceTest.class);
 	@InjectMocks
 	private AuditoriumService auditoriumService;
 	@Mock
@@ -41,12 +40,8 @@ class AuditoriumServiceTest {
 		
 		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
 
-		try {
-			auditoriumService.create(auditorium);
-		} catch (UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
-
+		auditoriumService.create(auditorium);
+	
 		verify(auditoriumDao, never()).create(auditorium);
 	}
 
@@ -59,11 +54,7 @@ class AuditoriumServiceTest {
 
 		when(auditoriumDao.getByName(expected)).thenReturn(null);
 
-		try {
-			auditoriumService.create(expected);
-		} catch (UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
+		auditoriumService.create(expected);
 
 		verify(auditoriumDao).create(expected);
 	}
@@ -94,14 +85,9 @@ class AuditoriumServiceTest {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(auditorium_1);
 
-		try {
-			auditoriumService.update(auditorium_2);
-		} catch (AuditroiumExistException e) {
-			LOG.debug(e.getMessage());
-		}
-		verify(auditoriumDao).update(auditorium_2);
-		;
+		auditoriumService.update(auditorium_2);
 
+		verify(auditoriumDao).update(auditorium_2);
 	}
 
 	@Test
@@ -109,11 +95,8 @@ class AuditoriumServiceTest {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(dublicateAuditorium_2);
 
-		try {
-			auditoriumService.update(auditorium_2);
-		} catch (AuditroiumExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		auditoriumService.update(auditorium_2);
+	
 		verify(auditoriumDao, never()).update(auditorium_2);
 	}
 
@@ -121,11 +104,7 @@ class AuditoriumServiceTest {
 	void givenId_whenDeleteById_thenCallDaoMethod() {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 
-		try {
-			auditoriumService.deleteById(1);
-		} catch (AuditroiumExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		auditoriumService.deleteById(1);
 
 		verify(auditoriumDao).getById(1);
 	}

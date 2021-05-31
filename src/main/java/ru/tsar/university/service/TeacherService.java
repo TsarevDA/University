@@ -7,13 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.StudentExistException;
-import ru.tsar.university.exceptions.TeacherExistException;
+import ru.tsar.university.exceptions.StudentNotExistException;
+import ru.tsar.university.exceptions.TeacherNotExistException;
 import ru.tsar.university.model.Teacher;
 
 @Service
 public class TeacherService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TeacherService.class);
 	private TeacherDao teacherDao;
 
 	public TeacherService(TeacherDao teacherDao) {
@@ -32,23 +33,27 @@ public class TeacherService {
 		return teacherDao.getAll();
 	}
 
-	public void update(Teacher teacher) throws TeacherExistException {
-		if (isTeacherExist(teacher.getId())) {
+	public void update(Teacher teacher) {
+		try {
+			isTeacherExist(teacher.getId());
 			teacherDao.update(teacher);
-		} else {
-			throw new TeacherExistException(teacher);
+		} catch (TeacherNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public void deleteById(int id) throws TeacherExistException {
-		if (isTeacherExist(id)) {
+	public void deleteById(int id)  {
+		try {
+			isTeacherExist(id);
 			teacherDao.deleteById(id);
-		} else {
-			throw new TeacherExistException(id);
+		} catch (TeacherNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public boolean isTeacherExist(int id) {
-		return teacherDao.getById(id) != null;
+	public void isTeacherExist(int id) throws TeacherNotExistException {
+		if (teacherDao.getById(id) == null) {
+			throw new TeacherNotExistException(id);
+		}
 	}
 }

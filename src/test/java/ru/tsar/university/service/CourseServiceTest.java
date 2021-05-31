@@ -37,11 +37,7 @@ class CourseServiceTest {
 				.description("Science about plants")
 				.build();
 
-		try {
-			courseService.create(course);
-		} catch (UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
+		courseService.create(course);
 
 		verify(courseDao).create(course);
 	}
@@ -55,12 +51,9 @@ class CourseServiceTest {
 	
 		when(courseDao.getByName(course)).thenReturn(course_1);
 
-		try {
-			courseService.create(course);
-		} catch (UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
-
+	
+		courseService.create(course);
+		
 		verify(courseDao, never()).create(course);
 	}
 
@@ -91,11 +84,7 @@ class CourseServiceTest {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(course_1);
 
-		try {
-			courseService.update(course_2);
-		} catch (UniqueNameException | CourseExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		courseService.update(course_2);
 
 		verify(courseDao).update(course_2);
 	}
@@ -105,11 +94,8 @@ class CourseServiceTest {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(dublicatedCourse_1);
 
-		try {
-			courseService.update(course_2);
-		} catch (UniqueNameException | CourseExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		courseService.update(course_2);
+		
 		verify(courseDao, never()).update(course_2);
 	}
 
@@ -118,11 +104,8 @@ class CourseServiceTest {
 		Course course = Course.builder().id(1).name("Math").description("Science about numbers").build();
 
 		when(courseDao.getById(1)).thenReturn(course);
-		try {
-			courseService.deleteById(1);
-		} catch (CourseExistException e) {
-			LOG.debug(e.getMessage());
-		}
+	
+		courseService.deleteById(1);
 
 		verify(courseDao).deleteById(1);
 	}

@@ -7,37 +7,37 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.CourseDao;
-import ru.tsar.university.exceptions.CourseExistException;
-import ru.tsar.university.exceptions.UniqueNameException;
+import ru.tsar.university.exceptions.CourseNotExistException;
+import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Teacher;
 
 @Service
 public class CourseService {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(CourseService.class);
 	private CourseDao courseDao;
 
 	public CourseService(CourseDao courseDao) {
 		this.courseDao = courseDao;
 	}
 
-	public void create(Course course) throws UniqueNameException {
-		if (isUniqueName(course)) {
+	public void create(Course course) {
+		try {
+			isUniqueName(course);
 			courseDao.create(course);
-		} else {
-			throw new UniqueNameException(course.getName());
+		} catch (NotUniqueNameException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public void update(Course course) throws UniqueNameException, CourseExistException {
-		if (isCourseExist(course.getId())) {
-			if (isUniqueName(course)) {
+	public void update(Course course) {
+		try {
+			isCourseExist(course.getId());
+			isUniqueName(course);
 			courseDao.update(course);
-			} else {
-				throw new UniqueNameException(course.getName());
-			}
-		} else {
-			throw new CourseExistException(course);
+		} catch (CourseNotExistException | NotUniqueNameException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
@@ -53,23 +53,28 @@ public class CourseService {
 		return courseDao.getByTeacherId(teacher.getId());
 	}
 
-	public void deleteById(int id) throws CourseExistException {
-		if (isCourseExist(id)) {
+	public void deleteById(int id) {
+		try {
+			isCourseExist(id);
 			courseDao.deleteById(id);
-		} else {
-			throw new CourseExistException(id);
+		} catch (CourseNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public boolean isCourseExist(int id) {
-		return courseDao.getById(id) != null;
+	public void isCourseExist(int id) throws CourseNotExistException {
+		if (courseDao.getById(id) == null) {
+			throw new CourseNotExistException(id);
+		}
 	}
 
-	public boolean isUniqueName(Course course) {
+	public void isUniqueName(Course course) throws NotUniqueNameException {
 		Course courseByName = courseDao.getByName(course);
-		return (courseByName == null || courseByName.getId() == course.getId());
+		if (courseByName != null) {
+			if (courseByName.getId() != course.getId()) {
+				throw new NotUniqueNameException(course.getName());
+			}
+		}
 	}
 
-
-	
 }

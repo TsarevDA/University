@@ -37,11 +37,7 @@ class LessonTimeServiceTest {
 		LocalTime endTime = LocalTime.of(9,0);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
 
-		try {
-			lessonTimeService.create(expected);
-		} catch (TimeCorrectException e) {
-			LOG.debug(e.getMessage());
-		}
+		lessonTimeService.create(expected);
 
 		verify(lessonTimeDao).create(expected);
 	}
@@ -52,11 +48,7 @@ class LessonTimeServiceTest {
 		LocalTime endTime = LocalTime.of(9,0);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
 
-		try {
-			lessonTimeService.create(expected);
-		} catch (TimeCorrectException e) {
-			LOG.debug(e.getMessage());
-		}
+		lessonTimeService.create(expected);
 
 		verify(lessonTimeDao, never()).create(expected);
 	}
@@ -81,11 +73,8 @@ class LessonTimeServiceTest {
 		LessonTime newLessonTime = lessonTime_1;
 		LessonTime oldLessonTime = lessonTime_3;
 		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
-		try {
-			lessonTimeService.update(newLessonTime);
-		} catch (LessonTimeExistException | TimeCorrectException e) {
-			LOG.debug(e.getMessage());
-		}
+		
+		lessonTimeService.update(newLessonTime);
 
 		verify(lessonTimeDao).update(newLessonTime);
 	}
@@ -96,11 +85,8 @@ class LessonTimeServiceTest {
 		LessonTime newLessonTime = lessonTime_4;
 
 		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
-		try {
-			lessonTimeService.update(newLessonTime);
-		} catch (LessonTimeExistException | TimeCorrectException e) {
-			LOG.debug(e.getMessage());
-		}
+	
+		lessonTimeService.update(newLessonTime);
 
 		verify(lessonTimeDao, never()).update(newLessonTime);
 	}
@@ -110,11 +96,8 @@ class LessonTimeServiceTest {
 		LessonTime lessonTime = lessonTime_1;
 
 		when(lessonTimeDao.getById(1)).thenReturn(lessonTime);
-		try {
-			lessonTimeService.deleteById(1);
-		} catch (LessonTimeExistException e) {
-			LOG.debug(e.getMessage());
-		}
+	
+		lessonTimeService.deleteById(1);
 
 		verify(lessonTimeDao).deleteById(1);
 	}
@@ -122,11 +105,7 @@ class LessonTimeServiceTest {
 	@Test
 	void givenId_whenDeleteById_thenNoAction() {
 		
-		try {
-			lessonTimeService.deleteById(1);
-		} catch (LessonTimeExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		lessonTimeService.deleteById(1);
 
 		verify(lessonTimeDao, never()).deleteById(1);
 	}

@@ -42,12 +42,8 @@ class GroupServiceTest {
 				.name("T5-03")
 				.build();
 
-		try {
-			groupService.create(group);
-		} catch (UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
-
+		groupService.create(group);
+			
 		verify(groupDao).create(group);
 	}
 
@@ -85,11 +81,8 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(oldGroup);
 
-		try {
-			groupService.update(newGroup);
-		} catch (GroupExistException | UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
+		
+		groupService.update(newGroup);
 
 		verify(groupDao).update(newGroup);
 	}
@@ -103,11 +96,9 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(dublicateGroup);
 
-		try {
-			groupService.update(newGroup);
-		} catch (GroupExistException | UniqueNameException e) {
-			LOG.debug(e.getMessage());
-		}
+
+		groupService.update(newGroup);
+		
 		verify(groupDao, never()).update(newGroup);
 	}
 
@@ -117,11 +108,8 @@ class GroupServiceTest {
 
 		when(groupDao.getById(1)).thenReturn(group);
 		when(studentDao.getByGroupId(1)).thenReturn(students_3);
-		try {
-			groupService.deleteById(1);
-		} catch (GroupExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		
+		groupService.deleteById(1);
 
 		verify(groupDao).deleteById(1);
 	}
@@ -133,11 +121,7 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(group);
 		when(studentDao.getByGroupId(1)).thenReturn(students_1);
 
-		try {
-			groupService.deleteById(1);
-		} catch (GroupExistException e) {
-			LOG.debug(e.getMessage());
-		}
+		groupService.deleteById(1);
 
 		verify(studentDao, never()).deleteById(1);
 	}

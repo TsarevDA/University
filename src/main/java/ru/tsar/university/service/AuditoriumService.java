@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.exceptions.AuditroiumExistException;
-import ru.tsar.university.exceptions.UniqueNameException;
+import ru.tsar.university.exceptions.AuditroiumNotExistException;
+import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
 import org.slf4j.Logger;
@@ -22,11 +22,12 @@ public class AuditoriumService {
 		this.auditoriumDao = auditoriumDao;
 	}
 
-	public void create(Auditorium auditorium) throws UniqueNameException {
-		if (isUniqueName(auditorium)) {
+	public void create(Auditorium auditorium) {
+		try {
+			isUniqueName(auditorium);
 			auditoriumDao.create(auditorium);
-		} else {
-			throw new UniqueNameException(auditorium.getName());
+		} catch (NotUniqueNameException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
@@ -38,32 +39,37 @@ public class AuditoriumService {
 		return auditoriumDao.getAll();
 	}
 
-	public void update(Auditorium auditorium) throws  AuditroiumExistException {
-		if (isAuditoriumExist(auditorium.getId())) {
-			if (isUniqueName(auditorium)) {
+	public void update(Auditorium auditorium) {
+		try {
+			isAuditoriumExist(auditorium.getId());
+			isUniqueName(auditorium);
 			auditoriumDao.update(auditorium);
-			} else {
-				LOG.warn("Update error, name {} is not unique", auditorium.getName());
-			}
-		} else {
-			throw new AuditroiumExistException(auditorium);
+		} catch (NotUniqueNameException | AuditroiumNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public void deleteById(int id) throws AuditroiumExistException {
-		if (isAuditoriumExist(id)) {
+	public void deleteById(int id) {
+		try {
+			isAuditoriumExist(id);
 			auditoriumDao.deleteById(id);
-		} else {
-			throw new AuditroiumExistException(id);
+		} catch (AuditroiumNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public boolean isUniqueName(Auditorium auditorium) {
+	public void isUniqueName(Auditorium auditorium) throws NotUniqueNameException {
 		Auditorium auditoriumByName = auditoriumDao.getByName(auditorium);
-		return (auditoriumByName == null || auditoriumByName.getId() == auditorium.getId());
+		if (auditoriumByName != null) {
+			if (auditoriumByName.getId() != auditorium.getId()) {
+				throw new NotUniqueNameException(auditorium.getName());
+			}
+		}
 	}
 
-	public boolean isAuditoriumExist(int id) {
-		return auditoriumDao.getById(id) != null;
+	public void isAuditoriumExist(int id) throws AuditroiumNotExistException {
+		if (auditoriumDao.getById(id) == null) {
+			throw new AuditroiumNotExistException(id);
+		}
 	}
 }

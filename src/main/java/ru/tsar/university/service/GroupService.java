@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.exceptions.GroupExistException;
-import ru.tsar.university.exceptions.UniqueNameException;
+import ru.tsar.university.exceptions.GroupNotExistException;
+import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Group;
 
 @Service
@@ -24,11 +24,12 @@ public class GroupService {
 		this.studentDao = studentDao;
 	}
 
-	public void create(Group group) throws UniqueNameException {
-		if (groupDao.getByName(group) == null) {
+	public void create(Group group) {
+		try {
+			isUniqueName(group);
 			groupDao.create(group);
-		} else {
-			throw new UniqueNameException(group.getName());
+		} catch (NotUniqueNameException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
@@ -40,42 +41,45 @@ public class GroupService {
 		return groupDao.getAll();
 	}
 
-	public void update(Group group) throws GroupExistException, UniqueNameException {
-		if (isGroupExist(group.getId()))  {
-			if (isUniqueName(group)) {
+	public void update(Group group) {
+		try {
+			isGroupExist(group.getId());
+			isUniqueName(group);
 			groupDao.update(group);
-			} else {
-				throw new UniqueNameException(group.getName());
-				//LOG.warn("Update error, name {} is not unique", group.getName());
-			}
-		} else {
-			throw new GroupExistException(group);
-			//LOG.warn("Update error, group {} is already exist", group);
+		} catch (NotUniqueNameException | GroupNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public void deleteById(int id) throws GroupExistException {
-		if (isGroupExist(id) ) {
-			if (!isStudentsInGroupExist(id)) { 
-			groupDao.deleteById(id);
+	public void deleteById(int id) {
+		try {
+			isGroupExist(id);
+			if (!isStudentsInGroupExist(id)) {
+				groupDao.deleteById(id);
 			} else {
-				LOG.warn("deleteById error, group, id = {} have students",id);
+				LOG.warn("deleteById error, group, id = {} have students", id);
 			}
-		} else {
-			throw new GroupExistException(id);		
+		} catch (GroupNotExistException e) {
+			LOG.warn(e.getMessage());
 		}
 	}
 
-	public boolean isUniqueName(Group group) {
+	public void isUniqueName(Group group) throws NotUniqueNameException {
 		Group groupByName = groupDao.getByName(group);
-		return (groupByName == null || groupByName.getId() == group.getId());
+		if (groupByName != null) {
+			if (groupByName.getId() != group.getId()) {
+				throw new NotUniqueNameException(group.getName());
+			}
+		}
 	}
 
 	public boolean isStudentsInGroupExist(int id) {
 		return (studentDao.getByGroupId(id) == null);
 	}
 
-	public boolean isGroupExist(int id) {
-		return groupDao.getById(id) != null;
+	public void isGroupExist(int id) throws GroupNotExistException {
+		if (groupDao.getById(id) == null) {
+			throw new GroupNotExistException(id);
+		}
 	}
 }
