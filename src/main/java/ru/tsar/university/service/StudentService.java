@@ -2,8 +2,6 @@ package ru.tsar.university.service;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.StudentDao;
@@ -13,7 +11,6 @@ import ru.tsar.university.model.Student;
 @Service
 public class StudentService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudentService.class);
 	private StudentDao studentDao;
 
 	public StudentService(StudentDao studentDao) {
@@ -33,26 +30,19 @@ public class StudentService {
 	}
 
 	public void update(Student student) {
-		try {
-			isStudentExist(student.getId());
-			studentDao.update(student);
-		} catch (StudentNotExistException e)  {
-			LOG.warn(e.getMessage());
-		}
+		isStudentExistence(student.getId());
+		studentDao.update(student);
+
 	}
 
 	public void deleteById(int id) {
-		try {
-		isStudentExist(id);
-			studentDao.deleteById(id);
-		} catch(StudentNotExistException e)  {
-			LOG.warn(e.getMessage());
-		}
+		isStudentExistence(id);
+		studentDao.deleteById(id);
 	}
 
-	public void isStudentExist(int id) throws StudentNotExistException {
-		if ( studentDao.getById(id) == null) {
-			throw new StudentNotExistException(id);
+	public void isStudentExistence(int id) throws StudentNotExistException {
+		if (studentDao.getById(id) == null) {
+			throw new StudentNotExistException("Student with id = " + id + " does not exist");
 		}
 	}
 }

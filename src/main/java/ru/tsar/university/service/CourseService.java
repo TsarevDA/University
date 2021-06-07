@@ -2,8 +2,6 @@ package ru.tsar.university.service;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.CourseDao;
@@ -15,7 +13,6 @@ import ru.tsar.university.model.Teacher;
 @Service
 public class CourseService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CourseService.class);
 	private CourseDao courseDao;
 
 	public CourseService(CourseDao courseDao) {
@@ -23,22 +20,14 @@ public class CourseService {
 	}
 
 	public void create(Course course) {
-		try {
-			isUniqueName(course);
-			courseDao.create(course);
-		} catch (NotUniqueNameException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyNameUniqueness(course);
+		courseDao.create(course);
 	}
 
 	public void update(Course course) {
-		try {
-			isCourseExist(course.getId());
-			isUniqueName(course);
-			courseDao.update(course);
-		} catch (CourseNotExistException | NotUniqueNameException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyCourseExistence(course.getId());
+		verifyNameUniqueness(course);
+		courseDao.update(course);
 	}
 
 	public Course getById(int id) {
@@ -54,26 +43,20 @@ public class CourseService {
 	}
 
 	public void deleteById(int id) {
-		try {
-			isCourseExist(id);
-			courseDao.deleteById(id);
-		} catch (CourseNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyCourseExistence(id);
+		courseDao.deleteById(id);
 	}
 
-	public void isCourseExist(int id) throws CourseNotExistException {
+	public void verifyCourseExistence(int id) throws CourseNotExistException {
 		if (courseDao.getById(id) == null) {
-			throw new CourseNotExistException(id);
+			throw new CourseNotExistException("Course with id = " + id + " does not exist");
 		}
 	}
 
-	public void isUniqueName(Course course) throws NotUniqueNameException {
+	public void verifyNameUniqueness(Course course) throws NotUniqueNameException {
 		Course courseByName = courseDao.getByName(course);
-		if (courseByName != null) {
-			if (courseByName.getId() != course.getId()) {
-				throw new NotUniqueNameException(course.getName());
-			}
+		if (courseByName != null && courseByName.getId() != course.getId()) {
+			throw new NotUniqueNameException("This name is not unique: " + course.getName());
 		}
 	}
 

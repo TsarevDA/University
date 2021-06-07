@@ -19,7 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.exceptions.StudentExistException;
+import ru.tsar.university.exceptions.LessonTimeNotExistException;
+import ru.tsar.university.exceptions.StudentNotExistException;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Student;
 
@@ -34,15 +35,9 @@ class StudentServiceTest {
 
 	@Test
 	void givenStudent_whenCreate_thenCallDaoMethod() {
-		Student expected = Student.builder()
-				.firstName("Ivan")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
-				.email("mail@mail.ru")
-				.phone("88008080")
-				.address("Ivanov street, 25-5")
-				.build();
+		Student expected = Student.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").build();
 
 		studentService.create(expected);
 
@@ -81,7 +76,6 @@ class StudentServiceTest {
 
 		when(studentDao.getById(1)).thenReturn(oldValue);
 
-
 		studentService.update(expected);
 
 		verify(studentDao).update(expected);
@@ -100,41 +94,28 @@ class StudentServiceTest {
 	}
 
 	@Test
-	void givenExistId_whenDeleteById_thenNoAction() {
+	void givenExistId_whenDeleteById_thenStudentNotExistException() {
 
-		studentService.deleteById(1);
+		Exception exception = assertThrows(StudentNotExistException.class, () -> {
+			studentService.deleteById(1);
+		});
 
-		verify(studentDao, never()).deleteById(1);
+		String expectedMessage = "Student with id = 1 does not exist";
+		String actualMessage = exception.getMessage();
+
+		assertTrue(actualMessage.contains(expectedMessage));
+
 	}
 
 	interface TestData {
-		Student student_1 = Student.builder()
-				.id(1)
-				.firstName("Ivan")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
-				.email("mail@mail.ru")
-				.phone("88008080")
-				.address("Ivanov street, 25-5")
-				.build();
-		Student student_2 = Student.builder()
-				.id(2).firstName("Petr")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1992, Month.MAY, 3))
-				.email("mail11111@mail.ru").phone("880899908080")
-				.address("Petrov street, 25-5")
-				.build();
-		Student student_3 = Student.builder()
-				.id(1)
-				.firstName("Ivan")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1991, Month.JANUARY, 1))
-				.email("100@mail.ru")
-				.phone("88008080")
-				.address("Ivanov street, 25-5")
-				.build();
+		Student student_1 = Student.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").build();
+		Student student_2 = Student.builder().id(2).firstName("Petr").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1992, Month.MAY, 3)).email("mail11111@mail.ru").phone("880899908080")
+				.address("Petrov street, 25-5").build();
+		Student student_3 = Student.builder().id(1).firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1991, Month.JANUARY, 1)).email("100@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").build();
 	}
 }

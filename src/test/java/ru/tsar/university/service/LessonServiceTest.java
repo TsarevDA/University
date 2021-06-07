@@ -17,20 +17,16 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.LessonDao;
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.AuditoriumFreeException;
-import ru.tsar.university.exceptions.CapacityEnoughException;
+import ru.tsar.university.exceptions.AuditoriumNotFreeException;
 import ru.tsar.university.exceptions.DayOffException;
-import ru.tsar.university.exceptions.GroupFreeException;
-import ru.tsar.university.exceptions.LessonExistException;
-import ru.tsar.university.exceptions.TeacherCompetentException;
-import ru.tsar.university.exceptions.TeacherFreeException;
+import ru.tsar.university.exceptions.GroupNotFreeException;
+import ru.tsar.university.exceptions.LessonNotExistException;
+import ru.tsar.university.exceptions.TeacherNotCompetentException;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
@@ -43,7 +39,6 @@ import ru.tsar.university.model.Teacher;
 @ExtendWith(MockitoExtension.class)
 class LessonServiceTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LessonServiceTest.class);
 	@InjectMocks
 	private LessonService lessonService;
 	@Mock
@@ -73,7 +68,7 @@ class LessonServiceTest {
 	}
 
 	@Test
-	void givenNewLessonAuditoriumBusy_whenCreate_thenNoAction() {
+	void givenNewLessonAuditoriumBusy_whenCreate_thenThrowAuditoriumNotFreeException() {
 		Lesson lesson1 = Lesson.builder()
 				.course(course_1)
 				.teacher(teacher_1)
@@ -83,14 +78,21 @@ class LessonServiceTest {
 				.auditorium(auditorium_1)
 				.build();
 
-		//when(lessonDao.getByDayTimeAuditorium(lesson1.getDay(), lesson1.getTime(), lesson1.getAuditorium()))
-		//		.thenReturn(lessonSameAuditorium);
+		when(lessonDao.getByDayTimeAuditorium(lesson1.getDay(), lesson1.getTime(), lesson1.getAuditorium()))
+				.thenReturn(lessonSameAuditorium);
+		
+		Exception exception = assertThrows(AuditoriumNotFreeException.class, () -> {
+			lessonService.create(lesson1);
+		    });
+		
+		String expectedMessage = "Auditorium: " + lesson1.getAuditorium() + " busy on day " + lesson1.getDay() +  " time " + lesson1.getTime();
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).create(lesson1);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
-	void givenNewLessonGroupBusy_whenCreate_thenNoAction() {
+	void givenNewLessonGroupBusy_whenCreate_thenThrowGroupNotFreeException() {
 		Lesson lesson1 = Lesson.builder()
 				.course(course_1)
 				.teacher(teacher_1)
@@ -103,13 +105,20 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 
-		//when(lessonDao.getByDayTime(lesson1.getDay(), lesson1.getTime())).thenReturn(lessonList);
+		when(lessonDao.getByDayTime(lesson1.getDay(), lesson1.getTime())).thenReturn(lessonList);
+		
+		Exception exception = assertThrows(GroupNotFreeException.class, () -> {
+			lessonService.create(lesson1);
+		    });
+		
+		String expectedMessage = "One of this groups: " + lesson1.getGroups() + " busy on day " + lesson1.getDay() +  " time " + lesson1.getTime();
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).create(lesson1);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
-	void givenNewLessonTeacherNotCompetence_whenCreate_thenNoAction() {
+	void givenNewLessonTeacherNotCompetence_whenCreate_thenThrowTeacherNotCompetentException() {
 		Lesson lesson1 = Lesson.builder()
 				.course(course_1)
 				.teacher(teacher_2)
@@ -119,23 +128,35 @@ class LessonServiceTest {
 				.auditorium(auditorium_1)
 				.build();
 
-		verify(lessonDao, never()).create(lesson1);
+		Exception exception = assertThrows(TeacherNotCompetentException.class, () -> {
+			lessonService.create(lesson1);
+		    });
+		
+		String expectedMessage = lesson1.getTeacher() + "can't teach this course: " + lesson1.getCourse();
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 	
 	@Test
-	void givenNewLessonDayOff_whenCreate_thenNoAction() {
+	void givenNewLessonDayOff_whenCreate_thenDayOffException() {
 		Lesson lesson1 = Lesson.builder()
 				.course(course_1)
-				.teacher(teacher_2)
+				.teacher(teacher_1)
 				.group(groups_1)
 				.day(dayOff)
 				.time(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
-		
-		lessonService.create(lesson1);
 
-		verify(lessonDao, never()).create(lesson1);
+		Exception exception = assertThrows(DayOffException.class, () -> {
+			lessonService.create(lesson1);
+		    });
+		
+		String expectedMessage = "Day " + lesson1.getDay() + " is dayoff";
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
@@ -148,8 +169,6 @@ class LessonServiceTest {
 
 		assertEquals(expected, actual);
 	}
-
-
 
 	@Test
 	void givenLesson_whenGetAll_thenLessonsListFound() {
@@ -187,21 +206,24 @@ class LessonServiceTest {
 	}
 
 	@Test
-	void givenNewLessonAuditoriumBusy_whenUpdate_thenNoAction() {
+	void givenNewLessonAuditoriumBusy_whenUpdate_thenAuditoriumNotFreeException() {
 		Lesson expected = lesson_1;
-		
-		when(lessonDao.getById(1)).thenReturn(expected);
 
 		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getTime(), expected.getAuditorium()))
 				.thenReturn(lessonSameAuditorium);
 		
-		lessonService.update(expected);
+		Exception exception = assertThrows(AuditoriumNotFreeException.class, () -> {
+			lessonService.create(expected);
+		    });
+		
+		String expectedMessage = "Auditorium: " + expected.getAuditorium() + " busy on day " + expected.getDay() +  " time " + expected.getTime();
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).update(expected);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
-	void givenNewLessonGroupBusy_whenUpdate_thenNoAction() {
+	void givenNewLessonGroupBusy_whenUpdate_thenGroupNotFreeException() {
 		Lesson expected = lesson_1;
 		Lesson lesson2 = lessonSameGroup;
 		List<Lesson> lessonList = new ArrayList<>();
@@ -211,41 +233,57 @@ class LessonServiceTest {
 		when(lessonDao.getByDayTime(expected.getDay(), expected.getTime())).thenReturn(lessonList);
 
 		
-		lessonService.update(expected);
+		Exception exception = assertThrows(GroupNotFreeException.class, () -> {
+			lessonService.update(expected);
+		    });
+		
+		String expectedMessage = "One of this groups: " + expected.getGroups() + " busy on day " + expected.getDay() +  " time " + expected.getTime();
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).update(expected);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
-	void givenNewLessonTeacherNotCompetence_whenUpdate_thenNoAction() {
+	void givenNewLessonTeacherNotCompetence_whenUpdate_thenTeacherNotCompetentException() {
 		Lesson expected = lessonNoCompetenceTeacher;
 
 		when(lessonDao.getById(2)).thenReturn(lessonNoCompetenceTeacher);
 	
-		lessonService.update(expected);
+		Exception exception = assertThrows(TeacherNotCompetentException.class, () -> {
+			lessonService.update(expected);
+		    });
 		
+		String expectedMessage = expected.getTeacher() + "can't teach this course: " + expected.getCourse();
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).update(expected);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
-	void givenNewLessonDayOff_whenUpdate_thenNoAction() {
+	void givenNewLessonDayOff_whenUpdate_thenDayOffException() {
 		Lesson expected = lessonDayOff;
-
-		when(lessonDao.getById(1)).thenReturn(lesson_1);
 		
-		lessonService.update(expected);
+		Exception exception = assertThrows(DayOffException.class, () -> {
+			lessonService.create(expected);
+		    });
 		
+		String expectedMessage =  "Day " + expected.getDay() + " is dayoff";
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).update(expected);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
-
+	
 	@Test
-	void givenId_whenDeleteById_thenNoAction() {
+	void givenId_whenDeleteById_thenLessonNotExistException() {
 
-		lessonService.deleteById(1);
+		Exception exception = assertThrows(LessonNotExistException.class, () -> {
+			lessonService.deleteById(1);
+		    });
+		
+		String expectedMessage = "Lesson with id = 1 does not exist";
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonDao, never()).deleteById(1);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	interface TestData {

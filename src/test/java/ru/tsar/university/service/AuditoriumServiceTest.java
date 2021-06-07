@@ -11,15 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.AuditoriumServiceTest.TestData.*;
 
 import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.exceptions.AuditroiumExistException;
-import ru.tsar.university.exceptions.UniqueNameException;
+import ru.tsar.university.exceptions.AuditroiumNotExistException;
+import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +29,7 @@ class AuditoriumServiceTest {
 	private AuditoriumDao auditoriumDao;
 
 	@Test
-	void givenExistAuditorium_whenCreate_thenNoAction() {
+	void givenExistAuditorium_whenCreate_thenThrowNotUniqueNameException() {
 		Auditorium auditorium = Auditorium
 				.builder()
 				.name("Auditorium")
@@ -39,10 +37,15 @@ class AuditoriumServiceTest {
 				.build();
 		
 		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
+		
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
+			auditoriumService.create(auditorium);
+		    });
+		
+		String expectedMessage = "This name is not unique: " + auditorium.getName();
+	    String actualMessage = exception.getMessage();
 
-		auditoriumService.create(auditorium);
-	
-		verify(auditoriumDao, never()).create(auditorium);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
@@ -91,13 +94,17 @@ class AuditoriumServiceTest {
 	}
 
 	@Test
-	void givenNameDublicateAuditorium_whenUpdate_thenNoAction() {
+	void givenNameDublicateAuditorium_whenUpdate_thenThrowNotUniqueNameException() {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(dublicateAuditorium_2);
 
-		auditoriumService.update(auditorium_2);
-	
-		verify(auditoriumDao, never()).update(auditorium_2);
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
+			auditoriumService.update(auditorium_2);
+		    });
+		
+		String expectedMessage = "This name is not unique: " + auditorium_2.getName();
+	    String actualMessage = exception.getMessage();
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
@@ -107,6 +114,19 @@ class AuditoriumServiceTest {
 		auditoriumService.deleteById(1);
 
 		verify(auditoriumDao).getById(1);
+	}
+	
+	@Test
+	void givenNotExistedId_whenDeleteById_thenThrowAuditroiumNotExistException() {
+		when(auditoriumDao.getById(1)).thenReturn(null);
+
+		Exception exception = assertThrows(AuditroiumNotExistException.class, () -> {
+			auditoriumService.deleteById(1);
+		    });
+		
+		String expectedMessage = "Auditorium with id = 1 does not exist";
+	    String actualMessage = exception.getMessage();
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 	
 	interface TestData {

@@ -14,18 +14,15 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonTimeServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.LessonTimeDao;
-import ru.tsar.university.exceptions.LessonTimeExistException;
-import ru.tsar.university.exceptions.TimeCorrectException;
+import ru.tsar.university.exceptions.LessonTimeNotExistException;
+import ru.tsar.university.exceptions.TimeNotCorrectException;
 import ru.tsar.university.model.LessonTime;
 
 @ExtendWith(MockitoExtension.class)
 class LessonTimeServiceTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeServiceTest.class);
 	@InjectMocks
 	private LessonTimeService lessonTimeService;
 	@Mock
@@ -43,16 +40,21 @@ class LessonTimeServiceTest {
 	}
 
 	@Test
-	void givenWrongLessonTime_whenCreate_thenNoAction() {
+	void givenWrongLessonTime_whenCreate_thenTimeNotCorrectException() {
 		LocalTime startTime = LocalTime.of(17,0);
 		LocalTime endTime = LocalTime.of(9,0);
 		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime).endTime(endTime).build();
-
-		lessonTimeService.create(expected);
-
-		verify(lessonTimeDao, never()).create(expected);
+		
+		Exception exception = assertThrows(TimeNotCorrectException.class, () -> {
+			lessonTimeService.create(expected);
+		    });
+		
+		String expectedMessage = "This time " + expected + " has not correct format";
+	    String actualMessage = exception.getMessage();
+		
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
-
+	
 	@Test
 	void givenLessonsTime_whenGetAll_thenCallDaoMEthod() {
 		LessonTime lessonTime1 = lessonTime_1;
@@ -80,15 +82,22 @@ class LessonTimeServiceTest {
 	}
 
 	@Test
-	void givenWrongLessonTime_whenUpdate_thenNoAction() {
+	void givenWrongLessonTime_whenUpdate_thenTimeNotCorrectException() {
 		LessonTime oldLessonTime = lessonTime_3;
 		LessonTime newLessonTime = lessonTime_4;
 
 		when(lessonTimeDao.getById(1)).thenReturn(oldLessonTime);
 	
-		lessonTimeService.update(newLessonTime);
+		
+		
+		Exception exception = assertThrows(TimeNotCorrectException.class, () -> {
+			lessonTimeService.update(newLessonTime);
+		    });
+		
+		String expectedMessage = "This time " + newLessonTime + " has not correct format";
+	    String actualMessage = exception.getMessage();
 
-		verify(lessonTimeDao, never()).update(newLessonTime);
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
@@ -103,11 +112,16 @@ class LessonTimeServiceTest {
 	}
 
 	@Test
-	void givenId_whenDeleteById_thenNoAction() {
+	void givenId_whenDeleteById_thenLessonTimeNotExistException() {
 		
-		lessonTimeService.deleteById(1);
-
-		verify(lessonTimeDao, never()).deleteById(1);
+		Exception exception = assertThrows(LessonTimeNotExistException.class, () -> {
+			lessonTimeService.deleteById(1);
+		    });
+		
+		String expectedMessage = "LessonTime with id = 1 does not exist";
+	    String actualMessage = exception.getMessage();
+	
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 	
 	interface TestData {

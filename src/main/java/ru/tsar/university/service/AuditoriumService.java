@@ -9,13 +9,9 @@ import ru.tsar.university.exceptions.AuditroiumNotExistException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Service
 public class AuditoriumService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumService.class);
 	private AuditoriumDao auditoriumDao;
 
 	public AuditoriumService(AuditoriumDao auditoriumDao) {
@@ -23,12 +19,8 @@ public class AuditoriumService {
 	}
 
 	public void create(Auditorium auditorium) {
-		try {
-			isUniqueName(auditorium);
-			auditoriumDao.create(auditorium);
-		} catch (NotUniqueNameException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyNameUniqueness(auditorium);
+		auditoriumDao.create(auditorium);
 	}
 
 	public Auditorium getById(int id) {
@@ -40,36 +32,27 @@ public class AuditoriumService {
 	}
 
 	public void update(Auditorium auditorium) {
-		try {
-			isAuditoriumExist(auditorium.getId());
-			isUniqueName(auditorium);
-			auditoriumDao.update(auditorium);
-		} catch (NotUniqueNameException | AuditroiumNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyAuditoriumExistence(auditorium.getId());
+		verifyNameUniqueness(auditorium);
+		auditoriumDao.update(auditorium);
 	}
 
 	public void deleteById(int id) {
-		try {
-			isAuditoriumExist(id);
-			auditoriumDao.deleteById(id);
-		} catch (AuditroiumNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyAuditoriumExistence(id);
+		auditoriumDao.deleteById(id);
 	}
 
-	public void isUniqueName(Auditorium auditorium) throws NotUniqueNameException {
+	public void verifyNameUniqueness(Auditorium auditorium) throws NotUniqueNameException {
 		Auditorium auditoriumByName = auditoriumDao.getByName(auditorium);
-		if (auditoriumByName != null) {
-			if (auditoriumByName.getId() != auditorium.getId()) {
-				throw new NotUniqueNameException(auditorium.getName());
-			}
+		if (auditoriumByName != null && auditoriumByName.getId() != auditorium.getId()) {
+			throw new NotUniqueNameException("This name is not unique: " + auditorium.getName());
 		}
 	}
 
-	public void isAuditoriumExist(int id) throws AuditroiumNotExistException {
+	public void verifyAuditoriumExistence(int id) throws AuditroiumNotExistException {
 		if (auditoriumDao.getById(id) == null) {
-			throw new AuditroiumNotExistException(id);
+			throw new AuditroiumNotExistException("Auditorium with id = " + id + " does not exist");
 		}
 	}
+
 }

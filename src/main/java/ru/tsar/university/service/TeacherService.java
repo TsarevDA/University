@@ -2,19 +2,15 @@ package ru.tsar.university.service;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.StudentNotExistException;
 import ru.tsar.university.exceptions.TeacherNotExistException;
 import ru.tsar.university.model.Teacher;
 
 @Service
 public class TeacherService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TeacherService.class);
 	private TeacherDao teacherDao;
 
 	public TeacherService(TeacherDao teacherDao) {
@@ -34,26 +30,18 @@ public class TeacherService {
 	}
 
 	public void update(Teacher teacher) {
-		try {
-			isTeacherExist(teacher.getId());
-			teacherDao.update(teacher);
-		} catch (TeacherNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyTeacherExistence(teacher.getId());
+		teacherDao.update(teacher);
 	}
 
-	public void deleteById(int id)  {
-		try {
-			isTeacherExist(id);
-			teacherDao.deleteById(id);
-		} catch (TeacherNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+	public void deleteById(int id) {
+		verifyTeacherExistence(id);
+		teacherDao.deleteById(id);
 	}
 
-	public void isTeacherExist(int id) throws TeacherNotExistException {
+	public void verifyTeacherExistence(int id) {
 		if (teacherDao.getById(id) == null) {
-			throw new TeacherNotExistException(id);
+			throw new TeacherNotExistException("Teacher with id = " + id + " does not exist");
 		}
 	}
 }

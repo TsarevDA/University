@@ -21,21 +21,6 @@ import ru.tsar.university.service.LessonService;
 import ru.tsar.university.service.LessonTimeService;
 import ru.tsar.university.service.StudentService;
 import ru.tsar.university.service.TeacherService;
-import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.exceptions.AuditoriumNotFreeException;
-import ru.tsar.university.exceptions.AuditroiumNotExistException;
-import ru.tsar.university.exceptions.CapacityNotEnoughException;
-import ru.tsar.university.exceptions.CourseNotExistException;
-import ru.tsar.university.exceptions.DayOffException;
-import ru.tsar.university.exceptions.GroupNotExistException;
-import ru.tsar.university.exceptions.GroupNotFreeException;
-import ru.tsar.university.exceptions.LessonNotExistException;
-import ru.tsar.university.exceptions.StudentNotExistException;
-import ru.tsar.university.exceptions.TeacherNotCompetentException;
-import ru.tsar.university.exceptions.TeacherNotExistException;
-import ru.tsar.university.exceptions.TeacherNotFreeException;
-import ru.tsar.university.exceptions.TimeNotCorrectException;
-import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Group;
@@ -47,9 +32,9 @@ import ru.tsar.university.model.Gender;
 
 @Component
 public class ConsoleInterface {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(ConsoleInterface.class);
-	
+
 	final private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	@Autowired
 	private University university;
@@ -168,8 +153,8 @@ public class ConsoleInterface {
 		System.out.println("Enter course description:");
 		String description = scanner.next();
 		Course course = Course.builder().name(name).description(description).build();
-			courseService.create(course);
-	
+		courseService.create(course);
+
 		university.addCourse(course);
 	}
 
@@ -232,7 +217,6 @@ public class ConsoleInterface {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Enter group name:");
 		String name = scanner.next();
-		// Group group = new Group(name);
 		Group group = Group.builder().name(name).build();
 		groupService.create(group);
 
@@ -285,7 +269,7 @@ public class ConsoleInterface {
 					.endTime(endTime.plusHours(i)).build());
 		}
 		lessonsTime.stream().forEach(lt -> {
-		lessonTimeService.create(lt);
+			lessonTimeService.create(lt);
 		});
 		university.setLessonsTime(lessonsTime);
 

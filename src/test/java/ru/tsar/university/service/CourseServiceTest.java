@@ -13,18 +13,15 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.CourseServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.CourseDao;
-import ru.tsar.university.exceptions.CourseExistException;
-import ru.tsar.university.exceptions.UniqueNameException;
+import ru.tsar.university.exceptions.CourseNotExistException;
+import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Course;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CourseServiceTest.class);
 	@InjectMocks
 	private CourseService courseService;
 	@Mock
@@ -43,7 +40,7 @@ class CourseServiceTest {
 	}
 
 	@Test
-	void givenExistCourse_whenCreate_thenNoAction() {
+	void givenExistCourse_whenCreate_thenThrowNotUniqueNameException() {
 		Course course = Course.builder()
 				.name("Math")
 				.description("Science about numbers")
@@ -51,10 +48,14 @@ class CourseServiceTest {
 	
 		when(courseDao.getByName(course)).thenReturn(course_1);
 
-	
-		courseService.create(course);
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
+			courseService.create(course);
+		    });
 		
-		verify(courseDao, never()).create(course);
+		String expectedMessage = "This name is not unique: " + course.getName();
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	@Test
@@ -90,13 +91,19 @@ class CourseServiceTest {
 	}
 
 	@Test
-	void givenNameDublicateCourse_whenUpdate_thenNoAction() {
+	void givenNameDublicateCourse_whenUpdate_thenNotUniqueNameException() {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(dublicatedCourse_1);
-
-		courseService.update(course_2);
 		
-		verify(courseDao, never()).update(course_2);
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
+			courseService.update(course_2);
+		    });
+		
+		String expectedMessage = "This name is not unique: " + course_2.getName();
+	    String actualMessage = exception.getMessage();
+
+	    assertTrue(actualMessage.contains(expectedMessage));
+		
 	}
 
 	@Test
@@ -108,6 +115,19 @@ class CourseServiceTest {
 		courseService.deleteById(1);
 
 		verify(courseDao).deleteById(1);
+	}
+	
+	@Test
+	void givenNotExistedId_whenDeleteById_thenThrowCourseNotExistException() {
+		when(courseDao.getById(1)).thenReturn(null);
+
+		Exception exception = assertThrows(CourseNotExistException.class, () -> {
+			courseService.deleteById(1);
+		    });
+		
+		String expectedMessage = "Course with id = 1 does not exist";
+	    String actualMessage = exception.getMessage();
+	    assertTrue(actualMessage.contains(expectedMessage));
 	}
 	
 	interface TestData {

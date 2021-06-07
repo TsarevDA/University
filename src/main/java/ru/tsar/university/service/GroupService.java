@@ -25,12 +25,8 @@ public class GroupService {
 	}
 
 	public void create(Group group) {
-		try {
-			isUniqueName(group);
-			groupDao.create(group);
-		} catch (NotUniqueNameException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyNameUniqueness(group);
+		groupDao.create(group);
 	}
 
 	public Group getById(int id) {
@@ -42,44 +38,34 @@ public class GroupService {
 	}
 
 	public void update(Group group) {
-		try {
-			isGroupExist(group.getId());
-			isUniqueName(group);
-			groupDao.update(group);
-		} catch (NotUniqueNameException | GroupNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyGroupExist(group.getId());
+		verifyNameUniqueness(group);
+		groupDao.update(group);
 	}
 
 	public void deleteById(int id) {
-		try {
-			isGroupExist(id);
-			if (!isStudentsInGroupExist(id)) {
-				groupDao.deleteById(id);
-			} else {
-				LOG.warn("deleteById error, group, id = {} have students", id);
-			}
-		} catch (GroupNotExistException e) {
-			LOG.warn(e.getMessage());
+		verifyGroupExist(id);
+		if (!isStudentsInGroupExistence(id)) {
+			groupDao.deleteById(id);
+		} else {
+			LOG.warn("deleteById error, group, id = {} have students", id);
 		}
 	}
 
-	public void isUniqueName(Group group) throws NotUniqueNameException {
+	public void verifyNameUniqueness(Group group) throws NotUniqueNameException {
 		Group groupByName = groupDao.getByName(group);
-		if (groupByName != null) {
-			if (groupByName.getId() != group.getId()) {
-				throw new NotUniqueNameException(group.getName());
-			}
+		if (groupByName != null && groupByName.getId() != group.getId()) {
+			throw new NotUniqueNameException("This name is not unique: " + group.getName());
 		}
 	}
 
-	public boolean isStudentsInGroupExist(int id) {
+	public boolean isStudentsInGroupExistence(int id) {
 		return (studentDao.getByGroupId(id) == null);
 	}
 
-	public void isGroupExist(int id) throws GroupNotExistException {
+	public void verifyGroupExist(int id) throws GroupNotExistException {
 		if (groupDao.getById(id) == null) {
-			throw new GroupNotExistException(id);
+			throw new GroupNotExistException("Group with id = " + id + " does not exist");
 		}
 	}
 }

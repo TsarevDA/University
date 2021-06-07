@@ -14,7 +14,6 @@ import ru.tsar.university.model.LessonTime;
 @Service
 public class LessonTimeService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeService.class);
 	private LessonTimeDao lessonTimeDao;
 
 	public LessonTimeService(LessonTimeDao lessonTimeDao) {
@@ -22,12 +21,8 @@ public class LessonTimeService {
 	}
 
 	public void create(LessonTime lessonTime) {
-		try {
-			isTimeCorrect(lessonTime);
-			lessonTimeDao.create(lessonTime);
-		} catch (TimeNotCorrectException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyTimeCorrect(lessonTime);
+		lessonTimeDao.create(lessonTime);
 	}
 
 	public LessonTime getById(int id) {
@@ -43,33 +38,25 @@ public class LessonTimeService {
 	}
 
 	public void update(LessonTime lessonTime) {
-		try {
-			isLessonTimeExist(lessonTime.getId());
-			isTimeCorrect(lessonTime);
-			lessonTimeDao.update(lessonTime);
-		} catch (LessonTimeNotExistException | TimeNotCorrectException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyLessonTimeExistence(lessonTime.getId());
+		verifyTimeCorrect(lessonTime);
+		lessonTimeDao.update(lessonTime);
 	}
 
 	public void deleteById(int id) {
-		try {
-			isLessonTimeExist(id);
-			lessonTimeDao.deleteById(id);
-		} catch (LessonTimeNotExistException e) {
-			LOG.warn(e.getMessage());
-		}
+		verifyLessonTimeExistence(id);
+		lessonTimeDao.deleteById(id);
 	}
 
-	public void isLessonTimeExist(int id) throws LessonTimeNotExistException {
+	public void verifyLessonTimeExistence(int id) throws LessonTimeNotExistException {
 		if (lessonTimeDao.getById(id) == null) {
-			throw new LessonTimeNotExistException(id);
+			throw new LessonTimeNotExistException("LessonTime with id = " + id + " does not exist");
 		}
 	}
 
-	public void isTimeCorrect(LessonTime lessonTime) throws TimeNotCorrectException {
+	public void verifyTimeCorrect(LessonTime lessonTime) throws TimeNotCorrectException {
 		if (lessonTime.getStartTime().isAfter(lessonTime.getEndTime())) {
-			throw new TimeNotCorrectException(lessonTime);
+			throw new TimeNotCorrectException("This time " + lessonTime + " has not correct format");
 		}
 	}
 }

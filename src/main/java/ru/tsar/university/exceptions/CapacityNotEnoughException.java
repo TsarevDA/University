@@ -4,7 +4,7 @@ import ru.tsar.university.model.Auditorium;
 
 public class CapacityNotEnoughException extends RuntimeException {
 
-	public CapacityNotEnoughException(Auditorium auditorium) {
-		super("Capacity of auditorium is not enough, auditorium: " + auditorium  );
+	public CapacityNotEnoughException(String message) {
+		super(message);
 	}
 }

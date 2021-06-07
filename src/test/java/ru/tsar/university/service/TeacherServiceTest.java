@@ -16,11 +16,9 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.TeacherServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.TeacherExistException;
+import ru.tsar.university.exceptions.TeacherNotExistException;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
@@ -28,7 +26,6 @@ import ru.tsar.university.model.Teacher;
 @ExtendWith(MockitoExtension.class)
 class TeacherServiceTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TeacherServiceTest.class);
 	@InjectMocks
 	private TeacherService teacherService;
 	@Mock
@@ -103,10 +100,15 @@ class TeacherServiceTest {
 
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
+		
+		Exception exception = assertThrows(TeacherNotExistException.class, () -> {
+			teacherService.deleteById(1);
+		});
 
-		teacherService.deleteById(1);
+		String expectedMessage = "Teacher with id = 1 does not exist";
+		String actualMessage = exception.getMessage();
 
-		verify(teacherDao, never()).deleteById(1);
+		assertTrue(actualMessage.contains(expectedMessage));
 	}
 
 	interface TestData {
