@@ -18,7 +18,7 @@ import static ru.tsar.university.service.TeacherServiceTest.TestData.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.TeacherNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
@@ -100,17 +100,15 @@ class TeacherServiceTest {
 
 	@Test
 	void givenExistId_whenDeleteById_thenNoAction() {
-		
-		Exception exception = assertThrows(TeacherNotExistException.class, () -> {
-			teacherService.deleteById(1);
-		});
+
+		Exception exception = assertThrows(EntityNotFoundException.class, () -> teacherService.deleteById(1));
 
 		String expectedMessage = "Teacher with id = 1 does not exist";
 		String actualMessage = exception.getMessage();
 
-		assertTrue(actualMessage.contains(expectedMessage));
+		assertEquals(actualMessage, expectedMessage);
 	}
-
+	
 	interface TestData {
 		Course course_1 = Course.builder()
 				.name("Biology")

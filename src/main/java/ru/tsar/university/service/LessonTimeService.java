@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonTimeDao;
-import ru.tsar.university.exceptions.LessonTimeNotExistException;
-import ru.tsar.university.exceptions.TimeNotCorrectException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
+import ru.tsar.university.exceptions.InvalidTimeIntervalException;
 import ru.tsar.university.model.LessonTime;
 
 @Service
@@ -48,15 +48,15 @@ public class LessonTimeService {
 		lessonTimeDao.deleteById(id);
 	}
 
-	public void verifyLessonTimeExistence(int id) throws LessonTimeNotExistException {
+	public void verifyLessonTimeExistence(int id) {
 		if (lessonTimeDao.getById(id) == null) {
-			throw new LessonTimeNotExistException("LessonTime with id = " + id + " does not exist");
+			throw new EntityNotFoundException("LessonTime with id = " + id + " does not exist");
 		}
 	}
 
-	public void verifyTimeCorrect(LessonTime lessonTime) throws TimeNotCorrectException {
+	public void verifyTimeCorrect(LessonTime lessonTime) {
 		if (lessonTime.getStartTime().isAfter(lessonTime.getEndTime())) {
-			throw new TimeNotCorrectException("This time " + lessonTime + " has not correct format");
+			throw new InvalidTimeIntervalException("This time " + lessonTime + " has not correct format");
 		}
 	}
 }

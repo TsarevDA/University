@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.exceptions.GroupNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Group;
 
@@ -63,9 +63,9 @@ public class GroupService {
 		return (studentDao.getByGroupId(id) == null);
 	}
 
-	public void verifyGroupExist(int id) throws GroupNotExistException {
+	public void verifyGroupExist(int id) {
 		if (groupDao.getById(id) == null) {
-			throw new GroupNotExistException("Group with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Group with id = " + id + " does not exist");
 		}
 	}
 }

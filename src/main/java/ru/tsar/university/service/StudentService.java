@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.exceptions.StudentNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Student;
 
 @Service
@@ -30,19 +30,19 @@ public class StudentService {
 	}
 
 	public void update(Student student) {
-		isStudentExistence(student.getId());
+		verifyStudentExistence(student.getId());
 		studentDao.update(student);
 
 	}
 
 	public void deleteById(int id) {
-		isStudentExistence(id);
+		verifyStudentExistence(id);
 		studentDao.deleteById(id);
 	}
 
-	public void isStudentExistence(int id) throws StudentNotExistException {
+	public void verifyStudentExistence(int id) {
 		if (studentDao.getById(id) == null) {
-			throw new StudentNotExistException("Student with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Student with id = " + id + " does not exist");
 		}
 	}
 }

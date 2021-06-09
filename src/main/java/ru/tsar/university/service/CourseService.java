@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.CourseDao;
-import ru.tsar.university.exceptions.CourseNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Teacher;
@@ -47,13 +47,13 @@ public class CourseService {
 		courseDao.deleteById(id);
 	}
 
-	public void verifyCourseExistence(int id) throws CourseNotExistException {
+	public void verifyCourseExistence(int id) {
 		if (courseDao.getById(id) == null) {
-			throw new CourseNotExistException("Course with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Course with id = " + id + " does not exist");
 		}
 	}
 
-	public void verifyNameUniqueness(Course course) throws NotUniqueNameException {
+	public void verifyNameUniqueness(Course course) {
 		Course courseByName = courseDao.getByName(course);
 		if (courseByName != null && courseByName.getId() != course.getId()) {
 			throw new NotUniqueNameException("This name is not unique: " + course.getName());

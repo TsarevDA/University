@@ -15,7 +15,7 @@ import static ru.tsar.university.service.CourseServiceTest.TestData.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.CourseDao;
-import ru.tsar.university.exceptions.CourseNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Course;
 
@@ -45,17 +45,15 @@ class CourseServiceTest {
 				.name("Math")
 				.description("Science about numbers")
 				.build();
-	
+
 		when(courseDao.getByName(course)).thenReturn(course_1);
 
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			courseService.create(course);
-		    });
-		
-		String expectedMessage = "This name is not unique: " + course.getName();
-	    String actualMessage = exception.getMessage();
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.create(course));
 
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String expectedMessage = "This name is not unique: " + course.getName();
+		String actualMessage = exception.getMessage();
+
+		assertEquals(actualMessage, expectedMessage);
 	}
 
 	@Test
@@ -94,42 +92,42 @@ class CourseServiceTest {
 	void givenNameDublicateCourse_whenUpdate_thenNotUniqueNameException() {
 		when(courseDao.getById(1)).thenReturn(course_1);
 		when(courseDao.getByName(course_2)).thenReturn(dublicatedCourse_1);
-		
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			courseService.update(course_2);
-		    });
-		
-		String expectedMessage = "This name is not unique: " + course_2.getName();
-	    String actualMessage = exception.getMessage();
 
-	    assertTrue(actualMessage.contains(expectedMessage));
-		
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> courseService.update(course_2));
+
+		String expectedMessage = "This name is not unique: " + course_2.getName();
+		String actualMessage = exception.getMessage();
+
+		assertEquals(actualMessage, expectedMessage);
+
 	}
 
 	@Test
 	void givenId_whenDeleteById_thenCallDaoMethod() {
-		Course course = Course.builder().id(1).name("Math").description("Science about numbers").build();
+		Course course = Course.builder()
+				.id(1)
+				.name("Math")
+				.description("Science about numbers")
+				.build();
 
 		when(courseDao.getById(1)).thenReturn(course);
-	
+
 		courseService.deleteById(1);
 
 		verify(courseDao).deleteById(1);
 	}
-	
+
 	@Test
 	void givenNotExistedId_whenDeleteById_thenThrowCourseNotExistException() {
 		when(courseDao.getById(1)).thenReturn(null);
 
-		Exception exception = assertThrows(CourseNotExistException.class, () -> {
-			courseService.deleteById(1);
-		    });
-		
+		Exception exception = assertThrows(EntityNotFoundException.class, () -> courseService.deleteById(1));
+
 		String expectedMessage = "Course with id = 1 does not exist";
-	    String actualMessage = exception.getMessage();
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String actualMessage = exception.getMessage();
+		assertTrue(actualMessage.contains(expectedMessage));
 	}
-	
+
 	interface TestData {
 		Course course_1 = Course.builder()
 				.id(1)

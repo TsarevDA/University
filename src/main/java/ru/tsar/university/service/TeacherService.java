@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.TeacherDao;
-import ru.tsar.university.exceptions.TeacherNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Teacher;
 
 @Service
@@ -41,7 +41,7 @@ public class TeacherService {
 
 	public void verifyTeacherExistence(int id) {
 		if (teacherDao.getById(id) == null) {
-			throw new TeacherNotExistException("Teacher with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Teacher with id = " + id + " does not exist");
 		}
 	}
 }

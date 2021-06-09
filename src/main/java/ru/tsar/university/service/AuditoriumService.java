@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.exceptions.AuditroiumNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
@@ -42,16 +42,16 @@ public class AuditoriumService {
 		auditoriumDao.deleteById(id);
 	}
 
-	public void verifyNameUniqueness(Auditorium auditorium) throws NotUniqueNameException {
+	public void verifyNameUniqueness(Auditorium auditorium) {
 		Auditorium auditoriumByName = auditoriumDao.getByName(auditorium);
 		if (auditoriumByName != null && auditoriumByName.getId() != auditorium.getId()) {
 			throw new NotUniqueNameException("This name is not unique: " + auditorium.getName());
 		}
 	}
 
-	public void verifyAuditoriumExistence(int id) throws AuditroiumNotExistException {
+	public void verifyAuditoriumExistence(int id) {
 		if (auditoriumDao.getById(id) == null) {
-			throw new AuditroiumNotExistException("Auditorium with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Auditorium with id = " + id + " does not exist");
 		}
 	}
 

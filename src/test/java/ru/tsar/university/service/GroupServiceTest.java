@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.StudentDao;
-import ru.tsar.university.exceptions.GroupNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
@@ -40,10 +40,10 @@ class GroupServiceTest {
 				.build();
 
 		groupService.create(group);
-			
+
 		verify(groupDao).create(group);
 	}
-	
+
 	@Test
 	void givenNewGroup_whenCreate_thenThrowNotUniqueNameException() {
 		Group group = Group.builder()
@@ -52,20 +52,18 @@ class GroupServiceTest {
 
 		when(groupDao.getByName(group)).thenReturn(group_1);
 
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			groupService.create(group);
-		    });
-		
-		String expectedMessage = "This name is not unique: " + group.getName();
-	    String actualMessage = exception.getMessage();
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> groupService.create(group));
 
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String expectedMessage = "This name is not unique: " + group.getName();
+		String actualMessage = exception.getMessage();
+
+		assertEquals(actualMessage, expectedMessage);
 	}
 
 	@Test
 	void givenId_whenGetById_thenGroupFound() {
 		Group expected = group_1;
-	
+
 		when(groupDao.getById(expected.getId())).thenReturn(expected);
 
 		Group actual = groupService.getById(1);
@@ -96,7 +94,6 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(oldGroup);
 
-		
 		groupService.update(newGroup);
 
 		verify(groupDao).update(newGroup);
@@ -111,15 +108,14 @@ class GroupServiceTest {
 		when(groupDao.getById(1)).thenReturn(oldGroup);
 		when(groupDao.getByName(newGroup)).thenReturn(dublicateGroup);
 
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			groupService.update(newGroup);
-		    });
-		
-		String expectedMessage = "This name is not unique: " + newGroup.getName();
-	    String actualMessage = exception.getMessage();
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> 
+			groupService.update(newGroup));
 
-	    assertTrue(actualMessage.contains(expectedMessage));
-		
+		String expectedMessage = "This name is not unique: " + newGroup.getName();
+		String actualMessage = exception.getMessage();
+
+		assertEquals(actualMessage, expectedMessage);
+
 	}
 
 	@Test
@@ -128,7 +124,7 @@ class GroupServiceTest {
 
 		when(groupDao.getById(1)).thenReturn(group);
 		when(studentDao.getByGroupId(1)).thenReturn(students_3);
-		
+
 		groupService.deleteById(1);
 
 		verify(groupDao).deleteById(1);
@@ -145,20 +141,20 @@ class GroupServiceTest {
 
 		verify(studentDao, never()).deleteById(1);
 	}
-	
+
 	@Test
 	void givenNotExistedId_whenDeleteById_thenThrowGroupNotExistException() {
 		when(groupDao.getById(1)).thenReturn(null);
 
-		Exception exception = assertThrows(GroupNotExistException.class, () -> {
-			groupService.deleteById(1);
-		    });
-		
+		Exception exception = assertThrows(EntityNotFoundException.class, () ->
+			groupService.deleteById(1));
+
 		String expectedMessage = "Group with id = 1 does not exist";
-	    String actualMessage = exception.getMessage();
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String actualMessage = exception.getMessage();
+		
+		assertEquals(actualMessage, expectedMessage);
 	}
-	
+
 	interface TestData {
 		Student student_1 = Student.builder()
 				.id(1)

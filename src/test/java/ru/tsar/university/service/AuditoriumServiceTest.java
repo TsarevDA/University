@@ -16,7 +16,7 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.AuditoriumServiceTest.TestData.*;
 
 import ru.tsar.university.dao.AuditoriumDao;
-import ru.tsar.university.exceptions.AuditroiumNotExistException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
 import ru.tsar.university.model.Auditorium;
 
@@ -30,22 +30,19 @@ class AuditoriumServiceTest {
 
 	@Test
 	void givenExistAuditorium_whenCreate_thenThrowNotUniqueNameException() {
-		Auditorium auditorium = Auditorium
-				.builder()
+		Auditorium auditorium = Auditorium.builder()
 				.name("Auditorium")
 				.capacity(1000)
 				.build();
-		
-		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
-		
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			auditoriumService.create(auditorium);
-		    });
-		
-		String expectedMessage = "This name is not unique: " + auditorium.getName();
-	    String actualMessage = exception.getMessage();
 
-	    assertTrue(actualMessage.contains(expectedMessage));
+		when(auditoriumDao.getByName(auditorium)).thenReturn(auditorium_1);
+
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> auditoriumService.create(auditorium));
+
+		String expectedMessage = "This name is not unique: " + auditorium.getName();
+		String actualMessage = exception.getMessage();
+
+		assertEquals(actualMessage, expectedMessage);
 	}
 
 	@Test
@@ -98,13 +95,12 @@ class AuditoriumServiceTest {
 		when(auditoriumDao.getById(1)).thenReturn(auditorium_1);
 		when(auditoriumDao.getByName(auditorium_2)).thenReturn(dublicateAuditorium_2);
 
-		Exception exception = assertThrows(NotUniqueNameException.class, () -> {
-			auditoriumService.update(auditorium_2);
-		    });
-		
+		Exception exception = assertThrows(NotUniqueNameException.class, () -> auditoriumService.update(auditorium_2));
+
 		String expectedMessage = "This name is not unique: " + auditorium_2.getName();
-	    String actualMessage = exception.getMessage();
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String actualMessage = exception.getMessage();
+		
+		assertEquals(actualMessage, expectedMessage);
 	}
 
 	@Test
@@ -115,20 +111,19 @@ class AuditoriumServiceTest {
 
 		verify(auditoriumDao).getById(1);
 	}
-	
+
 	@Test
 	void givenNotExistedId_whenDeleteById_thenThrowAuditroiumNotExistException() {
 		when(auditoriumDao.getById(1)).thenReturn(null);
 
-		Exception exception = assertThrows(AuditroiumNotExistException.class, () -> {
-			auditoriumService.deleteById(1);
-		    });
-		
+		Exception exception = assertThrows(EntityNotFoundException.class, () ->	auditoriumService.deleteById(1));
+
 		String expectedMessage = "Auditorium with id = 1 does not exist";
-	    String actualMessage = exception.getMessage();
-	    assertTrue(actualMessage.contains(expectedMessage));
+		String actualMessage = exception.getMessage();
+		
+		assertEquals(actualMessage, expectedMessage);
 	}
-	
+
 	interface TestData {
 		Auditorium auditorium_1 = Auditorium
 				.builder()

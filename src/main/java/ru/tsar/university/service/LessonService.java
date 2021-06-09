@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 import ru.tsar.university.dao.LessonDao;
 import ru.tsar.university.exceptions.AuditoriumNotFreeException;
 import ru.tsar.university.exceptions.CapacityNotEnoughException;
-import ru.tsar.university.exceptions.DayOffException;
+import ru.tsar.university.exceptions.DayNotWorkdayException;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.GroupNotFreeException;
-import ru.tsar.university.exceptions.LessonNotExistException;
 import ru.tsar.university.exceptions.TeacherNotCompetentException;
 import ru.tsar.university.exceptions.TeacherNotFreeException;
 import ru.tsar.university.model.Group;
@@ -63,7 +63,7 @@ public class LessonService {
 		return groups.stream().map(Group::getStudents).mapToInt(List::size).sum();
 	}
 
-	public void verifyCapacityEnough(Lesson lesson) throws CapacityNotEnoughException {
+	public void verifyCapacityEnough(Lesson lesson) {
 		int studentsAmount = countStudents(lesson.getGroups());
 		if (lesson.getAuditorium().getCapacity() < studentsAmount) {
 			throw new CapacityNotEnoughException(
@@ -78,13 +78,13 @@ public class LessonService {
 		}
 	}
 
-	public void verifyNotDayOff(Lesson lesson) throws DayOffException {
+	public void verifyNotDayOff(Lesson lesson) {
 		if (lesson.getDay().getDayOfWeek() == DayOfWeek.SATURDAY | lesson.getDay().getDayOfWeek() == DayOfWeek.SUNDAY) {
-			throw new DayOffException("Day " + lesson.getDay() + " is dayoff");
+			throw new DayNotWorkdayException("Day " + lesson.getDay() + " is dayoff");
 		}
 	}
 
-	public void verifyAuditoriumFree(Lesson lesson) throws AuditoriumNotFreeException {
+	public void verifyAuditoriumFree(Lesson lesson) {
 		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(),
 				lesson.getAuditorium());
 		if (lessonFromDao != null) {
@@ -95,7 +95,7 @@ public class LessonService {
 		}
 	}
 
-	public void verifyTeacherFree(Lesson lesson) throws TeacherNotFreeException {
+	public void verifyTeacherFree(Lesson lesson) {
 		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(), lesson.getTeacher());
 		if (lessonFromDao != null) {
 			if (lessonFromDao.getId() != lesson.getId()) {
@@ -105,7 +105,7 @@ public class LessonService {
 		}
 	}
 
-	public void verifyGroupFree(Lesson lesson) throws GroupNotFreeException {
+	public void verifyGroupFree(Lesson lesson) {
 		List<Lesson> lessons = lessonDao.getByDayTime(lesson.getDay(), lesson.getTime());
 		long count = lessons.stream().filter(l -> l.getId() != lesson.getId()).map(Lesson::getGroups)
 				.mapToInt(List::size).sum();
@@ -115,9 +115,9 @@ public class LessonService {
 		}
 	}
 
-	public void verifyLessonExistence(int id) throws LessonNotExistException {
+	public void verifyLessonExistence(int id) {
 		if (lessonDao.getById(id) == null) {
-			throw new LessonNotExistException("Lesson with id = " + id + " does not exist");
+			throw new EntityNotFoundException("Lesson with id = " + id + " does not exist");
 		}
 	}
 }
