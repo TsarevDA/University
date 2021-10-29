@@ -24,7 +24,7 @@ public class AuditoriumDao {
 	private static final String CREATE_AUDITORIUM_QUERY = "INSERT INTO auditoriums(name, capacity) VALUES(?,?)";
 	private static final String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums ";
+	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums";
 	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?, capacity=? WHERE id=?";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM auditoriums WHERE name = ?";
 	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT count(*) FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id =?";

@@ -39,10 +39,15 @@ public class StudentService {
 		verifyStudentExistence(id);
 		studentDao.deleteById(id);
 	}
-
+	
+	public List<Student> getByGroupId(int groupId) {
+		return studentDao.getByGroupId(groupId);
+	}
+	
 	public void verifyStudentExistence(int id) {
 		if (studentDao.getById(id) == null) {
 			throw new EntityNotFoundException("Student with id = " + id + " does not exist");
 		}
 	}
+	
 }

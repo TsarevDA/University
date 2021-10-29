@@ -24,7 +24,7 @@ public class GroupDao {
 	private static final String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
 	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
-	private static final String GET_GROUPS_BY_LESSOM_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE group_id = ?";
+	private static final String GET_GROUPS_BY_LESSON_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE lesson_id = ?";
 	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM groups ";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM groups WHERE name = ?";
@@ -74,7 +74,7 @@ public class GroupDao {
 	}
 
 	public List<Group> getByLessonId(int id) {
-		return jdbcTemplate.query(GET_GROUPS_BY_LESSOM_QUERY, rowMapper, id);
+		return jdbcTemplate.query(GET_GROUPS_BY_LESSON_QUERY, rowMapper, id);
 	}
 
 	public void update(Group group) {

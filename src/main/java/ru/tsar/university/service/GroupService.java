@@ -52,6 +52,11 @@ public class GroupService {
 		}
 	}
 
+	public List<Group> getByLessonId(int lessonId) {
+		return groupDao.getByLessonId(lessonId);
+	}
+	
+	
 	public void verifyNameUniqueness(Group group) throws NotUniqueNameException {
 		Group groupByName = groupDao.getByName(group);
 		if (groupByName != null && groupByName.getId() != group.getId()) {
