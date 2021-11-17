@@ -1,7 +1,14 @@
 package ru.tsar.university.service;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.AuditoriumDao;
@@ -28,7 +35,10 @@ public class AuditoriumService {
 	}
 
 	public List<Auditorium> getAll() {
-		return auditoriumDao.getAll();
+		
+		List<Auditorium> auditoriums = auditoriumDao.getAll();
+		
+		return auditoriums;
 	}
 
 	public void update(Auditorium auditorium) {

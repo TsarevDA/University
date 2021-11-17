@@ -17,16 +17,12 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 @ComponentScan("ru.tsar.university")
 @EnableWebMvc
 public class SpringMvcConfig implements WebMvcConfigurer {
-		
-		private final ApplicationContext applicationContext;
 
 		@Autowired
-		public SpringMvcConfig(ApplicationContext applicationContext) {
-			this.applicationContext = applicationContext;
-		}
+		private SpringTemplateEngine templateEngine;
 		
 		@Bean
-		public SpringResourceTemplateResolver templateResolver() {
+		public SpringResourceTemplateResolver templateResolver(ApplicationContext applicationContext) {
 			SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
 			templateResolver.setApplicationContext(applicationContext);
 			templateResolver.setPrefix("/WEB-INF/views/");
@@ -35,20 +31,18 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 		}
 		
 		@Bean
-		public SpringTemplateEngine templateEngine() {
+		public SpringTemplateEngine templateEngine(SpringResourceTemplateResolver templateResolver) {
 			SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-			templateEngine.setTemplateResolver(templateResolver());
+			templateEngine.setTemplateResolver(templateResolver);
 			templateEngine.addDialect(new Java8TimeDialect());
 			templateEngine.setEnableSpringELCompiler(true);
 			return templateEngine;
 		}
 	
-		
 		@Override
 		public void configureViewResolvers(ViewResolverRegistry registry) {
 			ThymeleafViewResolver resolver = new ThymeleafViewResolver();
-			resolver.setTemplateEngine(templateEngine());
+			resolver.setTemplateEngine(templateEngine);
 			registry.viewResolver(resolver);
 		}
-
 }

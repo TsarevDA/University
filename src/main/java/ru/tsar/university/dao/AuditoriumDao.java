@@ -6,9 +6,12 @@ import java.sql.Time;
 import java.util.List;
 
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+
 
 import ru.tsar.university.dao.mapper.AuditoriumRowMapper;
 import ru.tsar.university.model.Auditorium;

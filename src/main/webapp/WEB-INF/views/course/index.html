@@ -42,8 +42,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/auditoriums/find">Get by id </a></li>
 							</ul>
 						</li>
 
@@ -55,8 +53,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/courses/find">Get by id </a></li>
 							</ul>
 						</li>
 
@@ -67,8 +63,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/groups/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -79,8 +73,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/lessons/find">Get by id </a></li>
 							</ul>
 						</li>
 
@@ -91,8 +83,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/lessontimes/find">Get by id </a></li>
 							</ul>
 						</li>
 
@@ -103,8 +93,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/students/find">Get by id </a></li>
 							</ul>
 						</li>
 
@@ -115,12 +103,9 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/teachers/find">Get by id </a></li>
 							</ul>
 						</li>
 					</ul>
-
 				</div>
 			</div>
 		</nav>
@@ -129,7 +114,6 @@
 	<h3>
 		<center>Course</center>
 	</h3>
-
 
 	<table class="table table-hover table-sm">
 		<thead>
@@ -140,7 +124,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<div th:each="course : ${courses}">
+			<div th:each="course : ${coursesPage.getContent()}">
 				<tr>
 					<td th:text="${course.getId()}"></td>
 					<td th:text="${course.getName()}"></td>
@@ -149,6 +133,14 @@
 			</div>
 		</tbody>
 	</table>
+	
+	<ul class="pagination" th:if="${courses.totalPages > 0}">
+		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
+			th:class="${pageNumber==courses.number} ? active"><a
+			class="page-link"
+			th:href="@{/courses(size=${courses.size}, page=${pageNumber})}"
+			th:text="${pageNumber }"></a></li>
+	</ul>
 
 </body>
 </html>

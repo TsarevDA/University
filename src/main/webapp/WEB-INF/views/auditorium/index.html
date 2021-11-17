@@ -4,26 +4,31 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
-  
-    <!-- <link th:href="@{/views/bootstrap/bootstrap.min.css}"  rel="stylesheet"> 
+
+<!-- <link th:href="@{/views/bootstrap/bootstrap.min.css}"  rel="stylesheet"> 
       <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">-->
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" 
-	integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+	crossorigin="anonymous">
 
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-<!--   <script src = "bootstrap/bootstrap.min.js" ></script> -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+		crossorigin="anonymous"></script>
+	<!--   <script src = "bootstrap/bootstrap.min.js" ></script> -->
 
-<style>
-	.my-custom-row{
+	<style>
+.my-custom-row {
 	background-color: bisque;
-	}
-
+}
 </style>
 
-<header>
+	<header>
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="/university">University</a>
@@ -44,8 +49,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/auditoriums/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -58,8 +61,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/courses/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -71,8 +72,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/groups/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -84,8 +83,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/lessons/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -97,8 +94,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/lessontimes/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -110,8 +105,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/students/find">Get
-										by id </a></li>
 							</ul>
 						</li>
 
@@ -123,62 +116,47 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/teachers/find">Get
-										by id </a></li>
 							</ul>
 						</li>
-
-				
-
 					</ul>
-
 				</div>
 			</div>
 		</nav>
 	</header>
 
+	<h3>
+		<center>Auditorium</center>
+	</h3>
 
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Name</th>
+				<th scope="col">Capacity</th>
+			</tr>
+		</thead>
+		<tbody>
+			<div th:each="auditorium : ${auditoriumsPage.getContent()}">
+				<tr> 
+					<td> <a th:text="${auditorium.getId()}"
+					th:href="@{/auditoriums/{path}(path=${auditorium.getId()})}">
+					</a></td>
+					<td th:text="${auditorium.getName()}"></td>
+					<td th:text="${auditorium.getCapacity()}"></td>
+				
+				</tr>
+			</div>
+		</tbody>
+	</table>
 
- 
-<h3>
-<center>Auditorium</center>
-</h3>
+	<ul class="pagination" th:if="${auditoriums.totalPages > 0}">
+		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
+			th:class="${pageNumber==auditoriums.number} ? active"><a
+			class="page-link"
+			th:href="@{/auditoriums(size=${auditoriums.size}, page=${pageNumber})}"
+			th:text="${pageNumber }"></a></li>
+	</ul>
 
-
-<!--GAP HERE -->
-
-
-	
-	
-	
-	
-<table class="table table-hover table-sm">
-  <thead>
-    <tr>
-      <th scope="col">Id</th>
-      <th scope="col">Name</th>
-      <th scope="col">Capacity</th>
-    </tr>
-  </thead>
-  <tbody>
-  <div  th:each = "auditorium : ${auditoriums}">
-	 	<tr>
-     		<!--  <td> <a th:href = "@{/auditoriums/{id}(id = ${auditorium.getId()})}" th:text="${auditorium.getId()}"> user </a> </td>
-     		<!--   <td> <p  th:text="${auditorium.getName()}"> user </p> </td>
-     		 <td> <p  th:text="${auditorium.getCapacity()}"> user </p> </td> --> 
-     		 <td th:text="${auditorium.getId()}">  </td>
-     		 <td th:text="${auditorium.getName()}">  </td>
-     		 <td th:text="${auditorium.getCapacity()}"> </td>
-    	</tr>			
-  </div>
-  
-      
-  </tbody>
-</table>
-	
-	
-	
-	
-		
 </body>
 </html>
