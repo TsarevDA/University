@@ -8,22 +8,27 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
 import ru.tsar.university.model.Auditorium;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitConfig(SpringTestConfig.class)
 @Sql("/auditoriumData.sql")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@WebAppConfiguration
 class AuditoriumDaoTest {
 
 	@Autowired
@@ -33,10 +38,7 @@ class AuditoriumDaoTest {
 
 	@Test
 	void givenNewAuditorium_whenCreate_thenCreated() {
-		Auditorium expected = Auditorium.builder()
-				.name("Name")
-				.capacity(100)
-				.build();
+		Auditorium expected = Auditorium.builder().name("Name").capacity(100).build();
 
 		auditoriumDao.create(expected);
 
@@ -75,16 +77,18 @@ class AuditoriumDaoTest {
 
 	@Test
 	void givenAuditoriums_whenGetAll_thenAuditoriumsListFound() {
-		List<Auditorium> expected = new ArrayList<>();
-		expected.add(auditorium_1);
-		expected.add(auditorium_2);
+		List<Auditorium> auditoriums = new ArrayList<>();
+		auditoriums.add(auditorium_1);
+		auditoriums.add(auditorium_2);
+		Page<Auditorium> expected = new PageImpl<>(auditoriums, pageable, auditoriums.size());
 
-		List<Auditorium> actual = auditoriumDao.getAll();
+		Page<Auditorium> actual = auditoriumDao.getAll(pageable);
 
 		assertEquals(expected, actual);
 	}
 
 	interface TestData {
+		Pageable pageable = PageRequest.of(0, 5);
 		Auditorium auditorium_1 = Auditorium.builder()
 				.id(1)
 				.name("First")

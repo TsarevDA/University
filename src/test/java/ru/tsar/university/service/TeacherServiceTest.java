@@ -16,6 +16,10 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.TeacherServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.TeacherDao;
 import ru.tsar.university.exceptions.EntityNotFoundException;
@@ -64,12 +68,15 @@ class TeacherServiceTest {
 	void givenTeachers_whenGetAll_thenTeachersListFound() {
 		Teacher teacher1 = teacher_1;
 		Teacher teacher2 = teacher_2;
-		List<Teacher> expected = new ArrayList<>();
-		expected.add(teacher1);
-		expected.add(teacher2);
+		List<Teacher> teachers = new ArrayList<>();
+		teachers.add(teacher1);
+		teachers.add(teacher2);
 
-		when(teacherDao.getAll()).thenReturn(expected);
-		List<Teacher> actual = teacherService.getAll();
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<Teacher> expected = new PageImpl<>(teachers, pageabele, teachers.size());
+		
+		when(teacherDao.getAll(pageabele)).thenReturn(expected);
+		Page<Teacher> actual = teacherService.getAll(pageabele);
 
 		assertEquals(expected, actual);
 	}

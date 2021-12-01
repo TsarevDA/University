@@ -2,11 +2,16 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -27,7 +32,8 @@ public class TeacherDao {
 	private static final String DELETE_TEACHER_QUERY = "DELETE FROM teachers where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
 	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM teachers ";
+	private static final String GET_ALL_QUERY = "SELECT * FROM teachers LIMIT ? OFFSET ?";
+	private static final String GET_COUNT_TEACHERS_QUERY = "SELECT count(id) FROM teachers";
 
 	private JdbcTemplate jdbcTemplate;
 	private TeacherRowMapper rowMapper;
@@ -86,7 +92,9 @@ public class TeacherDao {
 				.forEach(c -> jdbcTemplate.update(CREATE_TEACHERS_COURSES_QUERY, teacher.getId(), c.getId()));
 	}
 
-	public List<Teacher> getAll() {
-		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	public Page<Teacher> getAll(Pageable pageable) {		
+		int total = jdbcTemplate.queryForObject(GET_COUNT_TEACHERS_QUERY, Integer.class);
+		List<Teacher> teachers = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		return new PageImpl<>(teachers, pageable, total);
 	}
 }

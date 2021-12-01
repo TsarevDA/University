@@ -17,6 +17,10 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.AuditoriumDao;
 import ru.tsar.university.dao.GroupDao;
@@ -167,12 +171,14 @@ class LessonServiceTest {
 	@Test
 	void givenLesson_whenGetAll_thenLessonsListFound() {
 		Lesson lesson1 = lesson_1;
-		List<Lesson> expected = new ArrayList<>();
-		expected.add(lesson1);
+		List<Lesson> lessons = new ArrayList<>();
+		lessons.add(lesson1);
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<Lesson> expected = new PageImpl<>(lessons, pageabele, lessons.size());
 
-		when(lessonDao.getAll()).thenReturn(expected);
+		when(lessonDao.getAll(pageabele)).thenReturn(expected);
 
-		List<Lesson> actual = lessonService.getAll();
+		Page<Lesson> actual = lessonService.getAll(pageabele);
 
 		assertEquals(expected, actual);
 	}

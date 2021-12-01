@@ -14,11 +14,16 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.GroupServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.GroupDao;
 import ru.tsar.university.dao.StudentDao;
 import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
@@ -75,14 +80,14 @@ class GroupServiceTest {
 	void givenGroups_whenGetAll_thenGroupsListFound() {
 		Group first = group_1;
 		Group second = group_2;
-		List<Group> expected = new ArrayList<>();
-		expected.add(first);
-		expected.add(second);
+		List<Group> groups = new ArrayList<>();
+		groups.add(first);
+		groups.add(second);
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<Group> expected = new PageImpl<>(groups, pageabele, groups.size());
 
-		when(groupDao.getAll()).thenReturn(expected);
-
-		List<Group> actual = groupService.getAll();
-
+		when(groupDao.getAll(pageabele)).thenReturn(expected);
+		Page<Group> actual = groupService.getAll(pageabele);
 		assertEquals(expected, actual);
 	}
 

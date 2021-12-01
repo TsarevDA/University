@@ -130,13 +130,13 @@
 			</div>
 		</tbody>
 	</table>
-	
-	<ul class="pagination" th:if="${lessonTimes.totalPages > 0}">
-		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-			th:class="${pageNumber==lessonTimes.number} ? active"><a
-			class="page-link"
-			th:href="@{/lessontimes(size=${lessonTimes.size}, page=${pageNumber})}"
-			th:text="${pageNumber }"></a></li>
+
+	<ul class="pagination" th:if="${lessonTimesPage.getTotalPages() > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, lessonTimesPage.getTotalPages() - 1)}"
+			th:class="${pageNumber==lessonTimesPage.number } ? active"><a
+			class="page-link" th:href="@{/lessontimes(page=${pageNumber+1}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
 	</ul>
 
 </body>

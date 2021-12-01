@@ -14,13 +14,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class UniversityControllerTest {
 
 	MockMvc mockMvc;
-	
+
 	@Test
-	void givenUniversityURI_whenMockMVC_thenReturnIndexHtml () throws Exception {
+	void givenUniversityRequest_whenUniversityRequestReceived_thenUniversityDetailsViewReturned() throws Exception {
 		UniversityController controller = new UniversityController();
 		mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-		
+
 		mockMvc.perform(get("/")).andExpect(status().isOk()).andExpect(view().name("university/index"));
-		
 	}
 }

@@ -1,9 +1,14 @@
 package ru.tsar.university.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonTimeDao;
@@ -33,8 +38,8 @@ public class LessonTimeService {
 		return lessonTimeDao.getByOrder(order);
 	}
 
-	public List<LessonTime> getAll() {
-		return lessonTimeDao.getAll();
+	public Page<LessonTime> getAll(Pageable pageable) {
+		return lessonTimeDao.getAll(pageable);
 	}
 
 	public void update(LessonTime lessonTime) {

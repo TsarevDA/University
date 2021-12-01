@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,51 +25,25 @@ import ru.tsar.university.service.CourseService;
 @Controller
 @RequestMapping("/courses")
 public class CourseController {
-	
+
 	private CourseService courseService;
-	
+
 	public CourseController(CourseService courseService) {
 		this.courseService = courseService;
 	}
-	
+
 	@GetMapping("/{id}")
-	public String getById(
-			@PathVariable int id,
-			Model model) {
+	public String getById(@PathVariable int id, Model model) {
 		
 		model.addAttribute("course", courseService.getById(id));
 		return ("course/show");
 	}
-	
-	@GetMapping()
-	public String getAll(Model model, @RequestParam("page") Optional<Integer> page,
-			@RequestParam("size") Optional<Integer> size) {
-		
-		int currentPage = page.orElse(1) - 1;
-		int pageSize = size.orElse(5);
-		int startItem = currentPage * pageSize;
-		
-		List<Course> courses = courseService.getAll();
-		List<Course> pageList;
 
-		if (courses.size() < startItem) {
-			pageList = Collections.emptyList();
-		} else {
-			int toIndex = Math.min(startItem + pageSize, courses.size());
-			pageList = courses.subList(startItem, toIndex);
-		}
-
-		Page<Course> coursePage = new PageImpl<>(pageList,
-				PageRequest.of(currentPage, pageSize), courses.size());
+	@GetMapping
+	public String getAll(Model model, Pageable pageable) {
 		
+		Page<Course> coursePage = courseService.getAll(pageable);
 		model.addAttribute("coursesPage", coursePage);
-
-		int totalPages = coursePage.getTotalPages();
-		if (totalPages > 0) {
-			List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-			model.addAttribute("pageNumbers", pageNumbers);
-		}
-		
 		return ("course/index");
-	}	
+	}
 }

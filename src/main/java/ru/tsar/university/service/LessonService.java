@@ -1,8 +1,13 @@
 package ru.tsar.university.service;
 
 import java.time.DayOfWeek;
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.LessonDao;
@@ -39,8 +44,8 @@ public class LessonService {
 		return lessonDao.getById(id);
 	}
 
-	public List<Lesson> getAll() {
-		return lessonDao.getAll();
+	public Page<Lesson> getAll(Pageable pageable) {
+		return lessonDao.getAll(pageable);
 	}
 
 	public void update(Lesson lesson) {

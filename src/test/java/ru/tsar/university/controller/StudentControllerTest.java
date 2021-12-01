@@ -20,6 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -29,56 +31,75 @@ import ru.tsar.university.service.StudentService;
 
 @ExtendWith(MockitoExtension.class)
 class StudentControllerTest {
-	
+
 	@Mock
 	StudentService studentService;
-	
+
 	@InjectMocks
 	StudentController studentController;
-	
+
 	MockMvc mockMvc;
-	
+
 	@BeforeEach
 	void init() {
-		mockMvc = MockMvcBuilders.standaloneSetup(studentController).build();
+		PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
+		pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
+		pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
+		mockMvc = MockMvcBuilders.standaloneSetup(studentController)
+				.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver).build();
 	}
-	
+
 	@Test
-	void givenStudentsURI_whenMockMvc_thenReturnIndexHtml () throws Exception {
-		
+	void givenExistingStudentsRequest_whenGetAllStudentsRequestReceived_thenStudentsDetailsViewReturned()
+			throws Exception {
 		mockMvc.perform(get("/students")).andExpect(status().isOk()).andExpect(view().name("student/index"));
 	}
-	
+
 	@Test
-	void givenStudentURI_whenMockMvc_thenVerifyResponse() throws Exception {
-		
-		List<Student> students = Stream.of(student1,student2).collect(Collectors.toList());
-		Page page = new PageImpl<>(students, PageRequest.of(0, 5),students.size());
-		
-		when(studentService.getAll()).thenReturn(students);
-		
+	void givenExistingStudentsRequest_whenGetAllStudentsRequestReceived_thenStudentsPageAttributeRecieved()
+			throws Exception {
+
+		List<Student> students = Stream.of(student1, student2).collect(Collectors.toList());
+		Page page = new PageImpl<>(students, PageRequest.of(0, 5), students.size());
+
+		when(studentService.getAll(pageabele)).thenReturn(page);
 		mockMvc.perform(get("/students")).andExpect(status().isOk()).andExpect(model().attribute("studentsPage", page));
 	}
-	
-	@Test
-	void givenStudentURIWithPathVariable_whenMockMvc_then_ReturnShowHml() throws Exception {
-		mockMvc.perform(get("/students/{id}",1)).andExpect(status().isOk()).andExpect(view().name("student/show"));
-	}
-	
-	@Test
-	void givenStudentURIWithPathVariable_whenMockMvc_thenVerifyResponse() throws Exception {
-		
-		when(studentService.getById(1)).thenReturn(student1);
-		
-		mockMvc.perform(get("/students/{id}",1)).andExpect(status().isOk()).andExpect(model().attribute("student", student1));
-	}
-	
-	
-	
-	interface TestData {
-		Student student1 = Student.builder().id(1).firstName("Bob").lastName("Kelso").gender(Gender.MALE).birthDate(LocalDate.of(1990, 10, 10)).address("Street").email("bob@dot.mail").phone("111").build();
-		Student student2 = Student.builder().id(2).firstName("Mark").lastName("Socket").gender(Gender.MALE).birthDate(LocalDate.of(1991, 11, 11)).address("HiStreet").email("mark@mark.ru").phone("1111").build();
-	}
-	
 
+	@Test
+	void givenExistingStudentId_whenGetStudentByIdRequestReceived_thenStudentDetailsViewReturned() throws Exception {
+		mockMvc.perform(get("/students/{id}", 1)).andExpect(status().isOk()).andExpect(view().name("student/show"));
+	}
+
+	@Test
+	void givenExistingStudentId_whenGetStudentByIdRequestReceived_thenAttributeStudentFound() throws Exception {
+
+		when(studentService.getById(1)).thenReturn(student1);
+
+		mockMvc.perform(get("/students/{id}", 1)).andExpect(status().isOk())
+				.andExpect(model().attribute("student", student1));
+	}
+
+	interface TestData {
+		
+		Pageable pageabele = PageRequest.of(0, 5);
+		Student student1 = Student.builder()
+				.id(1)
+				.firstName("Bob")
+				.lastName("Kelso")
+				.gender(Gender.MALE)
+				.birthDate(LocalDate.of(1990, 10, 10))
+				.address("Street").email("bob@dot.mail")
+				.phone("111")
+				.build();
+		Student student2 = Student.builder()
+				.id(2).firstName("Mark")
+				.lastName("Socket")
+				.gender(Gender.MALE)
+				.birthDate(LocalDate.of(1991, 11, 11))
+				.address("HiStreet")
+				.email("mark@mark.ru")
+				.phone("1111")
+				.build();
+	}
 }

@@ -35,76 +35,69 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Auditorium </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Course </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Group </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Lesson </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								LessonTime </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Student </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Teacher </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
-							</ul>
-						</li>
+							</ul></li>
 					</ul>
 				</div>
 			</div>
@@ -129,18 +122,20 @@
 				<tr>
 					<td th:text="${group.getId()}"></td>
 					<td th:text="${group.getName()}"></td>
-					<td ><a th:href="@{/groups/students(groupId=${group.getId()})}">students </a></td>
+					<td><a
+						th:href="@{/groups/students(groupId=${group.getId()})}">students
+					</a></td>
 				</tr>
 			</div>
 		</tbody>
 	</table>
-	
-	<ul class="pagination" th:if="${groups.totalPages > 0}">
-		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-			th:class="${pageNumber==groups.number} ? active"><a
-			class="page-link"
-			th:href="@{/groups(size=${groups.size}, page=${pageNumber})}"
-			th:text="${pageNumber }"></a></li>
+
+	<ul class="pagination" th:if="${groupsPage.getTotalPages() > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, groupsPage.getTotalPages() - 1)}"
+			th:class="${pageNumber==groupsPage.number } ? active"><a
+			class="page-link" th:href="@{/groups(page=${pageNumber+1}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
 	</ul>
 
 </body>

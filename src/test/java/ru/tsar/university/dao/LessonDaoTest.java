@@ -12,12 +12,16 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
@@ -30,10 +34,10 @@ import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitConfig(SpringTestConfig.class)
 @Sql("/lessonData.sql")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@WebAppConfiguration
 class LessonDaoTest {
 
 	@Autowired
@@ -43,14 +47,8 @@ class LessonDaoTest {
 
 	@Test
 	void givenNewLesson_whenCreate_thenCreated() {
-		Lesson expected = Lesson.builder()
-				.course(course)
-				.teacher(teacher)
-				.group(groups)
-				.day(day)
-				.time(lessonTime)
-				.auditorium(auditorium)
-				.build();
+		Lesson expected = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+				.auditorium(auditorium).build();
 
 		lessonDao.create(expected);
 
@@ -80,11 +78,10 @@ class LessonDaoTest {
 
 	@Test
 	void givenLesson_whenGetAll_thenLessonsListFound() {
-
-		List<Lesson> expected = new ArrayList<>();
-		expected.add(lesson);
-
-		List<Lesson> actual = lessonDao.getAll();
+		List<Lesson> lessons = new ArrayList<>();
+		lessons.add(lesson);
+		Page<Lesson> expected = new PageImpl<>(lessons, pageable, lessons.size());
+		Page<Lesson> actual = lessonDao.getAll(pageable);
 
 		assertEquals(expected, actual);
 	}
@@ -103,26 +100,21 @@ class LessonDaoTest {
 	@Test
 	void givenDayTimeAuditorium_whenGetByDayTimeAuditorium_thenLessonListFound() {
 		Lesson expected = lesson;
-		//List<Lesson> expected = new ArrayList<>();
-		//expected.add(lesson);
 		Lesson actual = lessonDao.getByDayTimeAuditorium(day, lessonTime, auditorium);
-		//List<Lesson> actual = lessonDao.getByDayTimeAuditorium(day, lessonTime, auditorium);
-
+		
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	void givenDayTimeTeacher_whenGetByDayTimeTeacher_thenLessonListFound() {
 		Lesson expected = lesson;
-		//List<Lesson> expected = new ArrayList<>();
-		//expected.add(lesson);
 		Lesson actual = lessonDao.getByDayTimeTeacher(day, lessonTime, teacher);
-		//List<Lesson> actual = lessonDao.getByDayTimeTeacher(day, lessonTime, teacher);
 
 		assertEquals(expected, actual);
 	}
 
 	interface TestData {
+		Pageable pageable = PageRequest.of(0, 5);
 		List<Student> students = new ArrayList<>();
 		Group group = Group.builder().id(1).name("T7-09").students(students).build();
 		List<Group> groups = Arrays.asList(group);

@@ -2,11 +2,16 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -24,7 +29,8 @@ public class CourseDao {
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM courses WHERE id=?";
 	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
 	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?, description=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM courses ";
+	private static final String GET_COUNT_COURSES_QUERY = "SELECT count(id) FROM courses ";
+	private static final String GET_ALL_QUERY = "SELECT * FROM courses LIMIT ? OFFSET ?";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM courses WHERE name = ?";
 
 	private JdbcTemplate jdbcTemplate;
@@ -70,8 +76,10 @@ public class CourseDao {
 		jdbcTemplate.update(UPDATE_COURSE_QUERY, course.getName(), course.getDescription(), course.getId());
 	}
 
-	public List<Course> getAll() {
-		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	public Page<Course> getAll(Pageable pageable) {
+		int total = jdbcTemplate.queryForObject(GET_COUNT_COURSES_QUERY, Integer.class);
+		List<Course> courses = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		return new PageImpl<>(courses, pageable, total);
 	}
 
 	public Course getByName(Course course) {

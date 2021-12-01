@@ -2,11 +2,16 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -18,14 +23,17 @@ import ru.tsar.university.model.Student;
 public class StudentDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudentDao.class);
-	
+
 	private static final String ADD_STUDENT_QUERY = "INSERT INTO students(first_name, last_name, gender, birth_date, email, phone, address) VALUES(?,?,?,?,?,?,?)";
 	private static final String DELETE_STUDENT_QUERY = "DELETE FROM students where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM students WHERE id=?";
+	private static final String GET_STUDENTS_BY_GROUP_ID_WITH_LIMIT_QUERY = "SELECT s.* FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=? LIMIT ? OFFSET ?";
 	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT s.* FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
 	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM students ";
-
+	private static final String GET_ALL_QUERY = "SELECT * FROM students LIMIT ? OFFSET ?";
+	private static final String GET_COUNT_STUDENTS_QUERY = "SELECT count(id) FROM students";
+	private static final String GET_COUNT_STUDENTS_IN_GROUP_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
+	
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
 
@@ -52,7 +60,7 @@ public class StudentDao {
 	}
 
 	public void deleteById(int id) {
-		LOG.debug("Deleted student, id = {}",id);
+		LOG.debug("Deleted student, id = {}", id);
 		jdbcTemplate.update(DELETE_STUDENT_QUERY, id);
 	}
 
@@ -60,20 +68,33 @@ public class StudentDao {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Student not found by id = {}",id);
+			LOG.warn("Student not found by id = {}", id);
+			return null;
+		}
+	}
+
+	public Page<Student> getByGroupId(int id, Pageable pageable) {
+		try {
+			int total = jdbcTemplate.queryForObject(GET_COUNT_STUDENTS_IN_GROUP_QUERY, Integer.class, id);
+			List<Student> students = jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_WITH_LIMIT_QUERY, rowMapper,id, pageable.getPageSize() ,pageable.getOffset());
+			return new PageImpl<>(students, pageable, total);
+	
+		} catch (EmptyResultDataAccessException e) {
+			LOG.warn("Student not found by id = {}", id);
 			return null;
 		}
 	}
 
 	public List<Student> getByGroupId(int id) {
 		try {
-			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
+			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper,id);
+	
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Student not found by id = {}",id);
+			LOG.warn("Student not found by id = {}", id);
 			return null;
 		}
 	}
-
+	
 	public void update(Student student) {
 		LOG.debug("Call update {}", student);
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
@@ -81,8 +102,9 @@ public class StudentDao {
 				student.getId());
 	}
 
-	public List<Student> getAll() {
-		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	public Page<Student> getAll(Pageable pageable) {
+		int total = jdbcTemplate.queryForObject(GET_COUNT_STUDENTS_QUERY, Integer.class);
+		List<Student> students = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		return new PageImpl<>(students, pageable, total);
 	}
-
 }

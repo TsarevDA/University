@@ -13,10 +13,15 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.CourseServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.CourseDao;
 import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.NotUniqueNameException;
+import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,14 +72,14 @@ class CourseServiceTest {
 
 	@Test
 	void givenCourses_whenGetAll_thenCoursesListFound() {
-		List<Course> expected = new ArrayList<>();
-		expected.add(course_1);
-		expected.add(course_2);
+		List<Course> courses = new ArrayList<>();
+		courses.add(course_1);
+		courses.add(course_2);
+		Pageable pageable = PageRequest.of(0, 5);
+		Page<Course> expected = new PageImpl<>(courses, pageable, courses.size());
 
-		when(courseDao.getAll()).thenReturn(expected);
-
-		List<Course> actual = courseService.getAll();
-
+		when(courseDao.getAll(pageable)).thenReturn(expected);
+		Page<Course> actual = courseService.getAll(pageable);
 		assertEquals(expected, actual);
 	}
 

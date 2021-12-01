@@ -138,24 +138,26 @@
 		</thead>
 		<tbody>
 			<div th:each="auditorium : ${auditoriumsPage.getContent()}">
-				<tr> 
-					<td> <a th:text="${auditorium.getId()}"
-					th:href="@{/auditoriums/{path}(path=${auditorium.getId()})}">
+				<tr>
+					<td><a th:text="${auditorium.getId()}"
+						th:href="@{/auditoriums/{path}(path=${auditorium.getId()})}">
 					</a></td>
 					<td th:text="${auditorium.getName()}"></td>
 					<td th:text="${auditorium.getCapacity()}"></td>
-				
+
 				</tr>
 			</div>
 		</tbody>
 	</table>
 
-	<ul class="pagination" th:if="${auditoriums.totalPages > 0}">
-		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-			th:class="${pageNumber==auditoriums.number} ? active"><a
+	<ul class="pagination"
+		th:if="${auditoriumsPage.getTotalPages() - 1 > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, (auditoriumsPage.getTotalPages() - 1))}"
+			th:class="${pageNumber==auditoriumsPage.number} ? active"><a
 			class="page-link"
-			th:href="@{/auditoriums(size=${auditoriums.size}, page=${pageNumber})}"
-			th:text="${pageNumber }"></a></li>
+			th:href="@{/auditoriums(page=${pageNumber+1}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
 	</ul>
 
 </body>

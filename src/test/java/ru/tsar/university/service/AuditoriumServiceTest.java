@@ -10,10 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.mockito.Mockito.*;
+
 import static ru.tsar.university.service.AuditoriumServiceTest.TestData.*;
 
 import ru.tsar.university.dao.AuditoriumDao;
@@ -73,12 +78,15 @@ class AuditoriumServiceTest {
 		List<Auditorium> expected = new ArrayList<>();
 		expected.add(auditorium_1);
 		expected.add(dublicateAuditorium_2);
+		
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<Auditorium> page = new PageImpl<>(expected,
+				pageabele, expected.size());
+		when(auditoriumDao.getAll(pageabele)).thenReturn(page);
 
-		when(auditoriumDao.getAll()).thenReturn(expected);
+		Page<Auditorium> actual = auditoriumService.getAll(pageabele);
 
-		List<Auditorium> actual = auditoriumService.getAll();
-
-		assertEquals(expected, actual);
+		assertEquals(page, actual);
 	}
 
 	@Test

@@ -1,7 +1,12 @@
 package ru.tsar.university.service;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.CourseDao;
@@ -34,8 +39,8 @@ public class CourseService {
 		return courseDao.getById(id);
 	}
 
-	public List<Course> getAll() {
-		return courseDao.getAll();
+	public Page<Course> getAll(Pageable pageable) {
+		return courseDao.getAll(pageable);
 	}
 
 	public List<Course> getByTeacherId(Teacher teacher) {

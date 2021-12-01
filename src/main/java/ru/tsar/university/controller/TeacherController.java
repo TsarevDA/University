@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,48 +27,23 @@ import ru.tsar.university.service.TeacherService;
 public class TeacherController {
 
 	private TeacherService teacherService;
-	
+
 	public TeacherController(TeacherService teacherService) {
 		this.teacherService = teacherService;
 	}
-	
+
 	@GetMapping("/{id}")
-	public String getById(
-			@PathVariable int id,
-			Model model) {
-		
+	public String getById(@PathVariable int id, Model model) {
+
 		model.addAttribute("teacher", teacherService.getById(id));
 		return ("teacher/show");
 	}
-	
-	@GetMapping()
-	public String getAll(Model model, @RequestParam("page") Optional<Integer> page,
-			@RequestParam("size") Optional<Integer> size) {
-		
-		int currentPage = page.orElse(1) - 1;
-		int pageSize = size.orElse(5);
-		int startItem = currentPage * pageSize;
-		
-		List<Teacher> teachers = teacherService.getAll();
-		List<Teacher> pageList;
 
-		if (teachers.size() < startItem) {
-			pageList = Collections.emptyList();
-		} else {
-			int toIndex = Math.min(startItem + pageSize, teachers.size());
-			pageList = teachers.subList(startItem, toIndex);
-		}
+	@GetMapping
+	public String getAll(Model model, Pageable pageable) {
 
-		Page<Teacher> teacherPage = new PageImpl<>(pageList,
-				PageRequest.of(currentPage, pageSize), teachers.size());
-		
+		Page<Teacher> teacherPage = teacherService.getAll(pageable);
 		model.addAttribute("teachersPage", teacherPage);
-
-		int totalPages = teacherPage.getTotalPages();
-		if (totalPages > 0) {
-			List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-			model.addAttribute("pageNumbers", pageNumbers);
-		}
 		return ("teacher/index");
-	}	
+	}
 }

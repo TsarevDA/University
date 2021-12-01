@@ -139,12 +139,12 @@
 		</tbody>
 	</table>
 
-	<ul class="pagination" th:if="${teacher.totalPages > 0}">
-		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-			th:class="${pageNumber==teachers.number} ? active"><a
-			class="page-link"
-			th:href="@{/teachers(size=${teacher.size}, page=${pageNumber})}"
-			th:text="${pageNumber }"></a></li>
+	<ul class="pagination" th:if="${teachersPage.getTotalPages() > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, teachersPage.getTotalPages() - 1)}"
+			th:class="${pageNumber==teachersPage.number } ? active"><a
+			class="page-link" th:href="@{/teachers(page=${pageNumber+1}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
 	</ul>
 
 </body>

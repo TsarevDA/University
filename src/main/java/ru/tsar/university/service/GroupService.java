@@ -1,9 +1,14 @@
 package ru.tsar.university.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.GroupDao;
@@ -33,8 +38,8 @@ public class GroupService {
 		return groupDao.getById(id);
 	}
 
-	public List<Group> getAll() {
-		return groupDao.getAll();
+	public Page<Group> getAll(Pageable pageable) {
+		return groupDao.getAll(pageable);
 	}
 
 	public void update(Group group) {
@@ -55,8 +60,7 @@ public class GroupService {
 	public List<Group> getByLessonId(int lessonId) {
 		return groupDao.getByLessonId(lessonId);
 	}
-	
-	
+
 	public void verifyNameUniqueness(Group group) throws NotUniqueNameException {
 		Group groupByName = groupDao.getByName(group);
 		if (groupByName != null && groupByName.getId() != group.getId()) {

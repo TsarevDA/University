@@ -2,11 +2,16 @@ package ru.tsar.university.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
@@ -26,8 +31,9 @@ public class GroupDao {
 	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
 	private static final String GET_GROUPS_BY_LESSON_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE lesson_id = ?";
 	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM groups ";
+	private static final String GET_ALL_QUERY = "SELECT * FROM groups LIMIT ? OFFSET ?";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM groups WHERE name = ?";
+	private static final String GET_COUNT_GROUPS_QUERY = "SELECT count(id) FROM groups";
 
 	private JdbcTemplate jdbcTemplate;
 	private GroupRowMapper rowMapper;
@@ -65,7 +71,6 @@ public class GroupDao {
 	public Group getById(int id) {
 		try {
 			Group group = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
-			group.setStudents(studentDao.getByGroupId(id));
 			return group;
 		} catch (EmptyResultDataAccessException e) {
 			LOG.warn("Group not found by id = {}",id);
@@ -82,8 +87,10 @@ public class GroupDao {
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
 	}
 
-	public List<Group> getAll() {
-		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
+	public Page<Group> getAll(Pageable pageable) {
+		int total = jdbcTemplate.queryForObject(GET_COUNT_GROUPS_QUERY, Integer.class);
+		List<Group> groups = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		return new PageImpl<>(groups, pageable, total);
 	}
 
 	public Group getByName(Group group) {

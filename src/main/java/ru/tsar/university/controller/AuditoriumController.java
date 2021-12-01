@@ -9,7 +9,9 @@ import java.util.stream.IntStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,36 +39,11 @@ public class AuditoriumController {
 		return ("auditorium/show");
 	}
 
-	@GetMapping()
-	public String getAll(Model model, @RequestParam("page") Optional<Integer> page,
-			@RequestParam("size") Optional<Integer> size) {
-
-		int currentPage = page.orElse(1) - 1;
-		int pageSize = size.orElse(5);
-		int startItem = currentPage * pageSize;
+	@GetMapping
+	public String getAll(Model model,  Pageable pageable) {
 		
-		List<Auditorium> auditoriums = auditoriumService.getAll();
-		List<Auditorium> pageList;
-
-		if (auditoriums.size() < startItem) {
-			pageList = Collections.emptyList();
-		} else {
-			int toIndex = Math.min(startItem + pageSize, auditoriums.size());
-			pageList = auditoriums.subList(startItem, toIndex);
-		}
-
-		Page<Auditorium> auditoriumPage = new PageImpl<>(pageList,
-				PageRequest.of(currentPage, pageSize, Sort.by(Sort.Direction.ASC, "capacity")), auditoriums.size());
-		
+		Page<Auditorium> auditoriumPage = auditoriumService.getAll(pageable);
 		model.addAttribute("auditoriumsPage", auditoriumPage);
-
-		int totalPages = auditoriumPage.getTotalPages();
-		if (totalPages > 0) {
-			List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-			model.addAttribute("pageNumbers", pageNumbers);
-		}
-
 		return ("auditorium/index");
 	}
-
 }

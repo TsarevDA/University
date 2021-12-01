@@ -14,10 +14,15 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.LessonTimeServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.LessonTimeDao;
 import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.exceptions.InvalidTimeIntervalException;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.LessonTime;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,13 +62,16 @@ class LessonTimeServiceTest {
 	void givenLessonsTime_whenGetAll_thenCallDaoMEthod() {
 		LessonTime lessonTime1 = lessonTime_1;
 		LessonTime lessonTime2 = lessonTime_2;
-		List<LessonTime> expected = new ArrayList<>();
-		expected.add(lessonTime1);
-		expected.add(lessonTime2);
+		List<LessonTime> lessonTimes = new ArrayList<>();
+		lessonTimes.add(lessonTime1);
+		lessonTimes.add(lessonTime2);
 
-		when(lessonTimeDao.getAll()).thenReturn(expected);
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<LessonTime> expected = new PageImpl<>(lessonTimes, pageabele, lessonTimes.size());
+		
+		when(lessonTimeDao.getAll(pageabele)).thenReturn(expected);
 
-		List<LessonTime> actual = lessonTimeService.getAll();
+		Page<LessonTime> actual = lessonTimeService.getAll(pageabele);
 
 		assertEquals(expected, actual);
 	}

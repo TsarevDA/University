@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -42,46 +44,52 @@ class LessonControllerTest {
 
 	@Mock
 	LessonService lessonService;
-	
+
 	@InjectMocks
 	LessonController lessonController;
-	
+
 	MockMvc mockMvc;
-	
+
 	@BeforeEach
 	void init() {
-		mockMvc = MockMvcBuilders.standaloneSetup(lessonController).build();
+		PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
+		pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
+		pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
+		mockMvc = MockMvcBuilders.standaloneSetup(lessonController)
+				.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver).build();
 	}
-	
+
 	@Test
-	void givenLessonsURI_whenMockMvc_thenReturnIndexHtml() throws Exception {
+	void givenExistingLessonsRequest_whenGetAllLessonsRequestReceived_thenLessonDetailsViewReturned() throws Exception {
 		mockMvc.perform(get("/lessons")).andExpect(status().isOk()).andExpect(view().name("lesson/index"));
 	}
-	
+
 	@Test
-	void givenLessonsURI_whenMockMvc_thenVerifyResponse() throws Exception {
-		
+	void givenExistingLessonsRequest_whenGetAllLessonsRequestReceived_thenLessonsPageAttributeRecieved()
+			throws Exception {
+
 		List<Lesson> lessons = Stream.of(lesson).collect(Collectors.toList());
-		
-		when(lessonService.getAll()).thenReturn(lessons);
-		Page<Lesson> page = new PageImpl<>(lessons,PageRequest.of(0, 5),lessons.size());
-		
+		Page<Lesson> page = new PageImpl<>(lessons, PageRequest.of(0, 5), lessons.size());
+
+		when(lessonService.getAll(pageabele)).thenReturn(page);
 		mockMvc.perform(get("/lessons")).andExpect(status().isOk()).andExpect(model().attribute("lessonsPage", page));
 	}
-	
+
 	@Test
-	void givenLessonsURIwithPathVariable_whenMockMvc_thenReturnShowHtml() throws Exception {
-		mockMvc.perform(get("/lessons/{id}",1)).andExpect(status().isOk()).andExpect(view().name("lesson/show"));
+	void givenExistingLessonId_whenGetLessonByIdRequestReceived_thenLessonDetailsViewReturned() throws Exception {
+		mockMvc.perform(get("/lessons/{id}", 1)).andExpect(status().isOk()).andExpect(view().name("lesson/show"));
 	}
-	
+
 	@Test
-	void givenLessonsURIwithPathVariable_whenMockMvc_thenVerifyResponse() throws Exception {
+	void givenExistingLessonId_whenGetLessonByIdRequestReceived_thenAttributeLessonFound() throws Exception {
 		when(lessonService.getById(1)).thenReturn(lesson);
-		mockMvc.perform(get("/lessons/{id}/",1)).andExpect(status().isOk()).andExpect(model().attribute("lesson", lesson));
+		mockMvc.perform(get("/lessons/{id}/", 1)).andExpect(status().isOk())
+				.andExpect(model().attribute("lesson", lesson));
 	}
-	
+
 	interface TestData {
 		
+		Pageable pageabele = PageRequest.of(0, 5);
 		List<Student> students = new ArrayList<>();
 		Group group = Group.builder().id(1).name("T7-09").students(students).build();
 		List<Group> groups = Arrays.asList(group);
@@ -122,5 +130,4 @@ class LessonControllerTest {
 				.auditorium(auditorium)
 				.build();
 	}
-
 }

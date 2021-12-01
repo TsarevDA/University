@@ -34,11 +34,8 @@ public class AuditoriumService {
 		return auditoriumDao.getById(id);
 	}
 
-	public List<Auditorium> getAll() {
-		
-		List<Auditorium> auditoriums = auditoriumDao.getAll();
-		
-		return auditoriums;
+	public Page<Auditorium> getAll(Pageable pageable) {	
+		return auditoriumDao.getAll(pageable);
 	}
 
 	public void update(Auditorium auditorium) {

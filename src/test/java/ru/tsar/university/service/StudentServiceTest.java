@@ -15,9 +15,14 @@ import static org.mockito.Mockito.*;
 import static ru.tsar.university.service.StudentServiceTest.TestData.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import ru.tsar.university.dao.StudentDao;
 import ru.tsar.university.exceptions.EntityNotFoundException;
+import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Student;
 
@@ -61,12 +66,15 @@ class StudentServiceTest {
 	void givenStudents_whenGetAll_thenStudentsListFound() {
 		Student student1 = student_1;
 		Student student2 = student_2;
-		List<Student> expected = new ArrayList<>();
-		expected.add(student1);
-		expected.add(student2);
+		List<Student> students = new ArrayList<>();
+		students.add(student1);
+		students.add(student2);
 
-		when(studentDao.getAll()).thenReturn(expected);
-		List<Student> actual = studentService.getAll();
+		Pageable pageabele = PageRequest.of(0, 5);
+		Page<Student> expected = new PageImpl<>(students, pageabele, students.size());
+		
+		when(studentDao.getAll(pageabele)).thenReturn(expected);
+		Page<Student> actual = studentService.getAll(pageabele);
 
 		assertEquals(expected, actual);
 	}

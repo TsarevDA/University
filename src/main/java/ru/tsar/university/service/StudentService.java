@@ -1,7 +1,12 @@
 package ru.tsar.university.service;
 
+import java.util.Collections;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import ru.tsar.university.dao.StudentDao;
@@ -25,8 +30,8 @@ public class StudentService {
 		return studentDao.getById(id);
 	}
 
-	public List<Student> getAll() {
-		return studentDao.getAll();
+	public Page<Student> getAll(Pageable pageable) {
+		return studentDao.getAll(pageable);
 	}
 
 	public void update(Student student) {
@@ -39,15 +44,15 @@ public class StudentService {
 		verifyStudentExistence(id);
 		studentDao.deleteById(id);
 	}
-	
-	public List<Student> getByGroupId(int groupId) {
-		return studentDao.getByGroupId(groupId);
+
+	public Page<Student> getByGroupId(int groupId, Pageable pageable ) {
+		return studentDao.getByGroupId(groupId, pageable);
 	}
-	
+
 	public void verifyStudentExistence(int id) {
 		if (studentDao.getById(id) == null) {
 			throw new EntityNotFoundException("Student with id = " + id + " does not exist");
 		}
 	}
-	
+
 }

@@ -9,22 +9,26 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
 import ru.tsar.university.model.LessonTime;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitConfig(SpringTestConfig.class)
 @Sql("/lessonTimeData.sql")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-
+@WebAppConfiguration
 class LessonTimeDaoTest {
 
 	@Autowired
@@ -34,11 +38,7 @@ class LessonTimeDaoTest {
 
 	@Test
 	void givenNewLessonTime_whenCreate_thenCreated() {
-		LessonTime expected = LessonTime.builder()
-				.orderNumber(1)
-				.startTime(startTime_1)
-				.endTime(endTime_2)
-				.build();
+		LessonTime expected = LessonTime.builder().orderNumber(1).startTime(startTime_1).endTime(endTime_2).build();
 
 		lessonTimeDao.create(expected);
 
@@ -66,16 +66,17 @@ class LessonTimeDaoTest {
 
 	@Test
 	void givenLessonsTime_whenGetAll_thenLessonsTimeListFound() {
-		List<LessonTime> expected = new ArrayList<>();
-		expected.add(lessonTime_1);
-		expected.add(lessonTime_2);
-
-		List<LessonTime> actual = lessonTimeDao.getAll();
+		List<LessonTime> LessonTimes = new ArrayList<>();
+		LessonTimes.add(lessonTime_1);
+		LessonTimes.add(lessonTime_2);
+		Page<LessonTime> expected = new PageImpl<>(LessonTimes, pageable, LessonTimes.size());
+		Page<LessonTime> actual = lessonTimeDao.getAll(pageable);
 
 		assertEquals(expected, actual);
 	}
 
 	interface TestData {
+		Pageable pageable = PageRequest.of(0, 5);
 		LocalTime startTime_1 = LocalTime.of(9, 0);
 		LocalTime endTime_1 = LocalTime.of(10, 0);
 		LessonTime lessonTime_1 = LessonTime.builder()

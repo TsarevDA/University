@@ -42,8 +42,6 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/auditoriums/find">Get by id </a></li>
 							</ul></li>
 
 
@@ -149,13 +147,14 @@
 			</div>
 		</tbody>
 	</table>
-		<ul class="pagination" th:if="${lessons.totalPages > 0}">
-		<li class="page-item" th:each="pageNumber : ${pageNumbers}"
-			th:class="${pageNumber==lessons.number} ? active"><a
-			class="page-link"
-			th:href="@{/lessons(size=${lessons.size}, page=${pageNumber})}"
-			th:text="${pageNumber }"></a></li>
-	</ul>
 	
+	<ul class="pagination" th:if="${lessonsPage.getTotalPages() > 0}">
+		<li class="page-item"
+			th:each="pageNumber : ${#numbers.sequence(0, lessonsPage.getTotalPages() - 1)}"
+			th:class="${pageNumber==lessonsPage.number } ? active"><a
+			class="page-link" th:href="@{/lessons(page=${pageNumber+1}, size=5)}"
+			th:text="${pageNumber+1}"></a></li>
+	</ul>
+
 </body>
 </html>

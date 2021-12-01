@@ -11,12 +11,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
@@ -24,10 +29,10 @@ import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitConfig(SpringTestConfig.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @Sql("/groupData.sql")
+@WebAppConfiguration
 class GroupDaoTest {
 
 	@Autowired
@@ -37,9 +42,7 @@ class GroupDaoTest {
 
 	@Test
 	void givenNewGroup_whenCreate_thenCreated() {
-		Group expected = Group.builder()
-				.name("T7-09")
-				.build();
+		Group expected = Group.builder().name("T7-09").build();
 
 		groupDao.create(expected);
 
@@ -67,16 +70,17 @@ class GroupDaoTest {
 	@Test
 	void givenGroups_whenGetAll_thenGroupsListFound() {
 
-		List<Group> expected = new ArrayList<>();
-		expected.add(group_1);
-		expected.add(group_2);
-
-		List<Group> actual = groupDao.getAll();
+		List<Group> groups = new ArrayList<>();
+		groups.add(group_1);
+		groups.add(group_2);
+		Page<Group> expected = new PageImpl<>(groups, pageable, groups.size());
+		Page<Group> actual = groupDao.getAll(pageable);
 
 		assertEquals(expected, actual);
 	}
 	
 	interface TestData {
+		Pageable pageable = PageRequest.of(0, 5);
 		Student student = Student.builder()
 				.id(1)
 				.firstName("Ivan")

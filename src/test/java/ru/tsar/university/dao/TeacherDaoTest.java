@@ -12,13 +12,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import ru.tsar.university.config.SpringTestConfig;
@@ -26,10 +30,10 @@ import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
 
-@SpringJUnitConfig
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitConfig(SpringTestConfig.class)
 @Sql("/teacherData.sql")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@WebAppConfiguration
 class TeacherDaoTest {
 
 	@Autowired
@@ -39,16 +43,9 @@ class TeacherDaoTest {
 
 	@Test
 	void givenTeacher_whenCreate_thenCreated() {
-		Teacher expected = Teacher.builder()
-				.firstName("Ivan")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1990, Month.JANUARY, 1))
-				.email("mail@mail.ru")
-				.phone("88008080")
-				.address("Ivanov street, 25-5")
-				.courses(new ArrayList<Course>())
-				.build();
+		Teacher expected = Teacher.builder().firstName("Ivan").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1990, Month.JANUARY, 1)).email("mail@mail.ru").phone("88008080")
+				.address("Ivanov street, 25-5").courses(new ArrayList<Course>()).build();
 
 		teacherDao.create(expected);
 
@@ -77,17 +74,17 @@ class TeacherDaoTest {
 	@Test
 	void givenTeachers_whenGetAll_thenTeachersListFound() {
 
-		List<Teacher> expected = new ArrayList<>();
-		expected.add(teacher_1);
-		expected.add(teacher_2);
-
-		List<Teacher> actual = teacherDao.getAll();
+		List<Teacher> teachers = new ArrayList<>();
+		teachers.add(teacher_1);
+		teachers.add(teacher_2);
+		Page<Teacher> expected = new PageImpl<>(teachers, pageable, teachers.size());
+		Page<Teacher> actual = teacherDao.getAll(pageable);
 
 		assertEquals(expected, actual);
 	}
-	
+
 	interface TestData {
-		
+		Pageable pageable = PageRequest.of(0, 5);
 		Course course_1 = Course.builder()
 				.id(1)
 				.name("Math")
