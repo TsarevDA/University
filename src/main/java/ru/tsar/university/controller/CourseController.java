@@ -1,21 +1,13 @@
 package ru.tsar.university.controller;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -34,16 +26,45 @@ public class CourseController {
 
 	@GetMapping("/{id}")
 	public String getById(@PathVariable int id, Model model) {
-		
+
 		model.addAttribute("course", courseService.getById(id));
 		return ("course/show");
 	}
 
 	@GetMapping
 	public String getAll(Model model, Pageable pageable) {
-		
+
 		Page<Course> coursePage = courseService.getAll(pageable);
 		model.addAttribute("coursesPage", coursePage);
 		return ("course/index");
+	}
+
+	@GetMapping("/new")
+	public String setCourse() {
+		return ("course/new");
+	}
+
+	@PostMapping("/create")
+	public String createCourse(@ModelAttribute Course course) {
+		courseService.create(course);
+		return "redirect:/courses";
+	}
+
+	@GetMapping("/update")
+	public String updateCourse(@RequestParam int id, Model model) {
+		model.addAttribute("course", courseService.getById(id));
+		return ("course/update");
+	}
+
+	@GetMapping("/delete")
+	public String deleteCourse(@RequestParam int id) {
+		courseService.deleteById(id);
+		return ("redirect:/courses");
+	}
+
+	@PostMapping("/save")
+	public String saveCourseUpdate(@ModelAttribute Course course) {
+		courseService.update(course);
+		return "redirect:/courses";
 	}
 }

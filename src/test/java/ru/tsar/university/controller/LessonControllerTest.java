@@ -1,9 +1,10 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.LessonControllerTest.TestData.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
 
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
@@ -28,7 +30,12 @@ import ru.tsar.university.model.Lesson;
 import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.model.Teacher;
+import ru.tsar.university.service.AuditoriumService;
+import ru.tsar.university.service.CourseService;
+import ru.tsar.university.service.GroupService;
 import ru.tsar.university.service.LessonService;
+import ru.tsar.university.service.LessonTimeService;
+import ru.tsar.university.service.TeacherService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,6 +51,16 @@ class LessonControllerTest {
 
 	@Mock
 	LessonService lessonService;
+	@Mock
+	private CourseService courseService;
+	@Mock
+	private AuditoriumService auditoriumService;
+	@Mock
+	private TeacherService teacherService;
+	@Mock
+	private GroupService groupService;
+	@Mock
+	private LessonTimeService lessonTimeService;
 
 	@InjectMocks
 	LessonController lessonController;
@@ -87,6 +104,48 @@ class LessonControllerTest {
 				.andExpect(model().attribute("lesson", lesson));
 	}
 
+	@Test
+	public void givenNewLesson_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		when(courseService.getById(anyInt())).thenReturn(course);
+		when(teacherService.getById(anyInt())).thenReturn(teacher);
+		when(auditoriumService.getById(anyInt())).thenReturn(auditorium);
+		when(groupService.getById(anyInt())).thenReturn(group);
+		when(lessonTimeService.getById(anyInt())).thenReturn(lessonTime);
+
+		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+		requestParams.add("courseId", "1");
+		requestParams.add("teacherId", "1");
+		requestParams.add("day", "08.12.2020");
+		requestParams.add("auditoriumId", "1");
+		requestParams.add("groupId", "1");
+		requestParams.add("lessonTimeId", "1");
+		mockMvc.perform(post("/lessons/create").params(requestParams)).andExpect(status().is3xxRedirection());
+
+		verify(lessonService).create(lesson2);
+	}
+
+	@Test
+	public void givenUpdatedLesson_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/lessons/save").flashAttr("lesson", lesson)).andExpect(status().is3xxRedirection());
+		verify(lessonService).update(lesson);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/lessons/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(lessonService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateLessonRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		mockMvc.perform(get("/lessons/new")).andExpect(status().isOk()).andExpect(view().name("lesson/new"));
+	}
+
+	@Test
+	public void givenUpdateLessonRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		mockMvc.perform(get("/lessons/update?id=1")).andExpect(status().isOk()).andExpect(view().name("lesson/update"));
+	}
+	
 	interface TestData {
 		
 		Pageable pageabele = PageRequest.of(0, 5);
@@ -122,6 +181,15 @@ class LessonControllerTest {
 		LocalDate day = LocalDate.of(2020, Month.DECEMBER, 8);
 		Lesson lesson = Lesson.builder()
 				.id(1)
+				.course(course)
+				.teacher(teacher)
+				.group(groups)
+				.day(day)
+				.time(lessonTime)
+				.auditorium(auditorium)
+				.build();
+		
+		Lesson lesson2 = Lesson.builder()
 				.course(course)
 				.teacher(teacher)
 				.group(groups)

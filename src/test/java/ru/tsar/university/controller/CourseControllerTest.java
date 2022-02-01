@@ -1,6 +1,6 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import ru.tsar.university.model.Course;
 import ru.tsar.university.service.CourseService;
@@ -76,6 +74,34 @@ class CourseControllerTest {
 		when(courseService.getById(1)).thenReturn(course1);
 		mockMvc.perform(get("/courses/{id}", 1)).andExpect(status().isOk())
 				.andExpect(model().attribute("course", course1));
+	}
+
+	@Test
+	public void givenNewCourse_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/courses/create").flashAttr("course", course1)).andExpect(status().is3xxRedirection());
+		verify(courseService).create(course1);
+	}
+
+	@Test
+	public void givenUpdatedCourse_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/courses/save").flashAttr("course", course2)).andExpect(status().is3xxRedirection());
+		verify(courseService).update(course2);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/courses/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(courseService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateCourseRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		mockMvc.perform(get("/courses/new")).andExpect(status().isOk()).andExpect(view().name("course/new"));
+	}
+
+	@Test
+	public void givenUpdateAuditoriumRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		mockMvc.perform(get("/courses/update?id=1")).andExpect(status().isOk()).andExpect(view().name("course/update"));
 	}
 
 	interface TestData {

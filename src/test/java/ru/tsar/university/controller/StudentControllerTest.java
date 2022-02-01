@@ -1,6 +1,6 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -80,6 +80,35 @@ class StudentControllerTest {
 				.andExpect(model().attribute("student", student1));
 	}
 
+	@Test
+	public void givenNewStudent_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/students/create").flashAttr("student", student3)).andExpect(status().is3xxRedirection());
+		verify(studentService).create(student3);
+	}
+
+	@Test
+	public void givenUpdatedStudent_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/students/save").flashAttr("student", student1)).andExpect(status().is3xxRedirection());
+		verify(studentService).update(student1);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/students/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(studentService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateStudentRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		mockMvc.perform(get("/students/new")).andExpect(status().isOk()).andExpect(view().name("student/new"));
+	}
+
+	@Test
+	public void givenUpdateStudentRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		mockMvc.perform(get("/students/update?id=1")).andExpect(status().isOk())
+				.andExpect(view().name("student/update"));
+	}
+
 	interface TestData {
 		
 		Pageable pageabele = PageRequest.of(0, 5);
@@ -100,6 +129,14 @@ class StudentControllerTest {
 				.address("HiStreet")
 				.email("mark@mark.ru")
 				.phone("1111")
+				.build();
+		Student student3 = Student.builder()
+				.firstName("Bob")
+				.lastName("Kelso")
+				.gender(Gender.MALE)
+				.birthDate(LocalDate.of(1990, 10, 10))
+				.address("Street").email("bob@dot.mail")
+				.phone("111")
 				.build();
 	}
 }

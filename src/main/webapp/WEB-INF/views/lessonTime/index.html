@@ -21,8 +21,7 @@
 	background-color: bisque;
 }
 </style>
-
-	<header>
+<header>
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="/university">University</a>
@@ -42,6 +41,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/auditoriums/new.html">Create</a></li>
 							</ul></li>
 
 
@@ -52,6 +52,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/courses/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -61,6 +62,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/groups/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -70,6 +72,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/lessons/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -79,6 +82,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/lessontimes/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -88,6 +92,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/students/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -97,6 +102,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
+								<li><a class="dropdown-item" href="/university/teachers/new.html">Create</a></li>
 							</ul></li>
 					</ul>
 
@@ -104,7 +110,7 @@
 			</div>
 		</nav>
 	</header>
-
+	
 	<h3>
 		<center>Lesson time</center>
 	</h3>
@@ -117,6 +123,7 @@
 				<th scope="col">Order number</th>
 				<th scope="col">Start time</th>
 				<th scope="col">End time</th>
+				<th colspan = "2"  scope="colgroup">Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -126,6 +133,10 @@
 					<td th:text="${lessonTime.getOrderNumber()}"></td>
 					<td th:text="${lessonTime.getStartTime()}"></td>
 					<td th:text="${lessonTime.getEndTime()}"></td>
+					<td><a
+						th:href="@{/lessontimes/update?id={id}(id=${lessonTime.getId()})}">Update</a></td>
+					<td><a
+						th:href="@{/lessontimes/delete?id={id}(id=${lessonTime.getId()})}">Delete</a></td>
 				</tr>
 			</div>
 		</tbody>

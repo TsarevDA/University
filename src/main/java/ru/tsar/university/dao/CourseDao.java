@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import ru.tsar.university.dao.mapper.CourseRowMapper;
 import ru.tsar.university.model.Course;
+import ru.tsar.university.model.Student;
+import ru.tsar.university.model.Teacher;
 
 @Component
 public class CourseDao {
@@ -27,11 +29,14 @@ public class CourseDao {
 	private static final String CREATE_COURSE_QUERY = "INSERT INTO courses(name, description) VALUES(?,?)";
 	private static final String DELETE_COURSE_QUERY = "DELETE FROM courses WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM courses WHERE id=?";
-	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.teacher_id = c.id WHERE teacher_id=?";
+	private static final String GET_COURSES_BY_TEACHER_ID_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.course_id = c.id WHERE teacher_id=?";
+	private static final String GET_COURSES_BY_TEACHER_ID_WITH_LIMIT_QUERY = "SELECT * FROM teachers_courses tc left join courses c on tc.course_id = c.id WHERE teacher_id=? LIMIT ? OFFSET ?";
 	private static final String UPDATE_COURSE_QUERY = "UPDATE courses SET name=?, description=? WHERE id=?";
 	private static final String GET_COUNT_COURSES_QUERY = "SELECT count(id) FROM courses ";
-	private static final String GET_ALL_QUERY = "SELECT * FROM courses LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM courses LIMIT ? OFFSET ?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM courses";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM courses WHERE name = ?";
+	private static final String GET_COUNT_TEACHER_COURSES_QUERY = "SELECT count(course_id) FROM teachers_courses WHERE teacher_id=?";
 
 	private JdbcTemplate jdbcTemplate;
 	private CourseRowMapper rowMapper;
@@ -67,6 +72,18 @@ public class CourseDao {
 		}
 	}
 
+	public Page<Course> getByTeacherId(int id, Pageable pageable) {
+		try {
+			int total = jdbcTemplate.queryForObject(GET_COUNT_TEACHER_COURSES_QUERY, Integer.class, id);
+			List<Course> courses = jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_WITH_LIMIT_QUERY, rowMapper,id, pageable.getPageSize() ,pageable.getOffset());
+			return new PageImpl<>(courses, pageable, total);
+	
+		} catch (EmptyResultDataAccessException e) {
+			LOG.warn("Courses not found by teacher id = {}", id);
+			return null;
+		}
+	}
+	
 	public List<Course> getByTeacherId(int id) {
 		return jdbcTemplate.query(GET_COURSES_BY_TEACHER_ID_QUERY, rowMapper, id);
 	}
@@ -78,8 +95,12 @@ public class CourseDao {
 
 	public Page<Course> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_COURSES_QUERY, Integer.class);
-		List<Course> courses = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Course> courses = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
 		return new PageImpl<>(courses, pageable, total);
+	}
+	
+	public List<Course> getAll( ) {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 
 	public Course getByName(Course course) {

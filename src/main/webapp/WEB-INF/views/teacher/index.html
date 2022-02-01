@@ -42,6 +42,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/auditoriums/new.html">Create</a></li>
 							</ul></li>
 
 
@@ -52,6 +54,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/courses/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -61,6 +65,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/groups/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -70,6 +76,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/lessons/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -79,6 +87,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/lessontimes/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -88,6 +98,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/students/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -97,6 +109,8 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
+								<li><a class="dropdown-item"
+									href="/university/teachers/new.html">Create</a></li>
 							</ul></li>
 					</ul>
 
@@ -121,6 +135,8 @@
 				<th scope="col">Email</th>
 				<th scope="col">Phone</th>
 				<th scope="col">Address</th>
+				<th scope="col">Courses</th>
+				<th colspan="2" scope="colgroup">Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -130,10 +146,17 @@
 					<td th:text="${teacher.getFirstName()}"></td>
 					<td th:text="${teacher.getLastName()}"></td>
 					<td th:text="${teacher.getGender()}"></td>
-					<td th:text="${teacher.getBirthDate()}"></td>
+					<td th:text="${#temporals.format(teacher.getBirthDate(), 'dd.MM.yyyy')}"></td>
 					<td th:text="${teacher.getEmail()}"></td>
 					<td th:text="${teacher.getPhone()}"></td>
 					<td th:text="${teacher.getAddress()}"></td>
+					<td><a
+						th:href="@{/teachers/courses(teacherId=${teacher.getId()})}">courses
+					</a></td>
+					<td><a
+						th:href="@{/teachers/update?id={id}(id=${teacher.getId()})}">Update</a></td>
+					<td><a
+						th:href="@{/teachers/delete?id={id}(id=${teacher.getId()})}">Delete</a></td>
 				</tr>
 			</div>
 		</tbody>
@@ -143,7 +166,8 @@
 		<li class="page-item"
 			th:each="pageNumber : ${#numbers.sequence(0, teachersPage.getTotalPages() - 1)}"
 			th:class="${pageNumber==teachersPage.number } ? active"><a
-			class="page-link" th:href="@{/teachers(page=${pageNumber+1}, size=5)}"
+			class="page-link"
+			th:href="@{/teachers(page=${pageNumber+1}, size=5)}"
 			th:text="${pageNumber+1}"></a></li>
 	</ul>
 

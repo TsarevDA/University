@@ -36,7 +36,8 @@ public class LessonDao {
 	private static final String DELETE_LESSON_QUERY = "DELETE FROM lessons where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons WHERE id =?";
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM lessons LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM lessons LIMIT ? OFFSET ?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
 	private static final String GET_BY_DAY_TIME_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? ";
 	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id = ?";
 	private static final String GET_BY_DAY_TIME_TEACHER_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND teacher_id = ?";
@@ -98,7 +99,7 @@ public class LessonDao {
 
 	public Page<Lesson> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_LESSONS_QUERY, Integer.class);
-		List<Lesson> lessons = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Lesson> lessons = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
 		return new PageImpl<>(lessons, pageable, total);
 	}
 

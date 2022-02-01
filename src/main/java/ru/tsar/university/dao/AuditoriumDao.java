@@ -30,7 +30,8 @@ public class AuditoriumDao {
 	private static final String DELETE_AUDITORIUM_QUERY = "DELETE FROM auditoriums WHERE id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM auditoriums WHERE id=?";
 	private static final String GET_COUNT_AUDITORIUMS_QUERY = "SELECT count(id) FROM auditoriums";
-	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM auditoriums LIMIT ? OFFSET ?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM auditoriums";
 	private static final String UPDATE_AUDITORIUMS_QUERY = "UPDATE auditoriums SET name=?, capacity=? WHERE id=?";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM auditoriums WHERE name = ?";
 	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT count(*) FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id =?";
@@ -72,8 +73,12 @@ public class AuditoriumDao {
 
 	public Page<Auditorium> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_AUDITORIUMS_QUERY, Integer.class);
-		List<Auditorium> auditoriums = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize(),pageable.getOffset());
+		List<Auditorium> auditoriums = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize(),pageable.getOffset());
 		return  new PageImpl<>(auditoriums, pageable, total);
+	}
+	
+	public List<Auditorium> getAll() {
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);	
 	}
 
 	public void update(Auditorium auditorium) {

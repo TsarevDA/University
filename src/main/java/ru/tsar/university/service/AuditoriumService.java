@@ -37,6 +37,10 @@ public class AuditoriumService {
 	public Page<Auditorium> getAll(Pageable pageable) {	
 		return auditoriumDao.getAll(pageable);
 	}
+	
+	public List<Auditorium> getAll() {	
+		return auditoriumDao.getAll();
+	}
 
 	public void update(Auditorium auditorium) {
 		verifyAuditoriumExistence(auditorium.getId());

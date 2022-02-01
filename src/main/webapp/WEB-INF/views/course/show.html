@@ -35,91 +35,85 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Auditorium </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/auditoriums/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/auditoriums/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Course </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/courses/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/courses/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Group </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
-								<li><a class="dropdown-item" href="/university/groups/find">Get
-										by id </a></li>
-							</ul>
-						</li>
+								<li><a class="dropdown-item"
+									href="/university/groups/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Lesson </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/lessons/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/lessons/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								LessonTime </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/lessontimes/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/lessontimes/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Student </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/students/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/students/new.html">Create</a></li>
+							</ul></li>
 
-						<li class="nav-item dropdown">
-							<!-- <a class="nav-link dropdown-toggle" href="auditoriums.html">Auditorium</a> -->
-							<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+						<li class="nav-item dropdown"><a
+							class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 							role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Teacher </a>
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
 								<li><a class="dropdown-item"
-									href="/university/teachers/find">Get by id </a></li>
-							</ul>
-						</li>
+									href="/university/teachers/new.html">Create</a></li>
+							</ul></li>
 					</ul>
+
 				</div>
 			</div>
 		</nav>
@@ -128,13 +122,14 @@
 	<h3>
 		<center>Course</center>
 	</h3>
-	
+
 	<table class="table table-hover table-sm">
 		<thead>
 			<tr>
 				<th scope="col">Id</th>
 				<th scope="col">Name</th>
 				<th scope="col">Descriprion</th>
+				<th colspan="2" scope="colgroup">Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -142,6 +137,10 @@
 				<td th:text="${course.getId()}"></td>
 				<td th:text="${course.getName()}"></td>
 				<td th:text="${course.getDescription()}"></td>
+				<td><a
+					th:href="@{/courses/update?id={id}(id=${course.getId()})}">Update</a></td>
+				<td><a
+					th:href="@{/courses/delete?id={id}(id=${course.getId()})}">Delete</a></td>
 			</tr>
 			</div>
 

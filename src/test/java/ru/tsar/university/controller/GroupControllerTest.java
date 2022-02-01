@@ -1,6 +1,6 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,12 +28,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.service.GroupService;
+import ru.tsar.university.service.StudentService;
 
 @ExtendWith(MockitoExtension.class)
 class GroupControllerTest {
 
 	@Mock
 	GroupService groupService;
+
+	@Mock
+	StudentService studentService;
 
 	@InjectMocks
 	GroupController groupController;
@@ -45,7 +49,8 @@ class GroupControllerTest {
 		PageableHandlerMethodArgumentResolver pageableHandlerMethodArgumentResolver = new PageableHandlerMethodArgumentResolver();
 		pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
 		pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
-		mockMvc = MockMvcBuilders.standaloneSetup(groupController).setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(groupController)
+				.setCustomArgumentResolvers(pageableHandlerMethodArgumentResolver).build();
 	}
 
 	@Test
@@ -77,6 +82,37 @@ class GroupControllerTest {
 				.andExpect(model().attribute("group", group1));
 	}
 
+	@Test
+	public void givenNewGroup_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/groups/create").flashAttr("group", group3)).andExpect(status().is3xxRedirection());
+		verify(groupService).create(group3);
+	}
+
+	@Test
+	public void givenUpdatedGroup_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/groups/save").flashAttr("group", group1)).andExpect(status().is3xxRedirection());
+		verify(groupService).update(group1);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/groups/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(groupService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateGroupRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		when(studentService.getAll()).thenReturn(students);
+		mockMvc.perform(get("/groups/new")).andExpect(status().isOk()).andExpect(view().name("group/new"));
+	}
+
+	@Test
+	public void givenUpdateGroupRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		when(groupService.getById(1)).thenReturn(group1);
+		when(studentService.getAll()).thenReturn(students);
+		mockMvc.perform(get("/groups/update?id=1")).andExpect(status().isOk()).andExpect(view().name("group/update"));
+	}
+
 	interface TestData {
 		Pageable pageabele = PageRequest.of(0, 5);
 		List<Student> students = new ArrayList<>();
@@ -86,6 +122,10 @@ class GroupControllerTest {
 				.build();
 		Group group2 = Group.builder()
 				.id(2).name("a2-53")
+				.students(students)
+				.build();
+		Group group3 = Group.builder()
+				.name("a5-75")
 				.students(students)
 				.build();
 	}

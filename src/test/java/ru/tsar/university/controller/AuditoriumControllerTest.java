@@ -82,6 +82,39 @@ class AuditoriumControllerTest {
 				.andExpect(model().attribute("auditorium", auditorium));
 	}
 
+	@Test
+	public void givenNewAuditorium_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		Auditorium auditorium = Auditorium.builder().name("A102").capacity(100).build();
+		mockMvc.perform(post("/auditoriums/create").flashAttr("auditorium", auditorium))
+				.andExpect(status().is3xxRedirection());
+		verify(auditoriumService).create(auditorium);
+	}
+
+	@Test
+	public void givenUpdatedAuditorium_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		Auditorium auditorium = Auditorium.builder().id(1).name("A102").capacity(100).build();
+		mockMvc.perform(post("/auditoriums/save").flashAttr("auditorium", auditorium))
+				.andExpect(status().is3xxRedirection());
+		verify(auditoriumService).update(auditorium);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/auditoriums/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(auditoriumService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateAuditoriumRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		mockMvc.perform(get("/auditoriums/new")).andExpect(status().isOk()).andExpect(view().name("auditorium/new"));
+	}
+
+	@Test
+	public void givenUpdateAuditoriumRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		mockMvc.perform(get("/auditoriums/update?id=1")).andExpect(status().isOk())
+				.andExpect(view().name("auditorium/update"));
+	}
+
 	interface TestData {
 		Pageable pageabele = PageRequest.of(0, 5);
 	}

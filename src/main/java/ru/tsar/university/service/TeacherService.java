@@ -33,6 +33,10 @@ public class TeacherService {
 	public Page<Teacher> getAll(Pageable pageable) {
 		return teacherDao.getAll(pageable);
 	}
+	
+	public List<Teacher> getAll() {
+		return teacherDao.getAll();
+	}
 
 	public void update(Teacher teacher) {
 		verifyTeacherExistence(teacher.getId());

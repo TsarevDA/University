@@ -1,6 +1,5 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.TeacherControllerTest.TestData.*;
@@ -20,12 +19,14 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import ru.tsar.university.service.CourseService;
 import ru.tsar.university.service.TeacherService;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.model.Gender;
 import ru.tsar.university.model.Teacher;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +36,9 @@ class TeacherControllerTest {
 
 	@Mock
 	private TeacherService teacherService;
+
+	@Mock
+	private CourseService courseService;
 
 	@InjectMocks
 	private TeacherController teacherController;
@@ -87,9 +91,42 @@ class TeacherControllerTest {
 		mockMvc.perform(get("/teachers/{id}", 1)).andExpect(model().attribute("teacher", teacher));
 	}
 
+	@Test
+	public void givenNewAuditorium_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/teachers/create").flashAttr("teacher", teacher3)).andExpect(status().is3xxRedirection());
+		verify(teacherService).create(teacher3);
+	}
+
+	@Test
+	public void givenUpdatedTeacher_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/teachers/save").flashAttr("teacher", teacher1)).andExpect(status().is3xxRedirection());
+		verify(teacherService).update(teacher1);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/teachers/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(teacherService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateTeacherRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		when(courseService.getAll()).thenReturn(courses);
+		mockMvc.perform(get("/teachers/new")).andExpect(status().isOk()).andExpect(view().name("teacher/new"));
+	}
+
+	@Test
+	public void givenUpdateTeacherRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		when(teacherService.getById(1)).thenReturn(teacher1);
+		when(courseService.getAll()).thenReturn(courses);
+		mockMvc.perform(get("/teachers/update?id=1")).andExpect(status().isOk())
+				.andExpect(view().name("teacher/update"));
+	}
+
 	interface TestData {
 		
 		Pageable pageabele = PageRequest.of(0, 5);
+		List<Course> courses = new ArrayList<>();
 		Course course1 = Course.builder()
 				.id(1)
 				.name("math")
@@ -111,6 +148,15 @@ class TeacherControllerTest {
 				.build();
 		Teacher teacher2 = Teacher.builder()
 				.id(2)
+				.firstName("Mark")
+				.lastName("Socket")
+				.gender(Gender.MALE)
+				.birthDate(LocalDate.of(1991, 11, 11))
+				.address("HiStreet")
+				.email("mark@mark.ru")
+				.phone("1111")
+				.build();
+		Teacher teacher3 = Teacher.builder()
 				.firstName("Mark")
 				.lastName("Socket")
 				.gender(Gender.MALE)

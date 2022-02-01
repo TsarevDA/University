@@ -43,8 +43,16 @@ public class CourseService {
 		return courseDao.getAll(pageable);
 	}
 
-	public List<Course> getByTeacherId(Teacher teacher) {
-		return courseDao.getByTeacherId(teacher.getId());
+	public List<Course> getAll() {
+		return courseDao.getAll();
+	}
+	
+	public List<Course> getByTeacherId(int id) {
+		return courseDao.getByTeacherId(id);
+	}
+	
+	public Page<Course> getByTeacherId(int id, Pageable pageable) {
+		return courseDao.getByTeacherId(id, pageable);
 	}
 
 	public void deleteById(int id) {

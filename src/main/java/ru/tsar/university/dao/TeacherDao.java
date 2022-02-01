@@ -31,8 +31,9 @@ public class TeacherDao {
 	private static final String DELETE_TEACHERS_COURSES_QUERY = "DELETE FROM teachers_courses where teacher_id = ?";
 	private static final String DELETE_TEACHER_QUERY = "DELETE FROM teachers where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM teachers WHERE id=?";
-	private static final String UPDATE_TEACHER_QUERY = "UPDATE teacher SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
-	private static final String GET_ALL_QUERY = "SELECT * FROM teachers LIMIT ? OFFSET ?";
+	private static final String UPDATE_TEACHER_QUERY = "UPDATE teachers SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
+	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM teachers LIMIT ? OFFSET ?";
+	private static final String GET_ALL_QUERY = "SELECT * FROM teachers";
 	private static final String GET_COUNT_TEACHERS_QUERY = "SELECT count(id) FROM teachers";
 
 	private JdbcTemplate jdbcTemplate;
@@ -85,7 +86,7 @@ public class TeacherDao {
 	public void update(Teacher teacher) {
 		LOG.debug("Call update {}", teacher);
 		jdbcTemplate.update(UPDATE_TEACHER_QUERY, teacher.getFirstName(), teacher.getLastName(),
-				teacher.getGender().name(), teacher.getBirthDate(), teacher.getPhone(), teacher.getAddress(),
+				teacher.getGender().name(), java.sql.Date.valueOf(teacher.getBirthDate()), teacher.getEmail(), teacher.getPhone(), teacher.getAddress(),
 				teacher.getId());
 		jdbcTemplate.update(DELETE_TEACHERS_COURSES_QUERY, teacher.getId());
 		teacher.getCourses().stream()
@@ -94,7 +95,11 @@ public class TeacherDao {
 
 	public Page<Teacher> getAll(Pageable pageable) {		
 		int total = jdbcTemplate.queryForObject(GET_COUNT_TEACHERS_QUERY, Integer.class);
-		List<Teacher> teachers = jdbcTemplate.query(GET_ALL_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Teacher> teachers = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
 		return new PageImpl<>(teachers, pageable, total);
+	}
+	
+	public List<Teacher> getAll() {		
+		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}
 }

@@ -1,6 +1,6 @@
 package ru.tsar.university.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,6 +83,37 @@ class LessonTimeControllerTest {
 				.andExpect(model().attribute("lessonTime", lessonTime1));
 	}
 
+	@Test
+	public void givenNewLessonTime_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/lessontimes/create").flashAttr("lessonTime", lessonTime3))
+				.andExpect(status().is3xxRedirection());
+		verify(lessonTimeService).create(lessonTime3);
+	}
+
+	@Test
+	public void givenUpdatedLessonTime_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(post("/lessontimes/save").flashAttr("lessonTime", lessonTime1))
+				.andExpect(status().is3xxRedirection());
+		verify(lessonTimeService).update(lessonTime1);
+	}
+
+	@Test
+	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+		mockMvc.perform(get("/lessontimes/delete?id=1")).andExpect(status().is3xxRedirection());
+		verify(lessonTimeService).deleteById(1);
+	}
+
+	@Test
+	public void givenCreateLessonTimeRequest_whenCreate_thenCreateFormViewReturned() throws Exception {
+		mockMvc.perform(get("/lessontimes/new")).andExpect(status().isOk()).andExpect(view().name("lessonTime/new"));
+	}
+
+	@Test
+	public void givenUpdateLessonTimeRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
+		mockMvc.perform(get("/lessontimes/update?id=1")).andExpect(status().isOk())
+				.andExpect(view().name("lessonTime/update"));
+	}
+
 	interface TestData {
 		
 		Pageable pageabele = PageRequest.of(0, 5);
@@ -97,6 +128,11 @@ class LessonTimeControllerTest {
 				.orderNumber(2)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(10, 0))
+				.build();
+		LessonTime lessonTime3 = LessonTime.builder()
+				.orderNumber(3)
+				.startTime(LocalTime.of(10, 0))
+				.endTime(LocalTime.of(11, 0))
 				.build();
 	}
 }
