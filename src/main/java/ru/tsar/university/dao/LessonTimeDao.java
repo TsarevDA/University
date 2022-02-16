@@ -30,10 +30,10 @@ public class LessonTimeDao {
 	private static final String GET_BY_ORDER_NUMBER_QUERY = "SELECT * FROM lessons_time WHERE order_number=?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons_time WHERE id=?";
 	private static final String UPDATE_LESSON_TIME_QUERY = "UPDATE lessons_time SET order_number=?, start_time=?, end_time=? WHERE id=?";
-	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM lessons_time LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGEABLE_QUERY = "SELECT * FROM lessons_time LIMIT ? OFFSET ?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons_time";
 	private static final String GET_COUNT_LESSON_TIME_QUERY = "SELECT count(id) FROM lessons_time";
-	
+
 	private JdbcTemplate jdbcTemplate;
 	private LessonTimeRowMapper rowMapper;
 
@@ -76,16 +76,17 @@ public class LessonTimeDao {
 
 	public void update(LessonTime lessonTime) {
 		LOG.debug("Updated LessonTime {}", lessonTime);
-		jdbcTemplate.update(UPDATE_LESSON_TIME_QUERY, lessonTime.getOrderNumber(), lessonTime.getStartTime(), lessonTime.getEndTime(),
-				lessonTime.getId());
+		jdbcTemplate.update(UPDATE_LESSON_TIME_QUERY, lessonTime.getOrderNumber(), lessonTime.getStartTime(),
+				lessonTime.getEndTime(), lessonTime.getId());
 	}
 
 	public Page<LessonTime> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_LESSON_TIME_QUERY, Integer.class);
-		List<LessonTime> lessonTimes = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<LessonTime> lessonTimes = jdbcTemplate.query(GET_ALL_PAGEABLE_QUERY, rowMapper, pageable.getPageSize(),
+				pageable.getOffset());
 		return new PageImpl<>(lessonTimes, pageable, total);
 	}
-	
+
 	public List<LessonTime> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}

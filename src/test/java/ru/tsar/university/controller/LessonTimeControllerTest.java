@@ -84,21 +84,21 @@ class LessonTimeControllerTest {
 	}
 
 	@Test
-	public void givenNewLessonTime_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewLessonTime_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/lessontimes/create").flashAttr("lessonTime", lessonTime3))
 				.andExpect(status().is3xxRedirection());
 		verify(lessonTimeService).create(lessonTime3);
 	}
 
 	@Test
-	public void givenUpdatedLessonTime_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedLessonTime_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/lessontimes/save").flashAttr("lessonTime", lessonTime1))
 				.andExpect(status().is3xxRedirection());
 		verify(lessonTimeService).update(lessonTime1);
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/lessontimes/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(lessonTimeService).deleteById(1);
 	}

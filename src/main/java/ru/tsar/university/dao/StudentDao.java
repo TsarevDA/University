@@ -30,11 +30,11 @@ public class StudentDao {
 	private static final String GET_STUDENTS_BY_GROUP_ID_WITH_LIMIT_QUERY = "SELECT s.* FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=? LIMIT ? OFFSET ?";
 	private static final String GET_STUDENTS_BY_GROUP_ID_QUERY = "SELECT s.* FROM groups_students gs left join students s on gs.student_id = s.id WHERE group_id=?";
 	private static final String UPDATE_STUDENT_QUERY = "UPDATE students SET first_name=?, last_name=?, gender=?, birth_date=?, email=?, phone=?, address=? WHERE id=?";
-	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM students LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGEABLE_QUERY = "SELECT * FROM students LIMIT ? OFFSET ?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM students";
 	private static final String GET_COUNT_STUDENTS_QUERY = "SELECT count(id) FROM students";
 	private static final String GET_COUNT_STUDENTS_IN_GROUP_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
-	
+
 	private JdbcTemplate jdbcTemplate;
 	private StudentRowMapper rowMapper;
 
@@ -77,9 +77,10 @@ public class StudentDao {
 	public Page<Student> getByGroupId(int id, Pageable pageable) {
 		try {
 			int total = jdbcTemplate.queryForObject(GET_COUNT_STUDENTS_IN_GROUP_QUERY, Integer.class, id);
-			List<Student> students = jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_WITH_LIMIT_QUERY, rowMapper,id, pageable.getPageSize() ,pageable.getOffset());
+			List<Student> students = jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_WITH_LIMIT_QUERY, rowMapper, id,
+					pageable.getPageSize(), pageable.getOffset());
 			return new PageImpl<>(students, pageable, total);
-	
+
 		} catch (EmptyResultDataAccessException e) {
 			LOG.warn("Students not found by group id = {}", id);
 			return null;
@@ -88,14 +89,14 @@ public class StudentDao {
 
 	public List<Student> getByGroupId(int id) {
 		try {
-			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper,id);
-	
+			return jdbcTemplate.query(GET_STUDENTS_BY_GROUP_ID_QUERY, rowMapper, id);
+
 		} catch (EmptyResultDataAccessException e) {
 			LOG.warn("Students not found by group id = {}", id);
 			return null;
 		}
 	}
-	
+
 	public void update(Student student) {
 		LOG.debug("Call update {}", student);
 		jdbcTemplate.update(UPDATE_STUDENT_QUERY, student.getFirstName(), student.getLastName(),
@@ -105,11 +106,11 @@ public class StudentDao {
 
 	public Page<Student> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_STUDENTS_QUERY, Integer.class);
-		List<Student> students = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Student> students = jdbcTemplate.query(GET_ALL_PAGEABLE_QUERY, rowMapper, pageable.getPageSize(),
+				pageable.getOffset());
 		return new PageImpl<>(students, pageable, total);
 	}
-	
-	
+
 	public List<Student> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}

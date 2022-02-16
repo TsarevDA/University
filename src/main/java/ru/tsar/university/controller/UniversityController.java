@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UniversityController {
-		
-		@GetMapping()
-		public String get() {
-			return ("university/index");
-		}	
+
+	@GetMapping()
+	public String get() {
+		return "university/index";
+	}
 }

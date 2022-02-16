@@ -83,19 +83,19 @@ class GroupControllerTest {
 	}
 
 	@Test
-	public void givenNewGroup_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewGroup_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/groups/create").flashAttr("group", group3)).andExpect(status().is3xxRedirection());
 		verify(groupService).create(group3);
 	}
 
 	@Test
-	public void givenUpdatedGroup_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedGroup_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/groups/save").flashAttr("group", group1)).andExpect(status().is3xxRedirection());
 		verify(groupService).update(group1);
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/groups/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(groupService).deleteById(1);
 	}

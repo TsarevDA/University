@@ -105,7 +105,7 @@ class LessonControllerTest {
 	}
 
 	@Test
-	public void givenNewLesson_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewLesson_whenCreatePostRequest_thenCreated() throws Exception {
 		when(courseService.getById(anyInt())).thenReturn(course);
 		when(teacherService.getById(anyInt())).thenReturn(teacher);
 		when(auditoriumService.getById(anyInt())).thenReturn(auditorium);
@@ -125,13 +125,13 @@ class LessonControllerTest {
 	}
 
 	@Test
-	public void givenUpdatedLesson_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedLesson_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/lessons/save").flashAttr("lesson", lesson)).andExpect(status().is3xxRedirection());
 		verify(lessonService).update(lesson);
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/lessons/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(lessonService).deleteById(1);
 	}

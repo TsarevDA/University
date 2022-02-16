@@ -77,19 +77,19 @@ class CourseControllerTest {
 	}
 
 	@Test
-	public void givenNewCourse_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewCourse_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/courses/create").flashAttr("course", course1)).andExpect(status().is3xxRedirection());
 		verify(courseService).create(course1);
 	}
 
 	@Test
-	public void givenUpdatedCourse_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedCourse_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/courses/save").flashAttr("course", course2)).andExpect(status().is3xxRedirection());
 		verify(courseService).update(course2);
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/courses/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(courseService).deleteById(1);
 	}

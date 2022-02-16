@@ -3,6 +3,8 @@ package ru.tsar.university.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.service.GroupService;
@@ -23,6 +26,7 @@ import ru.tsar.university.service.StudentService;
 @RequestMapping("/groups")
 public class GroupController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GroupController.class);
 	private GroupService groupService;
 	private StudentService studentService;
 	private List<Student> studentList = new ArrayList<>();
@@ -36,7 +40,7 @@ public class GroupController {
 	public String getById(@PathVariable("id") int id, Model model) {
 
 		model.addAttribute("group", groupService.getById(id));
-		return ("group/show");
+		return "group/show";
 	}
 
 	@GetMapping
@@ -44,7 +48,7 @@ public class GroupController {
 
 		Page<Group> groupPage = groupService.getAll(pageable);
 		model.addAttribute("groupsPage", groupPage);
-		return ("group/index");
+		return "group/index";
 	}
 
 	@GetMapping("/students")
@@ -52,34 +56,34 @@ public class GroupController {
 			Pageable pageable) {
 
 		model.addAttribute("studentsPage", studentService.getByGroupId(groupId, pageable));
-		return ("student/index");
+		return "student/index";
 	}
 
 	@GetMapping("/new")
-	public String setGroup(Model model) {
+	public String returnNewGroup(Model model) {
 		model.addAttribute("students", studentService.getAll());
 		model.addAttribute("studentList", studentList);
-		return ("group/new");
+		return "group/new";
 	}
 
 	@PostMapping("/addStudent")
-	public String addStudentToGroup(@RequestParam("studentId") int studentId, @RequestParam("groupId") int groupId) {
+	public String addStudentToForm(@RequestParam("studentId") int studentId, @RequestParam("groupId") int groupId) {
 		Student student = studentService.getById(studentId);
 		if (!studentList.contains(student)) {
 			studentList.add(student);
 		}
 		if (groupId > 0)
-			return ("redirect:/groups/update" + "?" + "id=" + groupId);
-		return ("redirect:/groups/new");
+			return "redirect:/groups/update" + "?" + "id=" + groupId;
+		return "redirect:/groups/new";
 	}
 
 	@PostMapping("/removeStudent")
-	public String removeStudentFromGroup(@RequestParam("studentId") int studentId,
+	public String removeStudentFromForm(@RequestParam("studentId") int studentId,
 			@RequestParam("groupId") int groupId) {
 		studentList.remove(studentService.getById(studentId));
 		if (groupId > 0)
-			return ("redirect:/groups/update" + "?" + "id=" + groupId);
-		return ("redirect:/groups/new");
+			return "redirect:/groups/update" + "?" + "id=" + groupId;
+		return "redirect:/groups/new";
 	}
 
 	@PostMapping("/create")
@@ -99,13 +103,18 @@ public class GroupController {
 		}
 		model.addAttribute("students", studentService.getAll());
 		model.addAttribute("studentList", studentList);
-		return ("group/update");
+		return "group/update";
 	}
 
 	@GetMapping("/delete")
 	public String deleteGroup(@RequestParam int id) {
-		groupService.deleteById(id);
-		return ("redirect:/groups");
+		try {
+			groupService.deleteById(id);
+		} catch (EntityNotFoundException e) {
+			LOG.warn("Group not found by id = {}", id);
+
+		}
+		return "redirect:/groups";
 	}
 
 	@PostMapping("/save")

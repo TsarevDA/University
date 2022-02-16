@@ -90,33 +90,33 @@ public class LessonService {
 	}
 
 	public void verifyAuditoriumFree(Lesson lesson) {
-		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getTime(),
+		Lesson lessonFromDao = lessonDao.getByDayTimeAuditorium(lesson.getDay(), lesson.getLessonTime(),
 				lesson.getAuditorium());
 		if (lessonFromDao != null) {
 			if (lessonFromDao.getId() != lesson.getId()) {
 				throw new AuditoriumNotFreeException("Auditorium: " + lesson.getAuditorium() + " busy on day "
-						+ lesson.getDay() + " time " + lesson.getTime());
+						+ lesson.getDay() + " time " + lesson.getLessonTime());
 			}
 		}
 	}
 
 	public void verifyTeacherFree(Lesson lesson) {
-		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getTime(), lesson.getTeacher());
+		Lesson lessonFromDao = lessonDao.getByDayTimeTeacher(lesson.getDay(), lesson.getLessonTime(), lesson.getTeacher());
 		if (lessonFromDao != null) {
 			if (lessonFromDao.getId() != lesson.getId()) {
 				throw new TeacherNotFreeException("Teacher: " + lesson.getTeacher() + " busy on day " + lesson.getDay()
-						+ " time " + lesson.getTime());
+						+ " time " + lesson.getLessonTime());
 			}
 		}
 	}
 
 	public void verifyGroupFree(Lesson lesson) {
-		List<Lesson> lessons = lessonDao.getByDayTime(lesson.getDay(), lesson.getTime());
+		List<Lesson> lessons = lessonDao.getByDayTime(lesson.getDay(), lesson.getLessonTime());
 		long count = lessons.stream().filter(l -> l.getId() != lesson.getId()).map(Lesson::getGroups)
 				.mapToInt(List::size).sum();
 		if (count != 0) {
 			throw new GroupNotFreeException("One of this groups: " + lesson.getGroups() + " busy on day "
-					+ lesson.getDay() + " time " + lesson.getTime());
+					+ lesson.getDay() + " time " + lesson.getLessonTime());
 		}
 	}
 

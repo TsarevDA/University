@@ -1,5 +1,7 @@
 package ru.tsar.university.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.LessonTime;
 import ru.tsar.university.service.LessonTimeService;
 
@@ -18,6 +21,7 @@ import ru.tsar.university.service.LessonTimeService;
 @RequestMapping("/lessontimes")
 public class LessonTimeController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeController.class);
 	private LessonTimeService lessonTimeService;
 
 	public LessonTimeController(LessonTimeService lessonTimeService) {
@@ -28,7 +32,7 @@ public class LessonTimeController {
 	public String getById(@PathVariable int id, Model model) {
 
 		model.addAttribute("lessonTime", lessonTimeService.getById(id));
-		return ("lessonTime/show");
+		return "lessonTime/show";
 	}
 
 	@GetMapping
@@ -36,12 +40,12 @@ public class LessonTimeController {
 
 		Page<LessonTime> lessonTimesPage = lessonTimeService.getAll(pageable);
 		model.addAttribute("lessonTimesPage", lessonTimesPage);
-		return ("lessonTime/index");
+		return "lessonTime/index";
 	}
 
 	@GetMapping("/new")
-	public String setLessonTime() {
-		return ("lessonTime/new");
+	public String returnNewLessonTime() {
+		return "lessonTime/new";
 	}
 
 	@PostMapping("/create")
@@ -53,13 +57,18 @@ public class LessonTimeController {
 	@GetMapping("/update")
 	public String updateLessonTime(@RequestParam int id, Model model) {
 		model.addAttribute("lessonTime", lessonTimeService.getById(id));
-		return ("lessonTime/update");
+		return "lessonTime/update";
 	}
 
 	@GetMapping("/delete")
 	public String deleteLessonTime(@RequestParam int id) {
-		lessonTimeService.deleteById(id);
-		return ("redirect:/lessontimes");
+		try {
+			lessonTimeService.deleteById(id);
+		} catch (EntityNotFoundException e) {
+			LOG.warn("LessonTime not found by id = {}", id);
+
+		}
+		return "redirect:/lessontimes";
 	}
 
 	@PostMapping("/save")

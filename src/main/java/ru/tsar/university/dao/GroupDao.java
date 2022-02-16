@@ -20,12 +20,11 @@ import ru.tsar.university.dao.mapper.GroupRowMapper;
 import ru.tsar.university.model.Group;
 import ru.tsar.university.model.Student;
 
-
 @Component
 public class GroupDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GroupDao.class);
-	
+
 	private static final String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
 	private static final String ADD_GROUPS_STUDENTS_QUERY = "INSERT INTO groups_students(group_id,student_id) VALUES(?,?)";
 	private static final String DELETE_GROUPS_STUDENTS_QUERY = "DELETE FROM groups_students where group_id = ?";
@@ -34,7 +33,7 @@ public class GroupDao {
 	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
 	private static final String GET_GROUPS_BY_LESSON_QUERY = "SELECT g.* FROM lessons_groups lg left join groups g on lg.group_id = g.id WHERE lesson_id = ?";
 	private static final String UPDATE_GROUP_QUERY = "UPDATE groups SET name=? WHERE id=?";
-	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM groups LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGEABLE_QUERY = "SELECT * FROM groups LIMIT ? OFFSET ?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM groups";
 	private static final String GET_BY_NAME_QUERY = "SELECT * FROM groups WHERE name = ?";
 	private static final String GET_COUNT_GROUPS_QUERY = "SELECT count(id) FROM groups";
@@ -59,12 +58,12 @@ public class GroupDao {
 		}, holder);
 		group.setId((int) holder.getKeys().get("id"));
 		group.getStudents().stream()
-		.forEach(c -> jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId()));
+				.forEach(c -> jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId()));
 	}
 
 	public void deleteById(int id) {
 		Integer studentCount = jdbcTemplate.queryForObject(GET_STUDENTS_GROUPS_COUNT_QUERY, Integer.class, id);
-		
+
 		if (studentCount == 0) {
 			LOG.debug("Deleted group, id = {}", id);
 			jdbcTemplate.update(DELETE_GROUP_QUERY, id);
@@ -79,7 +78,7 @@ public class GroupDao {
 			Group group = jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 			return group;
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Group not found by id = {}",id);
+			LOG.warn("Group not found by id = {}", id);
 			return null;
 		}
 	}
@@ -93,15 +92,16 @@ public class GroupDao {
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
 		jdbcTemplate.update(DELETE_GROUPS_STUDENTS_QUERY, group.getId());
 		group.getStudents().stream()
-		.forEach(c -> jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId()));
+				.forEach(c -> jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId()));
 	}
 
 	public Page<Group> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_GROUPS_QUERY, Integer.class);
-		List<Group> groups = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Group> groups = jdbcTemplate.query(GET_ALL_PAGEABLE_QUERY, rowMapper, pageable.getPageSize(),
+				pageable.getOffset());
 		return new PageImpl<>(groups, pageable, total);
 	}
-	
+
 	public List<Group> getAll() {
 		return jdbcTemplate.query(GET_ALL_QUERY, rowMapper);
 	}

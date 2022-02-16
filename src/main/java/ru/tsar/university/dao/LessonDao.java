@@ -29,14 +29,14 @@ import ru.tsar.university.model.Teacher;
 public class LessonDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LessonDao.class);
-	
+
 	private static final String CREATE_LESSON_QUERY = "INSERT INTO lessons(course_id, teacher_id, day, lesson_time_id, auditorium_id) VALUES(?,?,?,?,?)";
 	private static final String CREATE_LESSONS_GROUPS_QUERY = "INSERT INTO lessons_groups(lesson_id, group_id) VALUES(?,?)";
 	private static final String DELETE_LESSONS_GROUPS_QUERY = "DELETE FROM lessons_groups where lesson_id =?";
 	private static final String DELETE_LESSON_QUERY = "DELETE FROM lessons where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM lessons WHERE id =?";
 	private static final String UPDATE_LESSON_QUERY = "UPDATE lessons SET course_id=?,teacher_id=?,day=?,lesson_time_id=?,auditorium_id=? WHERE id=?";
-	private static final String GET_ALL_PAGES_QUERY = "SELECT * FROM lessons LIMIT ? OFFSET ?";
+	private static final String GET_ALL_PAGEABLE_QUERY = "SELECT * FROM lessons LIMIT ? OFFSET ?";
 	private static final String GET_ALL_QUERY = "SELECT * FROM lessons";
 	private static final String GET_BY_DAY_TIME_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? ";
 	private static final String GET_BY_DAY_TIME_AUDITORIUM_QUERY = "SELECT * FROM lessons WHERE day=? AND lesson_time_id = ? AND auditorium_id = ?";
@@ -60,7 +60,7 @@ public class LessonDao {
 			ps.setInt(1, lesson.getCourse().getId());
 			ps.setInt(2, lesson.getTeacher().getId());
 			ps.setDate(3, java.sql.Date.valueOf(lesson.getDay()));
-			ps.setInt(4, lesson.getTime().getId());
+			ps.setInt(4, lesson.getLessonTime().getId());
 			ps.setInt(5, lesson.getAuditorium().getId());
 			return ps;
 		}, holder);
@@ -82,7 +82,7 @@ public class LessonDao {
 		try {
 			return jdbcTemplate.queryForObject(GET_BY_ID_QUERY, rowMapper, id);
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Lesson not found by id = {}",id);
+			LOG.warn("Lesson not found by id = {}", id);
 			return null;
 		}
 	}
@@ -91,7 +91,7 @@ public class LessonDao {
 	public void update(Lesson lesson) {
 		LOG.debug("Updated to lesson {}", lesson);
 		jdbcTemplate.update(UPDATE_LESSON_QUERY, lesson.getCourse().getId(), lesson.getTeacher().getId(),
-				lesson.getDay(), lesson.getTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
+				lesson.getDay(), lesson.getLessonTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, lesson.getId());
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));
@@ -99,7 +99,8 @@ public class LessonDao {
 
 	public Page<Lesson> getAll(Pageable pageable) {
 		int total = jdbcTemplate.queryForObject(GET_COUNT_LESSONS_QUERY, Integer.class);
-		List<Lesson> lessons = jdbcTemplate.query(GET_ALL_PAGES_QUERY, rowMapper, pageable.getPageSize() ,pageable.getOffset());
+		List<Lesson> lessons = jdbcTemplate.query(GET_ALL_PAGEABLE_QUERY, rowMapper, pageable.getPageSize(),
+				pageable.getOffset());
 		return new PageImpl<>(lessons, pageable, total);
 	}
 
@@ -112,7 +113,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_AUDITORIUM_QUERY, rowMapper, day, lessonTime.getId(),
 					auditorium.getId());
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Lesson not found by: day = {}, lessonTime = {},auditorium = {}",day, lessonTime, auditorium);
+			LOG.warn("Lesson not found by: day = {}, lessonTime = {},auditorium = {}", day, lessonTime, auditorium);
 			return null;
 		}
 	}
@@ -122,7 +123,7 @@ public class LessonDao {
 			return jdbcTemplate.queryForObject(GET_BY_DAY_TIME_TEACHER_QUERY, rowMapper, day, lessonTime.getId(),
 					teacher.getId());
 		} catch (EmptyResultDataAccessException e) {
-			LOG.warn("Lesson not found by: day = {}, lessonTime = {},teacher = {}",day, lessonTime, teacher);
+			LOG.warn("Lesson not found by: day = {}, lessonTime = {},teacher = {}", day, lessonTime, teacher);
 			return null;
 		}
 	}

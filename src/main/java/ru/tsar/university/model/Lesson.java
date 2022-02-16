@@ -3,6 +3,8 @@ package ru.tsar.university.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import ru.tsar.university.model.Auditorium.AuditoriumBuilder;
 
 public class Lesson {
@@ -11,7 +13,7 @@ public class Lesson {
 	private Course course;
 	private Teacher teacher;
 	private List<Group> groups;
-	private LocalDate day;
+	private @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate day;
 	private LessonTime time;
 	private Auditorium auditorium;
 
@@ -38,7 +40,7 @@ public class Lesson {
 		return day;
 	}
 
-	public LessonTime getTime() {
+	public LessonTime getLessonTime() {
 		return time;
 	}
 
@@ -66,7 +68,7 @@ public class Lesson {
 		this.day = day;
 	}
 
-	public void setTime(LessonTime time) {
+	public void setLessonTime(LessonTime time) {
 		this.time = time;
 	}
 
@@ -197,7 +199,7 @@ public class Lesson {
 			lesson.setTeacher(teacher);
 			lesson.setGroups(group);
 			lesson.setDay(day);
-			lesson.setTime(time);
+			lesson.setLessonTime(time);
 			lesson.setAuditorium(auditorium);
 			return lesson;
 		}

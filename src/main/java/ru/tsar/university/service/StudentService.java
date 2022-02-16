@@ -33,7 +33,7 @@ public class StudentService {
 	public Page<Student> getAll(Pageable pageable) {
 		return studentDao.getAll(pageable);
 	}
-	
+
 	public List<Student> getAll() {
 		return studentDao.getAll();
 	}
@@ -49,7 +49,7 @@ public class StudentService {
 		studentDao.deleteById(id);
 	}
 
-	public Page<Student> getByGroupId(int groupId, Pageable pageable ) {
+	public Page<Student> getByGroupId(int groupId, Pageable pageable) {
 		return studentDao.getByGroupId(groupId, pageable);
 	}
 

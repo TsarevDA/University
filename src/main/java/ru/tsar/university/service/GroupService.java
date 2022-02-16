@@ -41,7 +41,7 @@ public class GroupService {
 	public Page<Group> getAll(Pageable pageable) {
 		return groupDao.getAll(pageable);
 	}
-	
+
 	public List<Group> getAll() {
 		return groupDao.getAll();
 	}

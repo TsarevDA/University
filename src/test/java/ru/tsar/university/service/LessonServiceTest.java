@@ -82,13 +82,13 @@ class LessonServiceTest {
 				.auditorium(auditorium_1)
 				.build();
 
-		when(lessonDao.getByDayTimeAuditorium(lesson1.getDay(), lesson1.getTime(), lesson1.getAuditorium()))
+		when(lessonDao.getByDayTimeAuditorium(lesson1.getDay(), lesson1.getLessonTime(), lesson1.getAuditorium()))
 				.thenReturn(lessonSameAuditorium);
 
 		Exception exception = assertThrows(AuditoriumNotFreeException.class, () -> 	lessonService.create(lesson1));
 
 		String expectedMessage = "Auditorium: " + lesson1.getAuditorium() + " busy on day " + lesson1.getDay()
-				+ " time " + lesson1.getTime();
+				+ " time " + lesson1.getLessonTime();
 		String actualMessage = exception.getMessage();
 
 		assertEquals(actualMessage, expectedMessage);
@@ -108,12 +108,12 @@ class LessonServiceTest {
 		List<Lesson> lessonList = new ArrayList<>();
 		lessonList.add(lesson2);
 
-		when(lessonDao.getByDayTime(lesson1.getDay(), lesson1.getTime())).thenReturn(lessonList);
+		when(lessonDao.getByDayTime(lesson1.getDay(), lesson1.getLessonTime())).thenReturn(lessonList);
 
 		Exception exception = assertThrows(GroupNotFreeException.class, () -> lessonService.create(lesson1));
 
 		String expectedMessage = "One of this groups: " + lesson1.getGroups() + " busy on day " + lesson1.getDay()
-				+ " time " + lesson1.getTime();
+				+ " time " + lesson1.getLessonTime();
 		String actualMessage = exception.getMessage();
 
 		assertEquals(actualMessage, expectedMessage);
@@ -209,13 +209,13 @@ class LessonServiceTest {
 	void givenNewLessonAuditoriumBusy_whenUpdate_thenAuditoriumNotFreeException() {
 		Lesson expected = lesson_1;
 
-		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getTime(), expected.getAuditorium()))
+		when(lessonDao.getByDayTimeAuditorium(expected.getDay(), expected.getLessonTime(), expected.getAuditorium()))
 				.thenReturn(lessonSameAuditorium);
 
 		Exception exception = assertThrows(AuditoriumNotFreeException.class, () -> lessonService.create(expected));
 
 		String expectedMessage = "Auditorium: " + expected.getAuditorium() + " busy on day " + expected.getDay()
-				+ " time " + expected.getTime();
+				+ " time " + expected.getLessonTime();
 		String actualMessage = exception.getMessage();
 
 		assertEquals(actualMessage, expectedMessage);
@@ -229,12 +229,12 @@ class LessonServiceTest {
 		lessonList.add(lesson2);
 
 		when(lessonDao.getById(1)).thenReturn(lesson_1);
-		when(lessonDao.getByDayTime(expected.getDay(), expected.getTime())).thenReturn(lessonList);
+		when(lessonDao.getByDayTime(expected.getDay(), expected.getLessonTime())).thenReturn(lessonList);
 
 		Exception exception = assertThrows(GroupNotFreeException.class, () -> lessonService.update(expected));
 
 		String expectedMessage = "One of this groups: " + expected.getGroups() + " busy on day " + expected.getDay()
-				+ " time " + expected.getTime();
+				+ " time " + expected.getLessonTime();
 		String actualMessage = exception.getMessage();
 
 		assertEquals(actualMessage, expectedMessage);

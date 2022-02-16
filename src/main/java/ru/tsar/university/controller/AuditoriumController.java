@@ -1,5 +1,7 @@
 package ru.tsar.university.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -12,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.tsar.university.service.AuditoriumService;
+import ru.tsar.university.dao.AuditoriumDao;
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Auditorium;
 
 @Controller
 @RequestMapping("/auditoriums")
 public class AuditoriumController {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumController.class);
 	private AuditoriumService auditoriumService;
 
 	public AuditoriumController(AuditoriumService auditoriumService) {
@@ -28,7 +33,7 @@ public class AuditoriumController {
 	public String getById(@PathVariable int id, Model model) {
 
 		model.addAttribute("auditorium", auditoriumService.getById(id));
-		return ("auditorium/show");
+		return "auditorium/show";
 	}
 
 	@GetMapping
@@ -36,34 +41,39 @@ public class AuditoriumController {
 
 		Page<Auditorium> auditoriumPage = auditoriumService.getAll(pageable);
 		model.addAttribute("auditoriumsPage", auditoriumPage);
-		return ("auditorium/index");
+		return "auditorium/index";
 	}
 
 	@GetMapping("/new")
-	public String setAuditorium() {
-		return ("auditorium/new");
+	public String returnNewAuditorium() {
+		return "auditorium/new";
 	}
 
 	@GetMapping("/update")
-	public String update(@RequestParam int id, Model model) {
+	public String updateAuditorium(@RequestParam int id, Model model) {
 		model.addAttribute("auditorium", auditoriumService.getById(id));
-		return ("auditorium/update");
+		return "auditorium/update";
 	}
 
 	@GetMapping("/delete")
-	public String delete(@RequestParam int id) {
-		auditoriumService.deleteById(id);
-		return ("redirect:/auditoriums");
+	public String deleteAuditorium(@RequestParam int id) {
+		try {
+			auditoriumService.deleteById(id);
+		} catch (EntityNotFoundException e) {
+			LOG.warn("Auditorium not found by id = {}", id);
+			
+		}
+		return "redirect:/auditoriums";
 	}
 
 	@PostMapping("/save")
-	public String save(@ModelAttribute Auditorium auditorium) {
+	public String saveUpdatedAuditorium(@ModelAttribute Auditorium auditorium) {
 		auditoriumService.update(auditorium);
 		return "redirect:/auditoriums";
 	}
 
 	@PostMapping("/create")
-	public String create(@ModelAttribute Auditorium auditorium) {
+	public String createAuditorium(@ModelAttribute Auditorium auditorium) {
 		auditoriumService.create(auditorium);
 		return "redirect:/auditoriums";
 	}

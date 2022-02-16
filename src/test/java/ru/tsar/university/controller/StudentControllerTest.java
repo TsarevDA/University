@@ -81,13 +81,13 @@ class StudentControllerTest {
 	}
 
 	@Test
-	public void givenNewStudent_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewStudent_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/students/create").flashAttr("student", student3)).andExpect(status().is3xxRedirection());
 		verify(studentService).create(student3);
 	}
 
 	@Test
-	public void givenUpdatedStudent_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedStudent_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/students/save").flashAttr("student", student1)).andExpect(status().is3xxRedirection());
 		verify(studentService).update(student1);
 	}

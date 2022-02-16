@@ -83,7 +83,7 @@ class AuditoriumControllerTest {
 	}
 
 	@Test
-	public void givenNewAuditorium_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewAuditorium_whenCreatePostRequest_thenCreated() throws Exception {
 		Auditorium auditorium = Auditorium.builder().name("A102").capacity(100).build();
 		mockMvc.perform(post("/auditoriums/create").flashAttr("auditorium", auditorium))
 				.andExpect(status().is3xxRedirection());
@@ -91,7 +91,7 @@ class AuditoriumControllerTest {
 	}
 
 	@Test
-	public void givenUpdatedAuditorium_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedAuditorium_whenSavePostRequest_thenUpdated() throws Exception {
 		Auditorium auditorium = Auditorium.builder().id(1).name("A102").capacity(100).build();
 		mockMvc.perform(post("/auditoriums/save").flashAttr("auditorium", auditorium))
 				.andExpect(status().is3xxRedirection());
@@ -99,7 +99,7 @@ class AuditoriumControllerTest {
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/auditoriums/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(auditoriumService).deleteById(1);
 	}

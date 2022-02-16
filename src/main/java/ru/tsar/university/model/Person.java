@@ -2,13 +2,15 @@ package ru.tsar.university.model;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class Person {
 
 	private int id;
 	private String firstName;
 	private String lastName;
 	private Gender gender;
-	private LocalDate birthDate;
+	private @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate birthDate;
 	private String email;
 	private String phone;
 	private String address;

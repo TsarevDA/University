@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
-
-<!-- <link th:href="@{/views/bootstrap/bootstrap.min.css}"  rel="stylesheet"> 
-      <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">-->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -20,15 +16,13 @@
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
 		crossorigin="anonymous"></script>
-	<!--   <script src = "bootstrap/bootstrap.min.js" ></script> -->
-
 	<style>
 .my-custom-row {
 	background-color: bisque;
 }
 </style>
 
-	<header>
+<header>
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="/university">University</a>
@@ -48,8 +42,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/auditoriums">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/auditoriums/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/auditoriums/new.html">Create</a></li>
 							</ul></li>
 
 
@@ -60,8 +53,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/courses">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/courses/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/courses/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -71,8 +63,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/groups">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/groups/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/groups/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -82,8 +73,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessons">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/lessons/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/lessons/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -93,8 +83,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/lessontimes">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/lessontimes/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/lessontimes/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -104,8 +93,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/students">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/students/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/students/new.html">Create</a></li>
 							</ul></li>
 
 						<li class="nav-item dropdown"><a
@@ -115,8 +103,7 @@
 							<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 								<li><a class="dropdown-item" href="/university/teachers">Get
 										all</a></li>
-								<li><a class="dropdown-item"
-									href="/university/teachers/new.html">Create</a></li>
+								<li><a class="dropdown-item" href="/university/teachers/new.html">Create</a></li>
 							</ul></li>
 					</ul>
 
@@ -126,101 +113,31 @@
 	</header>
 
 	<h3>
-		<center>Update lesson</center>
+		<center>Course</center>
 	</h3>
 
-
-	<div align="center">
-		<form action="save" method="post" modelAttribute="lesson">
-		<input type="hidden" name="id" th:value="${lesson.getId()}"/>
-			<table cellpadding="5">
-
-				<td>Course</td>
-				<td>
-					<select name="courseId">
-						<option th:each="course : ${courses}"
-							th:text="${course.getName()}" th:selected="${lesson.getCourse()==course}">Course</option>
-				</select>
-				</td>
-				</tr>
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Name</th>
+				<th scope="col">Description</th>
+				<th colspan = "2"  scope="colgroup">Action1</th>
+			</tr>
+		</thead>
+		<tbody>
+			<div th:each="course : ${courses}">
 				<tr>
-					<td>Teacher</td>
-					<td><select name="teacherId">
-							<option th:each="teacher : ${teachers}"
-								th:text="${teacher.getFirstName()}" th:selected="${lesson.getTeacher()==teacher}">Teacher</option>
-					</select></td>
+					<td th:text="${course.getId()}"></td>
+					<td th:text="${course.getName()}"></td>
+					<td th:text="${course.getDescription()}"></td>
+					<td><a th:href="@{/courses/update?id={id}(id=${course.getId()})}">Update</a></td>
+					<td><a th:href="@{/courses/delete?id={id}(id=${course.getId()})}">Delete</a></td>
 				</tr>
-				
-				<tr>
-				<tr>
-				<tr>
-					<td>Day</td>
-					<td><input type="text" name="day" th:value="${#temporals.format(lesson.getDay(), 'dd.MM.yyyy')}"/></td>
-				</tr>
+			</div>
+		</tbody>
+	</table>
 
-				<tr>
-					<td>LessonTime</td>
-					<td><select name="lessonTimeId">
-							<option th:each="lessonTime : ${lessonTimes}"
-								th:text="${lessonTime.getOrderNumber()}" th:selected="${lesson.getTime()==lessonTime}">LessonTime</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Auditorium</td>
-					<td>
-					<select name="auditoriumId">
-						<option th:each="auditorium : ${auditoriums}"
-							th:text="${auditorium.getName()}" th:selected="${lesson.getAuditorium()==auditorium}">Auditorium</option> </select>
-					</td>
-				</tr>
-				<td colspan="2" align="center"><input type="submit" value="Add" /></td>
-				</tr>
-
-
-			</table>
-		</form>
-	</div>
-	
-		<div align="center">
-		<table cellpadding="5">
-
-			<tbody>
-				<tr>
-					<form action="addGroup" method="post">
-					<input type="hidden" name="lessonId" th:value="${lesson.getId()}"/>
-					<td><select name="groupId">
-							<option th:each="group : ${groups}"
-								th:text="${group.getName()}" th:value="${group.getId()}">Groups</option>
-					</select></td>
-					<td>
-						<button type="submit" name="addGroup" >Add group</button>
-					</td>
-					</form>
-
-				</tr>
-
-				<tr>
-					<td>Groups:</td>
-				</tr>
-				<tr>
-					<td>Name</td>
-				</tr>
-
-				<tr th:if="${groupList.size() > 0}" th:each="group : ${groupList}">
-					<td th:text="${group.getName()}">1</td>
-
-					<form action="removeGroup" method="post">
-					<input type="hidden" name="lessonId" th:value="${lesson.getId()}"/>
-					<td>
-						<button type="submit" name="groupId"
-							th:value="${group.getId()}">Remove group</button>
-					</td>
-					</form>
-
-				</tr>
-			</tbody>
-		</table>
-	</div>
 
 </body>
 </html>

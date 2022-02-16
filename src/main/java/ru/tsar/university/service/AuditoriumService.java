@@ -34,11 +34,11 @@ public class AuditoriumService {
 		return auditoriumDao.getById(id);
 	}
 
-	public Page<Auditorium> getAll(Pageable pageable) {	
+	public Page<Auditorium> getAll(Pageable pageable) {
 		return auditoriumDao.getAll(pageable);
 	}
-	
-	public List<Auditorium> getAll() {	
+
+	public List<Auditorium> getAll() {
 		return auditoriumDao.getAll();
 	}
 

@@ -92,19 +92,19 @@ class TeacherControllerTest {
 	}
 
 	@Test
-	public void givenNewAuditorium_whenCreatePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenNewAuditorium_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/teachers/create").flashAttr("teacher", teacher3)).andExpect(status().is3xxRedirection());
 		verify(teacherService).create(teacher3);
 	}
 
 	@Test
-	public void givenUpdatedTeacher_whenSavePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenUpdatedTeacher_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/teachers/save").flashAttr("teacher", teacher1)).andExpect(status().is3xxRedirection());
 		verify(teacherService).update(teacher1);
 	}
 
 	@Test
-	public void givenExistingId_whenDeletePostRequest_thenCallServiceMethod() throws Exception {
+	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
 		mockMvc.perform(get("/teachers/delete?id=1")).andExpect(status().is3xxRedirection());
 		verify(teacherService).deleteById(1);
 	}

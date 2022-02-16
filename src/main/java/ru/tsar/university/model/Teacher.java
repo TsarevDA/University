@@ -10,7 +10,7 @@ public class Teacher extends Person {
 
 	private List<Course> courses;
 
-	public Teacher() {
+	private Teacher() {
 	}
 
 	public List<Course> getCourses() {

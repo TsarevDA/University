@@ -41,7 +41,7 @@ public class LessonTimeService {
 	public Page<LessonTime> getAll(Pageable pageable) {
 		return lessonTimeDao.getAll(pageable);
 	}
-	
+
 	public List<LessonTime> getAll() {
 		return lessonTimeDao.getAll();
 	}

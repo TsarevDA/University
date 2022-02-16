@@ -2,14 +2,16 @@ package ru.tsar.university.model;
 
 import java.time.LocalTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import ru.tsar.university.model.Lesson.LessonBuilder;
 
 public class LessonTime {
 
 	private int id;
 	private int orderNumber;
-	private LocalTime startTime;
-	private LocalTime endTime;
+	private @DateTimeFormat(pattern = "HH:mm") LocalTime startTime;
+	private @DateTimeFormat(pattern = "HH:mm") LocalTime endTime;
 	
 	private LessonTime () {
 

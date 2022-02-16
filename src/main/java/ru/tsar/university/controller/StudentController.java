@@ -1,5 +1,7 @@
 package ru.tsar.university.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import ru.tsar.university.exceptions.EntityNotFoundException;
 import ru.tsar.university.model.Student;
 import ru.tsar.university.service.StudentService;
 
@@ -18,6 +21,7 @@ import ru.tsar.university.service.StudentService;
 @RequestMapping("/students")
 public class StudentController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StudentController.class);
 	private StudentService studentService;
 
 	public StudentController(StudentService studentService) {
@@ -28,7 +32,7 @@ public class StudentController {
 	public String getById(@PathVariable int id, Model model) {
 
 		model.addAttribute("student", studentService.getById(id));
-		return ("student/show");
+		return "student/show";
 	}
 
 	@GetMapping
@@ -36,12 +40,12 @@ public class StudentController {
 
 		Page<Student> studentPage = studentService.getAll(pageable);
 		model.addAttribute("studentsPage", studentPage);
-		return ("student/index");
+		return "student/index";
 	}
 
 	@GetMapping("/new")
-	public String setStudent() {
-		return ("student/new");
+	public String returnNewStudent() {
+		return "student/new";
 	}
 
 	@PostMapping("/create")
@@ -53,13 +57,18 @@ public class StudentController {
 	@GetMapping("/update")
 	public String updateStudent(@RequestParam int id, Model model) {
 		model.addAttribute("student", studentService.getById(id));
-		return ("student/update");
+		return "student/update";
 	}
 
 	@GetMapping("/delete")
 	public String delete(@RequestParam int id) {
-		studentService.deleteById(id);
-		return ("redirect:/students");
+		try {
+			studentService.deleteById(id);
+		} catch (EntityNotFoundException e) {
+			LOG.warn("Student not found by id = {}", id);
+
+		}
+		return "redirect:/students";
 	}
 
 	@PostMapping("/save")
