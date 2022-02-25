@@ -14,9 +14,24 @@ import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+
+import ru.tsar.university.converter.AuditoriumConverter;
+import ru.tsar.university.converter.CourseConverter;
+import ru.tsar.university.converter.GroupConverter;
+import ru.tsar.university.converter.LessonTimeConverter;
+import ru.tsar.university.converter.StudentConverter;
+import ru.tsar.university.converter.TeacherConverter;
+import ru.tsar.university.service.AuditoriumService;
+import ru.tsar.university.service.CourseService;
+import ru.tsar.university.service.GroupService;
+import ru.tsar.university.service.LessonTimeService;
+import ru.tsar.university.service.StudentService;
+import ru.tsar.university.service.TeacherService;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 
 @Configuration
@@ -26,6 +41,18 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 
 	@Autowired
 	private SpringTemplateEngine templateEngine;
+	@Autowired
+	private StudentService studentService;
+	@Autowired
+	private CourseService courseService;
+	@Autowired
+	private GroupService groupService;
+	@Autowired
+	private LessonTimeService lessonTimeService;
+	@Autowired
+	private TeacherService teacherService;
+	@Autowired
+	private AuditoriumService auditoriumService;
 
 	@Bean
 	public SpringResourceTemplateResolver templateResolver(ApplicationContext applicationContext) {
@@ -58,5 +85,15 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 		pageableHandlerMethodArgumentResolver.setOneIndexedParameters(true);
 		pageableHandlerMethodArgumentResolver.setFallbackPageable(PageRequest.of(0, 5));
 		argumentResolvers.add(pageableHandlerMethodArgumentResolver);
+	}
+
+	@Override
+	public void addFormatters(FormatterRegistry registry) {
+		registry.addConverter(new StudentConverter(studentService));
+		registry.addConverter(new CourseConverter(courseService));
+		registry.addConverter(new GroupConverter(groupService));
+		registry.addConverter(new LessonTimeConverter(lessonTimeService));
+		registry.addConverter(new TeacherConverter(teacherService));
+		registry.addConverter(new AuditoriumConverter(auditoriumService));
 	}
 }

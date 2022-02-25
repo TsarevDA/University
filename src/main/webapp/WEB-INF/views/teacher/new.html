@@ -131,7 +131,7 @@
 
 
 	<div align="center">
-		<form action="create" method="post" modelAttribute="teacher">
+		<form action="create" method="post" th:object="${teacher}">
 			<table cellpadding="5">
 				<tr>
 					<td>First Name</td>
@@ -164,6 +164,16 @@
 					<td>Address</td>
 					<td><input type="text" name="address" /></td>
 				</tr>
+				
+				<tr>
+					<td>Courses</td>
+					<td><select th:field = "*{courses}" multiple required>
+							<option th:each="course: ${courses}" th:value="${course.id}" name = "id"
+								th:text="${course.name}">Courses</option>
+					</select>
+					<td>
+				</tr>
+				
 				<tr>
 					<td colspan="2" align="center"><input type="submit"
 						value="Add" /></td>
@@ -173,46 +183,7 @@
 		</form>
 	</div>
 	
-		<div align="center">
-		<table cellpadding="5">
-
-			<tbody>
-				<tr>
-					<form action="addCourse" method="post">
-					<input type="hidden" name="teacherId" th:value="0"/>
-					<td><select name="courseId">
-							<option th:each="course : ${courses}"
-								th:text="${course.getName()}" th:value="${course.getId()}">Courses</option>
-					</select></td>
-					<td>
-						<button type="submit" name="addCourse" >Add course</button>
-					</td>
-					</form>
-
-				</tr>
-
-				<tr>
-					<td>Courses:</td>
-				</tr>
-				<tr>
-					<td>Course</td>
-				</tr>
-
-				<tr th:if="${courseList.size() > 0}" th:each="course : ${courseList}">
-					<td th:text="${course.getName()}">Name</td>
-
-					<form action="removeCourse" method="post">
-					<input type="hidden" name="teacherId" th:value="0"/>
-					<td>
-						<button type="submit" name="courseId"
-							th:value="${course.getId()}">Remove course</button>
-					</td>
-					</form>
-
-				</tr>
-			</tbody>
-		</table>
-	</div>
+		
 
 </body>
 </html>

@@ -154,8 +154,8 @@
 					</a></td>
 					<td th:text="${#temporals.format(lesson.day,'dd-MM-yyyy')}"></td>
 					<td><a
-						th:text="${lesson.getTime().getStartTime()}+'-'+${lesson.getTime().getEndTime()}"
-						th:href="@{/lessontimes/{path}(path=${lesson.getTime().getId()})}">
+						th:text="${lesson.getLessonTime().getStartTime()}+'-'+${lesson.getLessonTime().getEndTime()}"
+						th:href="@{/lessontimes/{path}(path=${lesson.getLessonTime().getId()})}">
 					</a></td>
 					<td><a th:text="${lesson.getAuditorium().getName()}"
 						th:href="@{/auditoriums/{path}(path=${lesson.getAuditorium().getId()})}">

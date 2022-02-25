@@ -21,7 +21,8 @@ import ru.tsar.university.service.CourseService;
 @RequestMapping("/courses")
 public class CourseController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CourseController.class);
+	private static final Logger log = LoggerFactory.getLogger(CourseController.class);
+
 	private CourseService courseService;
 
 	public CourseController(CourseService courseService) {
@@ -65,7 +66,7 @@ public class CourseController {
 		try {
 			courseService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Course not found by id = {}", id);
+			log.warn("Course not found by id = {}", id);
 
 		}
 		return "redirect:/courses";

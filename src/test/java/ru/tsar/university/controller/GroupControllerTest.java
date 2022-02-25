@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.GroupControllerTest.TestData.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,19 +85,19 @@ class GroupControllerTest {
 
 	@Test
 	public void givenNewGroup_whenCreatePostRequest_thenCreated() throws Exception {
-		mockMvc.perform(post("/groups/create").flashAttr("group", group3)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/groups/create").flashAttr("group", group3)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/groups"));
 		verify(groupService).create(group3);
 	}
 
 	@Test
 	public void givenUpdatedGroup_whenSavePostRequest_thenUpdated() throws Exception {
-		mockMvc.perform(post("/groups/save").flashAttr("group", group1)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/groups/save").flashAttr("group", group1)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/groups"));
 		verify(groupService).update(group1);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/groups/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/groups/delete").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/groups"));
 		verify(groupService).deleteById(1);
 	}
 
@@ -110,7 +111,7 @@ class GroupControllerTest {
 	public void givenUpdateGroupRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
 		when(groupService.getById(1)).thenReturn(group1);
 		when(studentService.getAll()).thenReturn(students);
-		mockMvc.perform(get("/groups/update?id=1")).andExpect(status().isOk()).andExpect(view().name("group/update"));
+		mockMvc.perform(get("/groups/update").param("id", "1")).andExpect(status().isOk()).andExpect(view().name("group/update"));
 	}
 
 	interface TestData {

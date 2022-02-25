@@ -47,7 +47,7 @@ class LessonDaoTest {
 
 	@Test
 	void givenNewLesson_whenCreate_thenCreated() {
-		Lesson expected = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+		Lesson expected = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).lessonTime(lessonTime)
 				.auditorium(auditorium).build();
 
 		lessonDao.create(expected);
@@ -68,7 +68,7 @@ class LessonDaoTest {
 	@Test
 	void givenId_whenGetById_thenLessonFound() {
 
-		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+		Lesson expected = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day).lessonTime(lessonTime)
 				.auditorium(auditorium).build();
 
 		Lesson actual = lessonDao.getById(1);
@@ -151,7 +151,7 @@ class LessonDaoTest {
 				.teacher(teacher)
 				.group(groups)
 				.day(day)
-				.time(lessonTime)
+				.lessonTime(lessonTime)
 				.auditorium(auditorium)
 				.build();
 	}

@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
-
-<!-- <link th:href="@{/views/bootstrap/bootstrap.min.css}"  rel="stylesheet"> 
-      <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">-->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -20,8 +16,6 @@
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
 		crossorigin="anonymous"></script>
-	<!--   <script src = "bootstrap/bootstrap.min.js" ></script> -->
-
 	<style>
 .my-custom-row {
 	background-color: bisque;
@@ -126,71 +120,34 @@
 	</header>
 
 	<h3>
-		<center>New lesson</center>
+		<center>Group</center>
 	</h3>
 
-	<div align="center">
-		<form action="#" th:action="@{/lessons/create}" method="post"
-			th:object="${lesson}">
 
-			<table cellpadding="5">
+	<table class="table table-hover table-sm">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Name</th>
+				<th scope="col">Students</th>
+				<th colspan="2" scope="colgroup">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<div th:each="group : ${groups}">
 				<tr>
-
-					<td>Course</td>
-					<td><select th:field="*{course}">
-							<option th:each="thisCourse : ${courses}"
-								th:value="${thisCourse.id}" th:text="${thisCourse.name}">Course
-							</option>
-					</select></td>
-
+					<td th:text="${group.getId()}"></td>
+					<td th:text="${group.getName()}"></td>
+					<td><a th:href="@{/groups/students(groupId=${group.getId()})}">students
+					</a></td>
+					<td><a
+						th:href="@{/groups/update?id={id}(id=${group.getId()})}">Update</a></td>
+					<td><a
+						th:href="@{/groups/delete?id={id}(id=${group.getId()})}">Delete</a></td>
 				</tr>
-				<tr>
-					<td>Teacher</td>
-					<td><select th:field="*{teacher}">
-							<option th:each="thisTeacher : ${teachers}"
-								th:value="${thisTeacher.id}" th:text="${thisTeacher.firstName}">Teacher</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Groups</td>
-					<td><select th:field = "*{groups}" multiple required>
-							<option th:each="group: ${groups}" th:value="${group.id}" name = "id"
-								th:text="${group.name}">Groups</option>
-					</select>
-					<td>
-				</tr>
+			</div>
+		</tbody>
+	</table>
 
-				<tr>
-					<td>Day</td>
-					<td><input type="text" th:field="*{day}" /></td>
-				</tr>
-
-				<tr>
-					<td>LessonTime</td>
-					<td><select th:field="*{lessonTime}">
-							<option th:each="thisLessonTime : ${lessonTimes}"
-								th:value="${thisLessonTime.id}"
-								th:text="${thisLessonTime.getOrderNumber()}">LessonTime</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td>Auditorium</td>
-					<td><select th:field="*{auditorium}">
-							<option th:each="thisAuditorium : ${auditoriums}"
-								th:value="${thisAuditorium.id}"
-								th:text="${thisAuditorium.getName()}">Auditorium</option>
-					</select></td>
-				</tr>
-				<tr>
-					<td colspan="2" align="center"><input type="submit"
-						value="Add" /></td>
-				</tr>
-
-
-			</table>
-		</form>
-	</div>
-
-	
 </body>
 </html>

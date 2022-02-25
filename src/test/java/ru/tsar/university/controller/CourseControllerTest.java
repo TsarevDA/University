@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.CourseControllerTest.TestData.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,19 +79,19 @@ class CourseControllerTest {
 
 	@Test
 	public void givenNewCourse_whenCreatePostRequest_thenCreated() throws Exception {
-		mockMvc.perform(post("/courses/create").flashAttr("course", course1)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/courses/create").flashAttr("course", course1)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/courses"));
 		verify(courseService).create(course1);
 	}
 
 	@Test
 	public void givenUpdatedCourse_whenSavePostRequest_thenUpdated() throws Exception {
-		mockMvc.perform(post("/courses/save").flashAttr("course", course2)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/courses/save").flashAttr("course", course2)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/courses"));
 		verify(courseService).update(course2);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/courses/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/courses/delete").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/courses"));
 		verify(courseService).deleteById(1);
 	}
 
@@ -101,7 +102,7 @@ class CourseControllerTest {
 
 	@Test
 	public void givenUpdateAuditoriumRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
-		mockMvc.perform(get("/courses/update?id=1")).andExpect(status().isOk()).andExpect(view().name("course/update"));
+		mockMvc.perform(get("/courses/update").param("id", "1")).andExpect(status().isOk()).andExpect(view().name("course/update"));
 	}
 
 	interface TestData {

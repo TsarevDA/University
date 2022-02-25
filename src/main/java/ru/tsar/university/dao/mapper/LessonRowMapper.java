@@ -50,7 +50,7 @@ public class LessonRowMapper implements RowMapper<Lesson> {
 				.id(rs.getInt("id"))
 				.course(course).teacher(teacher)
 				.day(rs.getDate("day").toLocalDate())
-				.time(lessonTime)
+				.lessonTime(lessonTime)
 				.auditorium(auditorium)
 				.group(groups)
 				.build();

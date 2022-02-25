@@ -10,8 +10,10 @@ public class LessonTime {
 
 	private int id;
 	private int orderNumber;
-	private @DateTimeFormat(pattern = "HH:mm") LocalTime startTime;
-	private @DateTimeFormat(pattern = "HH:mm") LocalTime endTime;
+	@DateTimeFormat(pattern = "HH:mm")
+	private LocalTime startTime;
+	@DateTimeFormat(pattern = "HH:mm")
+	private LocalTime endTime;
 	
 	private LessonTime () {
 

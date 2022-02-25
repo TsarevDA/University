@@ -21,7 +21,8 @@ import ru.tsar.university.service.LessonTimeService;
 @RequestMapping("/lessontimes")
 public class LessonTimeController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LessonTimeController.class);
+	private static final Logger log = LoggerFactory.getLogger(LessonTimeController.class);
+
 	private LessonTimeService lessonTimeService;
 
 	public LessonTimeController(LessonTimeService lessonTimeService) {
@@ -65,7 +66,7 @@ public class LessonTimeController {
 		try {
 			lessonTimeService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("LessonTime not found by id = {}", id);
+			log.warn("LessonTime not found by id = {}", id);
 
 		}
 		return "redirect:/lessontimes";

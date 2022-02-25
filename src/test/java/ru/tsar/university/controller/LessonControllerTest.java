@@ -4,6 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.LessonControllerTest.TestData.*;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -109,30 +111,23 @@ class LessonControllerTest {
 		when(courseService.getById(anyInt())).thenReturn(course);
 		when(teacherService.getById(anyInt())).thenReturn(teacher);
 		when(auditoriumService.getById(anyInt())).thenReturn(auditorium);
-		when(groupService.getById(anyInt())).thenReturn(group);
 		when(lessonTimeService.getById(anyInt())).thenReturn(lessonTime);
 
-		LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-		requestParams.add("courseId", "1");
-		requestParams.add("teacherId", "1");
-		requestParams.add("day", "08.12.2020");
-		requestParams.add("auditoriumId", "1");
-		requestParams.add("groupId", "1");
-		requestParams.add("lessonTimeId", "1");
-		mockMvc.perform(post("/lessons/create").params(requestParams)).andExpect(status().is3xxRedirection());
-
+		Lesson lesson = Lesson.builder().course(Course.builder().id(1).build()).teacher(Teacher.builder().id(1).build()).day(LocalDate.of(2020, 12, 8)).auditorium(Auditorium.builder().id(1).build()).lessonTime(LessonTime.builder().id(1).build()).group(groups).build();
+		mockMvc.perform(post("/lessons/create").flashAttr("lesson", lesson)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessons"));
+		
 		verify(lessonService).create(lesson2);
 	}
 
 	@Test
 	public void givenUpdatedLesson_whenSavePostRequest_thenUpdated() throws Exception {
-		mockMvc.perform(post("/lessons/save").flashAttr("lesson", lesson)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/lessons/save").flashAttr("lesson", lesson)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessons"));
 		verify(lessonService).update(lesson);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/lessons/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/lessons/delete").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessons"));
 		verify(lessonService).deleteById(1);
 	}
 
@@ -143,59 +138,34 @@ class LessonControllerTest {
 
 	@Test
 	public void givenUpdateLessonRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
-		mockMvc.perform(get("/lessons/update?id=1")).andExpect(status().isOk()).andExpect(view().name("lesson/update"));
+		mockMvc.perform(get("/lessons/update").param("id", "1")).andExpect(status().isOk())
+				.andExpect(view().name("lesson/update"));
 	}
-	
+
 	interface TestData {
-		
+
 		Pageable pageabele = PageRequest.of(0, 5);
 		List<Student> students = new ArrayList<>();
 		Group group = Group.builder().id(1).name("T7-09").students(students).build();
 		List<Group> groups = Arrays.asList(group);
 
-		Auditorium auditorium = Auditorium.builder()
-				.id(1)
-				.name("First")
-				.capacity(100)
-				.build();
-		Course course = Course.builder()
-				.id(1).name("Astronomy")
-				.description("Science about stars and deep space")
+		Auditorium auditorium = Auditorium.builder().id(1).name("First").capacity(100).build();
+		Course course = Course.builder().id(1).name("Astronomy").description("Science about stars and deep space")
 				.build();
 		List<Course> teacherCourses = Arrays.asList(course);
 
-		Teacher teacher = Teacher.builder()
-				.id(1).firstName("Petr")
-				.lastName("Ivanov")
-				.gender(Gender.valueOf("MALE"))
-				.birthDate(LocalDate.of(1992, Month.MAY, 03))
-				.email("mail11111@mail.ru")
-				.phone("880899908080")
-				.address("Petrov street, 25-5")
-				.courses(teacherCourses)
-				.build();
+		Teacher teacher = Teacher.builder().id(1).firstName("Petr").lastName("Ivanov").gender(Gender.valueOf("MALE"))
+				.birthDate(LocalDate.of(1992, Month.MAY, 03)).email("mail11111@mail.ru").phone("880899908080")
+				.address("Petrov street, 25-5").courses(teacherCourses).build();
 		LocalTime startTime = LocalTime.of(9, 0);
 		LocalTime endTime = LocalTime.of(10, 0);
 		LessonTime lessonTime = LessonTime.builder().id(1).orderNumber(2).startTime(startTime).endTime(endTime).build();
 
 		LocalDate day = LocalDate.of(2020, Month.DECEMBER, 8);
-		Lesson lesson = Lesson.builder()
-				.id(1)
-				.course(course)
-				.teacher(teacher)
-				.group(groups)
-				.day(day)
-				.time(lessonTime)
-				.auditorium(auditorium)
-				.build();
-		
-		Lesson lesson2 = Lesson.builder()
-				.course(course)
-				.teacher(teacher)
-				.group(groups)
-				.day(day)
-				.time(lessonTime)
-				.auditorium(auditorium)
-				.build();
+		Lesson lesson = Lesson.builder().id(1).course(course).teacher(teacher).group(groups).day(day)
+				.lessonTime(lessonTime).auditorium(auditorium).build();
+
+		Lesson lesson2 = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).lessonTime(lessonTime)
+				.auditorium(auditorium).build();
 	}
 }

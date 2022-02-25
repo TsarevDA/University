@@ -315,7 +315,7 @@ public class ConsoleInterface {
 				.collect(Collectors.toList());
 		Auditorium auditorium = auditoriumForAdding.get(0);
 
-		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).time(lessonTime)
+		Lesson lesson = Lesson.builder().course(course).teacher(teacher).group(groups).day(day).lessonTime(lessonTime)
 				.auditorium(auditorium).build();
 		lessonService.create(lesson);
 	}

@@ -28,6 +28,8 @@ public class GroupDao {
 	private static final String ADD_GROUP_QUERY = "INSERT INTO groups(name) VALUES(?)";
 	private static final String ADD_GROUPS_STUDENTS_QUERY = "INSERT INTO groups_students(group_id,student_id) VALUES(?,?)";
 	private static final String DELETE_GROUPS_STUDENTS_QUERY = "DELETE FROM groups_students where group_id = ?";
+	private static final String DELETE_FROM_GROUPS_STUDENTS_BY_STUDENT_ID_QUERY = "DELETE FROM groups_students where group_id = ? and student_id = ?";
+	private static final String GET_STUDENTS_FROM_STUDENTS_GROUPS_BY_GROUP_ID_QUERY = "SELECT student_id FROM groups_students WHERE group_id=?";
 	private static final String DELETE_GROUP_QUERY = "DELETE FROM groups where id =?";
 	private static final String GET_BY_ID_QUERY = "SELECT * FROM groups WHERE id=?";
 	private static final String GET_STUDENTS_GROUPS_COUNT_QUERY = "SELECT count(student_id) FROM groups_students WHERE group_id=?";
@@ -90,9 +92,22 @@ public class GroupDao {
 	public void update(Group group) {
 		LOG.debug("Updated to group: {}", group);
 		jdbcTemplate.update(UPDATE_GROUP_QUERY, group.getName(), group.getId());
-		jdbcTemplate.update(DELETE_GROUPS_STUDENTS_QUERY, group.getId());
-		group.getStudents().stream()
-				.forEach(c -> jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId()));
+		List<Integer> studentsBeforeUpdate = jdbcTemplate.query(GET_STUDENTS_FROM_STUDENTS_GROUPS_BY_GROUP_ID_QUERY,
+				(resultSet, rowNum) -> {
+					return resultSet.getInt("student_id");
+				}, group.getId());
+		List<Integer> studentsForDelete = studentsBeforeUpdate;
+		group.getStudents().stream().forEach(c -> {
+			if (!studentsBeforeUpdate.contains(c.getId())) {
+				jdbcTemplate.update(ADD_GROUPS_STUDENTS_QUERY, group.getId(), c.getId());
+				studentsForDelete.remove(new Integer(c.getId()));
+			} else {
+				studentsForDelete.remove(new Integer(c.getId()));
+			}
+		});
+
+		studentsForDelete.stream()
+				.forEach(s -> jdbcTemplate.update(DELETE_FROM_GROUPS_STUDENTS_BY_STUDENT_ID_QUERY, group.getId(), s));
 	}
 
 	public Page<Group> getAll(Pageable pageable) {

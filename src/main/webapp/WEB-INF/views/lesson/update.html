@@ -129,98 +129,78 @@
 		<center>Update lesson</center>
 	</h3>
 
-
 	<div align="center">
-		<form action="save" method="post" modelAttribute="lesson">
-		<input type="hidden" name="id" th:value="${lesson.getId()}"/>
-			<table cellpadding="5">
+		<form action="#" th:action="@{/lessons/save}" method="post"
+			th:object="${lesson}">
 
-				<td>Course</td>
-				<td>
-					<select name="courseId">
-						<option th:each="course : ${courses}"
-							th:text="${course.getName()}" th:selected="${lesson.getCourse()==course}">Course</option>
-				</select>
-				</td>
-				</tr>
+			<table cellpadding="5">
 				<tr>
-					<td>Teacher</td>
-					<td><select name="teacherId">
-							<option th:each="teacher : ${teachers}"
-								th:text="${teacher.getFirstName()}" th:selected="${lesson.getTeacher()==teacher}">Teacher</option>
-					</select></td>
+					<input type="hidden" name="id" th:value="${lesson.getId()}" />
 				</tr>
 				
 				<tr>
+
+					<td>Course</td>
+					<td><select th:field="*{course}">
+							<option th:each="thisCourse : ${courses}"
+								th:value="${thisCourse.id}" th:text="${thisCourse.name}"
+								th:selected="${lesson.getCourse()==thisCourse}">Course
+							</option>
+					</select></td>
+
+				</tr>
 				<tr>
+					<td>Teacher</td>
+					<td><select th:field="*{teacher}">
+							<option th:each="thisTeacher : ${teachers}"
+								th:value="${thisTeacher.id}" th:text="${thisTeacher.firstName}"
+								th:selected="${lesson.getTeacher()==thisTeacher}">Teacher</option>
+					</select></td>
+				</tr>
+				<tr>
+					<td>Groups</td>
+					<td><select th:field="*{groups}" multiple required>
+							<option th:each="group: ${groups}" th:value="${group.id}"
+								name="id" th:text="${group.name}"
+								th:selected="${lesson.getGroups()==group}">Groups</option>
+					</select>
+					<td>
+				</tr>
+
 				<tr>
 					<td>Day</td>
-					<td><input type="text" name="day" th:value="${#temporals.format(lesson.getDay(), 'dd.MM.yyyy')}"/></td>
+					<td><input type="text" th:field="*{day}"
+						th:value="${#temporals.format(lesson.getDay(), 'dd.MM.yyyy')}" /></td>
 				</tr>
 
 				<tr>
 					<td>LessonTime</td>
-					<td><select name="lessonTimeId">
-							<option th:each="lessonTime : ${lessonTimes}"
-								th:text="${lessonTime.getOrderNumber()}" th:selected="${lesson.getTime()==lessonTime}">LessonTime</option>
+					<td><select th:field="*{lessonTime}">
+							<option th:each="thisLessonTime : ${lessonTimes}"
+								th:value="${thisLessonTime.id}"
+								th:text="${thisLessonTime.getOrderNumber()}"
+								th:selected="${lesson.getLessonTime()==thisLessonTime}">LessonTime</option>
 					</select></td>
 				</tr>
 				<tr>
 					<td>Auditorium</td>
-					<td>
-					<select name="auditoriumId">
-						<option th:each="auditorium : ${auditoriums}"
-							th:text="${auditorium.getName()}" th:selected="${lesson.getAuditorium()==auditorium}">Auditorium</option> </select>
-					</td>
+					<td><select th:field="*{auditorium}">
+							<option th:each="thisAuditorium : ${auditoriums}"
+								th:value="${thisAuditorium.id}"
+								th:text="${thisAuditorium.getName()}"
+								th:selected="${lesson.getAuditorium()==thisAuditorium}">Auditorium</option>
+					</select></td>
 				</tr>
-				<td colspan="2" align="center"><input type="submit" value="Add" /></td>
+				<tr>
+					<td colspan="2" align="center"><input type="submit"
+						value="Update" /></td>
 				</tr>
 
 
 			</table>
 		</form>
 	</div>
-	
-		<div align="center">
-		<table cellpadding="5">
 
-			<tbody>
-				<tr>
-					<form action="addGroup" method="post">
-					<input type="hidden" name="lessonId" th:value="${lesson.getId()}"/>
-					<td><select name="groupId">
-							<option th:each="group : ${groups}"
-								th:text="${group.getName()}" th:value="${group.getId()}">Groups</option>
-					</select></td>
-					<td>
-						<button type="submit" name="addGroup" >Add group</button>
-					</td>
-					</form>
-
-				</tr>
-
-				<tr>
-					<td>Groups:</td>
-				</tr>
-				<tr>
-					<td>Name</td>
-				</tr>
-
-				<tr th:if="${groupList.size() > 0}" th:each="group : ${groupList}">
-					<td th:text="${group.getName()}">1</td>
-
-					<form action="removeGroup" method="post">
-					<input type="hidden" name="lessonId" th:value="${lesson.getId()}"/>
-					<td>
-						<button type="submit" name="groupId"
-							th:value="${group.getId()}">Remove group</button>
-					</td>
-					</form>
-
-				</tr>
-			</tbody>
-		</table>
-	</div>
 
 </body>
 </html>

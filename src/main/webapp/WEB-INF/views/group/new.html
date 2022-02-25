@@ -131,14 +131,20 @@
 
 
 	<div align="center">
-		<form action="create" method="post" modelAttribute="group">
+		<form action="create" method="post" th:object = "${group}">
 			<table cellpadding="5">
 				<tr>
 					<td>Name</td>
 					<td><input type="text" name="name" /></td>
 				</tr>
-
-
+				<tr>
+					<td>Students</td>
+					<td><select th:field = "*{students}" multiple required>
+							<option th:each="student: ${students}" th:value="${student.id}" name = "id"
+								th:text="${student.firstName} +' '+  ${student.getLastName()}">Students</option>
+					</select>
+					<td>
+				</tr>
 
 				<tr>
 					<td colspan="2" align="center"><input type="submit"
@@ -151,48 +157,7 @@
 
 
 
-	<div align="center">
-		<table cellpadding="5">
 
-			<tbody>
-				<tr>
-					<form action="addStudent" method="post">
-					<input type="hidden" name="groupId" th:value="0"/>
-					<td><select name="studentId">
-							<option th:each="student : ${students}"
-								th:text="${student.getFirstName()} +' '+ ${student.getLastName() }" th:value="${student.getId()}">Students</option>
-					</select></td>
-					<td>
-						<button type="submit" name="addStudent" >Add student</button>
-					</td>
-					</form>
-
-				</tr>
-
-				<tr>
-					<td>Students:</td>
-				</tr>
-				<tr>
-					<td>First name</td>
-					<td>Last name</td>
-				</tr>
-
-				<tr th:if="${studentList.size() > 0}" th:each="student : ${studentList}">
-					<td th:text="${student.getFirstName()}">1</td>
-					<td th:text="${student.getLastName()}">1</td>
-
-					<form action="removeStudent" method="post">
-					<input type="hidden" name="groupId" th:value="0"/>
-					<td>
-						<button type="submit" name="studentId"
-							th:value="${student.getId()}">Remove student</button>
-					</td>
-					</form>
-
-				</tr>
-			</tbody>
-		</table>
-	</div>
 
 </body>
 </html>

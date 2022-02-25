@@ -37,15 +37,14 @@ import ru.tsar.university.service.TeacherService;
 @RequestMapping("/lessons")
 public class LessonController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(LessonController.class);
+	private static final Logger log = LoggerFactory.getLogger(LessonController.class);
+
 	private LessonService lessonService;
 	private TeacherService teacherService;
 	private CourseService courseService;
 	private GroupService groupService;
 	private LessonTimeService lessonTimeService;
 	private AuditoriumService auditoriumService;
-	
-	private List<Group> groupList = new ArrayList<>();
 
 	public LessonController(LessonService lessonService, CourseService courseService, TeacherService teacherService,
 			GroupService groupService, LessonTimeService lessonTimeService, AuditoriumService auditoriumService) {
@@ -76,70 +75,34 @@ public class LessonController {
 	public String getGroupStudents(@RequestParam(value = "lessonId", required = false) Integer lessonId, Model model) {
 
 		model.addAttribute("groups", groupService.getByLessonId(lessonId));
-		return "group/index";
+		return "group/indexNotPageable";
 	}
 
 	@GetMapping("/new")
 	public String returnNewLesson(Model model) {
-		model.addAttribute("lesson", Lesson.builder().course(Course.builder().build()).build());
+		model.addAttribute("lesson",
+				Lesson.builder().course(Course.builder().build()).teacher(Teacher.builder().build())
+						.auditorium(Auditorium.builder().build()).lessonTime(LessonTime.builder().build())
+						.group(new ArrayList<Group>()).build());
 		model.addAttribute("courses", courseService.getAll());
 		model.addAttribute("teachers", teacherService.getAll());
 		model.addAttribute("auditoriums", auditoriumService.getAll());
 		model.addAttribute("groups", groupService.getAll());
 		model.addAttribute("lessonTimes", lessonTimeService.getAll());
-		model.addAttribute("groupList", groupList);
 		return "lesson/new";
 	}
-	
-	@PostMapping("/addGroup")
-	public String addStudentToGroup(@RequestParam("lessonId") int lessonId, @RequestParam("groupId") int groupId) {
-		Group group = groupService.getById(groupId);
-		if (!groupList.contains(group)) {
-			groupList.add(group);
-		}
-		if (lessonId > 0)
-			return "redirect:/lessons/update" + "?" + "id=" + lessonId;
-		return "redirect:/lessons/new";
-	}
 
-	@PostMapping("/removeGroup")
-	public String removeStudentFromGroup(@RequestParam("lessonId") int lessonId,
-			@RequestParam("groupId") int groupId) {
-		groupList.remove(groupService.getById(groupId));
-		if (lessonId > 0)
-			return "redirect:/lessons/update" + "?" + "id=" + lessonId;
-		return "redirect:/lessons/new";
-	}
-
-	/*@PostMapping("/create")
-	public String createLesson(@RequestParam int courseId, @RequestParam int teacherId, @RequestParam String day,
-			@RequestParam int auditoriumId, @RequestParam int groupId, @RequestParam int lessonTimeId) {
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		List<Group> groups = new ArrayList<>();
-		groups.add(groupService.getById(groupId));
-
-		lessonService.create(Lesson.builder().course(courseService.getById(courseId))
-				.teacher(teacherService.getById(teacherId)).day(LocalDate.parse(day, formatter)).group(groups)
-				.auditorium(auditoriumService.getById(auditoriumId)).time(lessonTimeService.getById(lessonTimeId))
-				.build());
-		return "redirect:/lessons";
-	}
-*/
-	
 	@PostMapping("/create")
 	public String createLesson(@ModelAttribute Lesson lesson) {
-		lesson.setGroups(groupList);
+
 		lesson.setCourse(courseService.getById(lesson.getCourse().getId()));
 		lesson.setAuditorium(auditoriumService.getById(lesson.getAuditorium().getId()));
 		lesson.setLessonTime(lessonTimeService.getById(lesson.getLessonTime().getId()));
 		lesson.setTeacher(teacherService.getById(lesson.getTeacher().getId()));
-		System.out.println(lesson);
 		lessonService.create(lesson);
-		groupList.clear();
 		return "redirect:/lessons";
 	}
-	
+
 	@GetMapping("/update")
 	public String updateLesson(@RequestParam int id, Model model) {
 		Lesson lesson = lessonService.getById(id);
@@ -149,30 +112,23 @@ public class LessonController {
 		model.addAttribute("auditoriums", auditoriumService.getAll());
 		model.addAttribute("groups", groupService.getAll());
 		model.addAttribute("lessonTimes", lessonTimeService.getAll());
-		if (groupList.size() == 0) {
-			groupList = lesson.getGroups();
-		}
-		model.addAttribute("groupList", groupList);
-		
 		return "lesson/update";
 	}
 
 	@GetMapping("/delete")
 	public String deleteLesson(@RequestParam int id) {
 		try {
-		lessonService.deleteById(id);
+			lessonService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Lesson not found by id = {}", id);
-			
+			log.warn("Lesson not found by id = {}", id);
+
 		}
 		return "redirect:/lessons";
 	}
 
 	@PostMapping("/save")
 	public String saveLessonUpdate(@ModelAttribute Lesson lesson) {
-		lesson.setGroups(groupList);
 		lessonService.update(lesson);
-		groupList.clear();
 		return "redirect:/lessons";
 	}
 }

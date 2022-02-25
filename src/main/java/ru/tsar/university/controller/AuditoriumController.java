@@ -21,8 +21,9 @@ import ru.tsar.university.model.Auditorium;
 @Controller
 @RequestMapping("/auditoriums")
 public class AuditoriumController {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(AuditoriumController.class);
+
+	private static final Logger log = LoggerFactory.getLogger(AuditoriumController.class);
+
 	private AuditoriumService auditoriumService;
 
 	public AuditoriumController(AuditoriumService auditoriumService) {
@@ -60,8 +61,8 @@ public class AuditoriumController {
 		try {
 			auditoriumService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Auditorium not found by id = {}", id);
-			
+			log.warn("Auditorium not found by id = {}", id);
+
 		}
 		return "redirect:/auditoriums";
 	}

@@ -27,10 +27,10 @@ import ru.tsar.university.service.TeacherService;
 @RequestMapping("/teachers")
 public class TeacherController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TeacherController.class);
+	private static final Logger log = LoggerFactory.getLogger(TeacherController.class);
+
 	private TeacherService teacherService;
 	private CourseService courseService;
-	private List<Course> courseList = new ArrayList<>();
 
 	public TeacherController(TeacherService teacherService, CourseService courseService) {
 		this.teacherService = teacherService;
@@ -63,66 +63,37 @@ public class TeacherController {
 	@GetMapping("/new")
 	public String returnNewTeacher(Model model) {
 		model.addAttribute("courses", courseService.getAll());
-		model.addAttribute("courseList", courseList);
+		model.addAttribute("teacher", Teacher.builder().courses(new ArrayList<Course>()).build());
 		return "teacher/new";
-	}
-
-	@PostMapping("/addCourse")
-	public String addCourseToForm(@RequestParam("courseId") int courseId, @RequestParam("teacherId") int teacherId) {
-		Course course = courseService.getById(courseId);
-		if (!courseList.contains(course)) {
-			courseList.add(course);
-		}
-		if (teacherId > 0)
-			return "redirect:/teachers/update" + "?" + "id=" + teacherId;
-		return "redirect:/teachers/new";
-	}
-
-	@PostMapping("/removeCourse")
-	public String removeCourseFromForm(@RequestParam("courseId") int courseId,
-			@RequestParam("teacherId") int teacherId) {
-		courseList.remove(courseService.getById(courseId));
-		if (teacherId > 0)
-			return "redirect:/teachers/update" + "?" + "id=" + teacherId;
-		return "redirect:/teachers/new";
 	}
 
 	@PostMapping("/create")
 	public String createTeacher(@ModelAttribute Teacher teacher) {
-		teacher.setCourses(courseList);
 		teacherService.create(teacher);
-		courseList.clear();
 		return "redirect:/teachers";
 	}
 
 	@GetMapping("/update")
 	public String updateTeacher(@RequestParam int id, Model model) {
-		Teacher teacher = teacherService.getById(id);
-		model.addAttribute("teacher", teacher);
-		if (courseList.size() == 0) {
-			courseList = teacher.getCourses();
-		}
 		model.addAttribute("courses", courseService.getAll());
-		model.addAttribute("courseList", courseList);
+		model.addAttribute("teacher", teacherService.getById(id));
 		return "teacher/update";
 	}
 
 	@GetMapping("/delete")
 	public String deleteTeacher(@RequestParam int id) {
 		try {
-		teacherService.deleteById(id);
+			teacherService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Teacher not found by id = {}", id);
-			
+			log.warn("Teacher not found by id = {}", id);
+
 		}
 		return "redirect:/teachers";
 	}
 
 	@PostMapping("/save")
 	public String saveTeacherUpdate(@ModelAttribute Teacher teacher) {
-		teacher.setCourses(courseList);
 		teacherService.update(teacher);
-		courseList.clear();
 		return "redirect:/teachers";
 	}
 }

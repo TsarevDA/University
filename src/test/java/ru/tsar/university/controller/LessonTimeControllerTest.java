@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.LessonTimeControllerTest.TestData.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,20 +87,20 @@ class LessonTimeControllerTest {
 	@Test
 	public void givenNewLessonTime_whenCreatePostRequest_thenCreated() throws Exception {
 		mockMvc.perform(post("/lessontimes/create").flashAttr("lessonTime", lessonTime3))
-				.andExpect(status().is3xxRedirection());
+				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessontimes"));
 		verify(lessonTimeService).create(lessonTime3);
 	}
 
 	@Test
 	public void givenUpdatedLessonTime_whenSavePostRequest_thenUpdated() throws Exception {
 		mockMvc.perform(post("/lessontimes/save").flashAttr("lessonTime", lessonTime1))
-				.andExpect(status().is3xxRedirection());
+				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessontimes"));
 		verify(lessonTimeService).update(lessonTime1);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/lessontimes/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/lessontimes/delete").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/lessontimes"));
 		verify(lessonTimeService).deleteById(1);
 	}
 
@@ -110,7 +111,7 @@ class LessonTimeControllerTest {
 
 	@Test
 	public void givenUpdateLessonTimeRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
-		mockMvc.perform(get("/lessontimes/update?id=1")).andExpect(status().isOk())
+		mockMvc.perform(get("/lessontimes/update").param("id", "1")).andExpect(status().isOk())
 				.andExpect(view().name("lessonTime/update"));
 	}
 

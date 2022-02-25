@@ -26,10 +26,10 @@ import ru.tsar.university.service.StudentService;
 @RequestMapping("/groups")
 public class GroupController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GroupController.class);
+	private static final Logger log = LoggerFactory.getLogger(GroupController.class);
+
 	private GroupService groupService;
 	private StudentService studentService;
-	private List<Student> studentList = new ArrayList<>();
 
 	GroupController(GroupService groupService, StudentService studentService) {
 		this.groupService = groupService;
@@ -62,35 +62,13 @@ public class GroupController {
 	@GetMapping("/new")
 	public String returnNewGroup(Model model) {
 		model.addAttribute("students", studentService.getAll());
-		model.addAttribute("studentList", studentList);
+		model.addAttribute("group", Group.builder().students(new ArrayList<Student>()).build());
 		return "group/new";
-	}
-
-	@PostMapping("/addStudent")
-	public String addStudentToForm(@RequestParam("studentId") int studentId, @RequestParam("groupId") int groupId) {
-		Student student = studentService.getById(studentId);
-		if (!studentList.contains(student)) {
-			studentList.add(student);
-		}
-		if (groupId > 0)
-			return "redirect:/groups/update" + "?" + "id=" + groupId;
-		return "redirect:/groups/new";
-	}
-
-	@PostMapping("/removeStudent")
-	public String removeStudentFromForm(@RequestParam("studentId") int studentId,
-			@RequestParam("groupId") int groupId) {
-		studentList.remove(studentService.getById(studentId));
-		if (groupId > 0)
-			return "redirect:/groups/update" + "?" + "id=" + groupId;
-		return "redirect:/groups/new";
 	}
 
 	@PostMapping("/create")
 	public String createGroup(@ModelAttribute Group group) {
-		group.setStudents(studentList);
 		groupService.create(group);
-		studentList.clear();
 		return "redirect:/groups";
 	}
 
@@ -98,11 +76,7 @@ public class GroupController {
 	public String updateGroup(@RequestParam int id, Model model) {
 		Group group = groupService.getById(id);
 		model.addAttribute("group", group);
-		if (studentList.size() == 0) {
-			studentList = group.getStudents();
-		}
 		model.addAttribute("students", studentService.getAll());
-		model.addAttribute("studentList", studentList);
 		return "group/update";
 	}
 
@@ -111,7 +85,7 @@ public class GroupController {
 		try {
 			groupService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Group not found by id = {}", id);
+			log.warn("Group not found by id = {}", id);
 
 		}
 		return "redirect:/groups";
@@ -119,9 +93,7 @@ public class GroupController {
 
 	@PostMapping("/save")
 	public String saveGroupUpdate(@ModelAttribute Group group) {
-		group.setStudents(studentList);
 		groupService.update(group);
-		studentList.clear();
 		return "redirect:/groups";
 	}
 }

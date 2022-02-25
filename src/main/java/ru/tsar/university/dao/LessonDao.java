@@ -91,7 +91,8 @@ public class LessonDao {
 	public void update(Lesson lesson) {
 		LOG.debug("Updated to lesson {}", lesson);
 		jdbcTemplate.update(UPDATE_LESSON_QUERY, lesson.getCourse().getId(), lesson.getTeacher().getId(),
-				lesson.getDay(), lesson.getLessonTime().getOrderNumber(), lesson.getAuditorium().getId(), lesson.getId());
+				lesson.getDay(), lesson.getLessonTime().getOrderNumber(), lesson.getAuditorium().getId(),
+				lesson.getId());
 		jdbcTemplate.update(DELETE_LESSONS_GROUPS_QUERY, lesson.getId());
 		lesson.getGroups().stream()
 				.forEach(g -> jdbcTemplate.update(CREATE_LESSONS_GROUPS_QUERY, lesson.getId(), g.getId()));

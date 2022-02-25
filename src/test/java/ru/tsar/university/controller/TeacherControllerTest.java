@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.tsar.university.controller.TeacherControllerTest.TestData.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,19 +94,19 @@ class TeacherControllerTest {
 
 	@Test
 	public void givenNewAuditorium_whenCreatePostRequest_thenCreated() throws Exception {
-		mockMvc.perform(post("/teachers/create").flashAttr("teacher", teacher3)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/teachers/create").flashAttr("teacher", teacher3)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/teachers"));
 		verify(teacherService).create(teacher3);
 	}
 
 	@Test
 	public void givenUpdatedTeacher_whenSavePostRequest_thenUpdated() throws Exception {
-		mockMvc.perform(post("/teachers/save").flashAttr("teacher", teacher1)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(post("/teachers/save").flashAttr("teacher", teacher1)).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/teachers"));
 		verify(teacherService).update(teacher1);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/teachers/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/teachers/delete").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/teachers"));
 		verify(teacherService).deleteById(1);
 	}
 
@@ -119,7 +120,7 @@ class TeacherControllerTest {
 	public void givenUpdateTeacherRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
 		when(teacherService.getById(1)).thenReturn(teacher1);
 		when(courseService.getAll()).thenReturn(courses);
-		mockMvc.perform(get("/teachers/update?id=1")).andExpect(status().isOk())
+		mockMvc.perform(get("/teachers/update").param("id", "1")).andExpect(status().isOk())
 				.andExpect(view().name("teacher/update"));
 	}
 

@@ -62,7 +62,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 
@@ -78,7 +78,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 
@@ -101,7 +101,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 		Lesson lesson2 = lessonSameGroup;
@@ -126,7 +126,7 @@ class LessonServiceTest {
 				.teacher(teacher_2)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 
@@ -145,7 +145,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(dayOff)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 
@@ -409,7 +409,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 		Lesson lessonSameAuditorium = Lesson.builder()
@@ -418,7 +418,7 @@ class LessonServiceTest {
 				.teacher(teacher_2)
 				.group(groups_2)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_1)
 				.build();
 		Lesson lessonSameGroup = Lesson.builder()
@@ -427,7 +427,7 @@ class LessonServiceTest {
 				.teacher(teacher_2)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_2)
 				.build();
 		Lesson lessonNoCompetenceTeacher = Lesson.builder()
@@ -436,7 +436,7 @@ class LessonServiceTest {
 				.teacher(teacher_2)
 				.group(groups_1)
 				.day(day_1)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_2)
 				.build();
 		Lesson lessonDayOff = Lesson.builder()
@@ -445,7 +445,7 @@ class LessonServiceTest {
 				.teacher(teacher_1)
 				.group(groups_1)
 				.day(dayOff)
-				.time(lessonTime_1)
+				.lessonTime(lessonTime_1)
 				.auditorium(auditorium_2)
 				.build();
 	}

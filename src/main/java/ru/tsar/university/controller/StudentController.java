@@ -21,7 +21,8 @@ import ru.tsar.university.service.StudentService;
 @RequestMapping("/students")
 public class StudentController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudentController.class);
+	private static final Logger log = LoggerFactory.getLogger(StudentController.class);
+
 	private StudentService studentService;
 
 	public StudentController(StudentService studentService) {
@@ -65,7 +66,7 @@ public class StudentController {
 		try {
 			studentService.deleteById(id);
 		} catch (EntityNotFoundException e) {
-			LOG.warn("Student not found by id = {}", id);
+			log.warn("Student not found by id = {}", id);
 
 		}
 		return "redirect:/students";

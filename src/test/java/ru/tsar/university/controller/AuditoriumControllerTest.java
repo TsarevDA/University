@@ -1,5 +1,10 @@
 package ru.tsar.university.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.tsar.university.controller.AuditoriumControllerTest.TestData.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,9 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ru.tsar.university.controller.AuditoriumControllerTest.TestData.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +88,7 @@ class AuditoriumControllerTest {
 	public void givenNewAuditorium_whenCreatePostRequest_thenCreated() throws Exception {
 		Auditorium auditorium = Auditorium.builder().name("A102").capacity(100).build();
 		mockMvc.perform(post("/auditoriums/create").flashAttr("auditorium", auditorium))
-				.andExpect(status().is3xxRedirection());
+				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/auditoriums"));
 		verify(auditoriumService).create(auditorium);
 	}
 
@@ -94,13 +96,13 @@ class AuditoriumControllerTest {
 	public void givenUpdatedAuditorium_whenSavePostRequest_thenUpdated() throws Exception {
 		Auditorium auditorium = Auditorium.builder().id(1).name("A102").capacity(100).build();
 		mockMvc.perform(post("/auditoriums/save").flashAttr("auditorium", auditorium))
-				.andExpect(status().is3xxRedirection());
+				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/auditoriums"));
 		verify(auditoriumService).update(auditorium);
 	}
 
 	@Test
 	public void givenExistingId_whenDeletePostRequest_thenDeleted() throws Exception {
-		mockMvc.perform(get("/auditoriums/delete?id=1")).andExpect(status().is3xxRedirection());
+		mockMvc.perform(get("/auditoriums/delete?").param("id", "1")).andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/auditoriums"));
 		verify(auditoriumService).deleteById(1);
 	}
 
@@ -111,7 +113,7 @@ class AuditoriumControllerTest {
 
 	@Test
 	public void givenUpdateAuditoriumRequest_whenUpdate_thenUpdateViewReturned() throws Exception {
-		mockMvc.perform(get("/auditoriums/update?id=1")).andExpect(status().isOk())
+		mockMvc.perform(get("/auditoriums/update").param("id", "1")).andExpect(status().isOk())
 				.andExpect(view().name("auditorium/update"));
 	}
 

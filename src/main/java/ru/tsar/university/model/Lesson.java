@@ -13,8 +13,9 @@ public class Lesson {
 	private Course course;
 	private Teacher teacher;
 	private List<Group> groups;
-	private @DateTimeFormat(pattern = "dd.MM.yyyy") LocalDate day;
-	private LessonTime time;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate day;
+	private LessonTime lessonTime;
 	private Auditorium auditorium;
 
 	private Lesson() {
@@ -41,7 +42,7 @@ public class Lesson {
 	}
 
 	public LessonTime getLessonTime() {
-		return time;
+		return lessonTime;
 	}
 
 	public Auditorium getAuditorium() {
@@ -69,7 +70,7 @@ public class Lesson {
 	}
 
 	public void setLessonTime(LessonTime time) {
-		this.time = time;
+		this.lessonTime = time;
 	}
 
 	public void setAuditorium(Auditorium auditorium) {
@@ -86,7 +87,7 @@ public class Lesson {
 		result = prime * result + ((groups == null) ? 0 : groups.hashCode());
 		result = prime * result + id;
 		result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
-		result = prime * result + ((time == null) ? 0 : time.hashCode());
+		result = prime * result + ((lessonTime == null) ? 0 : lessonTime.hashCode());
 		return result;
 	}
 
@@ -126,10 +127,10 @@ public class Lesson {
 				return false;
 		} else if (!teacher.equals(other.teacher))
 			return false;
-		if (time == null) {
-			if (other.time != null)
+		if (lessonTime == null) {
+			if (other.lessonTime != null)
 				return false;
-		} else if (!time.equals(other.time))
+		} else if (!lessonTime.equals(other.lessonTime))
 			return false;
 		return true;
 	}
@@ -137,7 +138,7 @@ public class Lesson {
 	@Override
 	public String toString() {
 		return "Lesson [id=" + id + ", course=" + course + ", teacher=" + teacher + ", group=" + groups + ", day=" + day
-				+ ", time=" + time + ", auditorium=" + auditorium + "]";
+				+ ", time=" + lessonTime + ", auditorium=" + auditorium + "]";
 	}
 
 	public static LessonBuilder builder() {
@@ -149,9 +150,9 @@ public class Lesson {
 		private int id;
 		private Course course;
 		private Teacher teacher;
-		private List<Group> group;
+		private List<Group> groups;
 		private LocalDate day;
-		private LessonTime time;
+		private LessonTime lessonTime;
 		private Auditorium auditorium;
 
 		public LessonBuilder() {
@@ -167,8 +168,8 @@ public class Lesson {
 			return this;
 		}
 
-		public LessonBuilder time(LessonTime time) {
-			this.time = time;
+		public LessonBuilder lessonTime(LessonTime time) {
+			this.lessonTime = time;
 			return this;
 		}
 
@@ -177,8 +178,8 @@ public class Lesson {
 			return this;
 		}
 
-		public LessonBuilder group(List<Group> group) {
-			this.group = group;
+		public LessonBuilder group(List<Group> groups) {
+			this.groups = groups;
 			return this;
 		}
 
@@ -197,9 +198,9 @@ public class Lesson {
 			lesson.setId(id);
 			lesson.setCourse(course);
 			lesson.setTeacher(teacher);
-			lesson.setGroups(group);
+			lesson.setGroups(groups);
 			lesson.setDay(day);
-			lesson.setLessonTime(time);
+			lesson.setLessonTime(lessonTime);
 			lesson.setAuditorium(auditorium);
 			return lesson;
 		}
