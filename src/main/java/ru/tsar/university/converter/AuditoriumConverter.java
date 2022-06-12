@@ -2,11 +2,13 @@ package ru.tsar.university.converter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
 import ru.tsar.university.model.Auditorium;
 import ru.tsar.university.model.Course;
 import ru.tsar.university.service.AuditoriumService;
 
+@Component
 public class AuditoriumConverter implements Converter<String, Auditorium> {
 
 	private AuditoriumService auditoriumService;

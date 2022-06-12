@@ -73,8 +73,16 @@ public class StudentController {
 	}
 
 	@PostMapping("/save")
-	public String saveStudentUpdate(@ModelAttribute Student student) {
+	public String saveUpdatedStudent(@ModelAttribute Student student) {
 		studentService.update(student);
 		return "redirect:/students";
 	}
+	
+	@GetMapping("/group")
+	public String getGroupStudents(@RequestParam(value = "groupId", required = false) Integer groupId, Model model,
+			Pageable pageable) {
+
+		model.addAttribute("studentsPage", studentService.getByGroupId(groupId, pageable));
+		return "student/index";
+	} 
 }

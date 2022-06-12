@@ -138,7 +138,7 @@
 				<tr>
 					<td th:text="${group.getId()}"></td>
 					<td th:text="${group.getName()}"></td>
-					<td><a th:href="@{/groups/students(groupId=${group.getId()})}">students
+					<td><a th:href="@{/students/group(groupId=${group.getId()})}">students
 					</a></td>
 					<td><a
 						th:href="@{/groups/update?id={id}(id=${group.getId()})}">Update</a></td>

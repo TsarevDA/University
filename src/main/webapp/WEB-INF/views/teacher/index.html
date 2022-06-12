@@ -151,7 +151,7 @@
 					<td th:text="${teacher.getPhone()}"></td>
 					<td th:text="${teacher.getAddress()}"></td>
 					<td><a
-						th:href="@{/teachers/courses(teacherId=${teacher.getId()})}">courses
+						th:href="@{/courses/teacher(teacherId=${teacher.getId()})}">courses
 					</a></td>
 					<td><a
 						th:href="@{/teachers/update?id={id}(id=${teacher.getId()})}">Update</a></td>

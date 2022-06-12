@@ -73,7 +73,7 @@ public class LessonTimeController {
 	}
 
 	@PostMapping("/save")
-	public String saveLessonTimeUpdate(@ModelAttribute LessonTime lessonTime) {
+	public String saveUpdatedLessonTime(@ModelAttribute LessonTime lessonTime) {
 		lessonTimeService.update(lessonTime);
 		return "redirect:/lessontimes";
 	}

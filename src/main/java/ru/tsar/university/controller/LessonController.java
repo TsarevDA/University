@@ -127,7 +127,7 @@ public class LessonController {
 	}
 
 	@PostMapping("/save")
-	public String saveLessonUpdate(@ModelAttribute Lesson lesson) {
+	public String saveUpdatedLesson(@ModelAttribute Lesson lesson) {
 		lessonService.update(lesson);
 		return "redirect:/lessons";
 	}

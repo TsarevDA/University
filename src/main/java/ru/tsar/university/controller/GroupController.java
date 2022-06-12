@@ -51,14 +51,6 @@ public class GroupController {
 		return "group/index";
 	}
 
-	@GetMapping("/students")
-	public String getGroupStudents(@RequestParam(value = "groupId", required = false) Integer groupId, Model model,
-			Pageable pageable) {
-
-		model.addAttribute("studentsPage", studentService.getByGroupId(groupId, pageable));
-		return "student/index";
-	}
-
 	@GetMapping("/new")
 	public String returnNewGroup(Model model) {
 		model.addAttribute("students", studentService.getAll());
@@ -92,7 +84,7 @@ public class GroupController {
 	}
 
 	@PostMapping("/save")
-	public String saveGroupUpdate(@ModelAttribute Group group) {
+	public String saveUpdatedGroup(@ModelAttribute Group group) {
 		groupService.update(group);
 		return "redirect:/groups";
 	}

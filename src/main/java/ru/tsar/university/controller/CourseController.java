@@ -73,8 +73,16 @@ public class CourseController {
 	}
 
 	@PostMapping("/save")
-	public String saveCourseUpdate(@ModelAttribute Course course) {
+	public String saveUpdatedCourse(@ModelAttribute Course course) {
 		courseService.update(course);
 		return "redirect:/courses";
+	}
+	
+	@GetMapping("/teacher")
+	public String getGroupStudents(@RequestParam(value = "teacherId", required = false) Integer teacherId,
+			Model model) {
+
+		model.addAttribute("courses", courseService.getByTeacherId(teacherId));
+		return "course/indexNotPageable";
 	}
 }

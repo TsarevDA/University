@@ -52,14 +52,6 @@ public class TeacherController {
 		return "teacher/index";
 	}
 
-	@GetMapping("/courses")
-	public String getGroupStudents(@RequestParam(value = "teacherId", required = false) Integer teacherId,
-			Model model) {
-
-		model.addAttribute("courses", courseService.getByTeacherId(teacherId));
-		return "course/indexNotPageable";
-	}
-
 	@GetMapping("/new")
 	public String returnNewTeacher(Model model) {
 		model.addAttribute("courses", courseService.getAll());
@@ -92,7 +84,7 @@ public class TeacherController {
 	}
 
 	@PostMapping("/save")
-	public String saveTeacherUpdate(@ModelAttribute Teacher teacher) {
+	public String saveUpdatedTeacher(@ModelAttribute Teacher teacher) {
 		teacherService.update(teacher);
 		return "redirect:/teachers";
 	}
